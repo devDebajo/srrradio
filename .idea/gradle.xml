@@ -12,6 +12,7 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/common" />
             <option value="$PROJECT_DIR$/common-di" />
+            <option value="$PROJECT_DIR$/common-presentation" />
             <option value="$PROJECT_DIR$/data" />
           </set>
         </option>
