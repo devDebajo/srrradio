@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.AnyThread
+import androidx.compose.runtime.Stable
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -113,8 +114,11 @@ class RadioPlayer(private val context: Context) {
         }
     }
 
+    @Stable
     sealed interface State {
+
         object None : State
+
         data class HasStation(
             val station: UiStation,
             val playbackState: PlaybackState = PlaybackState.IDLE,

@@ -31,7 +31,11 @@ fun StationItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             when (station.playingState) {
-                UiStationPlayingState.BUFFERING -> CircularProgressIndicator()
+                UiStationPlayingState.BUFFERING -> CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                )
                 UiStationPlayingState.PLAYING,
                 UiStationPlayingState.NONE -> {
                     IconButton(onClick = { onPlayClick(station) }) {

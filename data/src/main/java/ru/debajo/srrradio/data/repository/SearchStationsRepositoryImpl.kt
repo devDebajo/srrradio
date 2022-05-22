@@ -12,7 +12,7 @@ internal class SearchStationsRepositoryImpl(
         return serviceHolder.createService().search(query).map { station ->
             Station(
                 id = station.id,
-                name = station.name,
+                name = station.name.trim(),
                 stream = station.stream.replaceHttp(),
                 image = station.image,
             )

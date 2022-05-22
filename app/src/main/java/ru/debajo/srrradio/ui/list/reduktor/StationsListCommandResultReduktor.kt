@@ -6,6 +6,7 @@ import ru.debajo.srrradio.common.presentation.CommandResult
 import ru.debajo.srrradio.common.presentation.Reduktor
 import ru.debajo.srrradio.ui.list.reduktor.processor.PlayerStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandResult, StationsListNews> {
@@ -24,7 +25,13 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
         return when (state) {
             is StationsListState.Empty,
             is StationsListState.Loading -> Akt()
-            is StationsListState.Data -> Akt(state = state.copy(stations = event.stations))
+            is StationsListState.Data -> Akt(
+                state = state.copy(
+                    stations = event.stations,
+                    nextStation = event.stations.findNextStation(playerState = state.playerState, deltaIndex = 1),
+                    previousStation = event.stations.findNextStation(playerState = state.playerState, deltaIndex = -1),
+                )
+            )
         }
     }
 
@@ -54,8 +61,26 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
                         }
                     }
                 }
-                Akt(state = state.copy(stations = newStationList))
+                Akt(
+                    state = state.copy(
+                        stations = newStationList,
+                        playerState = event.state,
+                        nextStation = newStationList.findNextStation(playerState = event.state, deltaIndex = 1),
+                        previousStation = newStationList.findNextStation(playerState = event.state, deltaIndex = -1),
+                    )
+                )
             }
         }
     }
+}
+
+fun StationsListState.Data.findNextStation(deltaIndex: Int): UiStation? {
+    return stations.findNextStation(playerState = playerState, deltaIndex = deltaIndex)
+}
+
+fun List<UiStation>.findNextStation(playerState: RadioPlayer.State?, deltaIndex: Int): UiStation? {
+    if (playerState !is RadioPlayer.State.HasStation) return null
+    val playingIndex = indexOfFirst { it.id == playerState.station.id }
+    if (playingIndex == -1) return null
+    return getOrNull(playingIndex + deltaIndex)
 }

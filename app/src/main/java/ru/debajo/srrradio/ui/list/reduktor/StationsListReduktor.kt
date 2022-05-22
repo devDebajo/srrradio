@@ -16,6 +16,7 @@ class StationsListReduktor(
             is StationsListEvent.Start -> reduceStart(state)
             is StationsListEvent.OnSearchQueryChanged -> reduceOnSearchQueryChanged(state, event)
             is StationsListEvent.OnPlayPauseClick -> reduceOnPlayPauseClick(state, event)
+            is StationsListEvent.ChangeStation -> reduceChangeStation(state, event)
         }
     }
 
@@ -56,6 +57,20 @@ class StationsListReduktor(
             is StationsListState.Data -> {
                 radioPlayer.changeStation(event.station, playWhenReady = event.station.playingState != UiStationPlayingState.PLAYING)
                 Akt()
+            }
+        }
+    }
+
+    private fun reduceChangeStation(
+        state: StationsListState,
+        event: StationsListEvent.ChangeStation
+    ): Akt<StationsListState, StationsListNews> {
+        return when (state) {
+            is StationsListState.Empty,
+            is StationsListState.Loading -> Akt()
+            is StationsListState.Data -> {
+                radioPlayer.changeStation(event.station, playWhenReady = event.station.playingState != UiStationPlayingState.PLAYING)
+                Akt(state = state.copy(playerState = null))
             }
         }
     }
