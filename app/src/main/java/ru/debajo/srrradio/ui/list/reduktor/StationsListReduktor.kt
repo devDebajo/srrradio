@@ -17,6 +17,8 @@ class StationsListReduktor(
             is StationsListEvent.OnSearchQueryChanged -> reduceOnSearchQueryChanged(state, event)
             is StationsListEvent.OnPlayPauseClick -> reduceOnPlayPauseClick(state, event)
             is StationsListEvent.ChangeStation -> reduceChangeStation(state, event)
+            is StationsListEvent.OnPauseClick -> emptyAkt { radioPlayer.pause() }
+            is StationsListEvent.OnPlayClick -> emptyAkt { radioPlayer.play() }
         }
     }
 
@@ -73,5 +75,10 @@ class StationsListReduktor(
                 Akt(state = state.copy(playerState = null))
             }
         }
+    }
+
+    private inline fun emptyAkt(block: () -> Unit): Akt<StationsListState, StationsListNews> {
+        block()
+        return Akt()
     }
 }

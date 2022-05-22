@@ -69,7 +69,13 @@ fun PlayerContent(
                 size = 80.dp,
                 icon = if (playerState.playWhenReady) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 contentDescription = if (playerState.playWhenReady) "Пауза" else "Продолжить воспроизведение",
-                onClick = { viewModel.onEvent(StationsListEvent.OnPlayPauseClick(playerState.station)) }
+                onClick = {
+                    if (playerState.playWhenReady) {
+                        viewModel.onEvent(StationsListEvent.OnPauseClick)
+                    } else {
+                        viewModel.onEvent(StationsListEvent.OnPlayClick)
+                    }
+                }
             )
             Spacer(Modifier.width(18.dp))
             PlayBackButton(
@@ -114,7 +120,7 @@ private fun PlayBackButton(
             }
     ) {
         Icon(
-            modifier = Modifier.align(Alignment.Center),
+            modifier = Modifier.size((size.value * 0.6).dp).align(Alignment.Center),
             imageVector = icon,
             tint = MaterialTheme.colorScheme.onPrimary,
             contentDescription = null,
