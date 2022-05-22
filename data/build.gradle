@@ -3,6 +3,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 
 dependencies {
+    implementation project(":common")
     implementation project(":common-di")
     implementation project(":domain")
 

@@ -5,7 +5,7 @@ import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
 internal class SearchStationsRepositoryImpl(
-    private val serviceHolder: ServiceHolder
+    private val serviceHolder: ServiceHolder,
 ) : SearchStationsRepository {
 
     override suspend fun search(query: String): List<Station> {

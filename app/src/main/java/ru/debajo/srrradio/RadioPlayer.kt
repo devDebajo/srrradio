@@ -80,10 +80,10 @@ class RadioPlayer(private val context: Context) {
         if (station == currentStation) {
             if (playWhenReady) play() else pause()
         } else {
+            statesMutable.value = State.HasStation(station)
             exoPlayer.pause()
             exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
             exoPlayer.prepare()
-            statesMutable.value = State.HasStation(station)
             if (playWhenReady) {
                 exoPlayer.play()
             }
