@@ -1,14 +1,15 @@
 package ru.debajo.srrradio.ui.list
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import ru.debajo.srrradio.ui.list.reduktor.StationsListEvent
 import ru.debajo.srrradio.ui.list.reduktor.StationsListState
 import ru.debajo.srrradio.ui.station.StationItem
@@ -30,18 +31,31 @@ private fun ListContent(state: StationsListState.Data) {
     val viewModel = StationsListViewModel.Local.current
     Column(Modifier.fillMaxSize()) {
         OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            placeholder = { Text("Поиск") },
             value = state.searchQuery,
-            onValueChange = {
-                viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(it))
-            }
+            onValueChange = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(it)) },
+            shape = RoundedCornerShape(12.dp)
         )
-
-        LazyColumn {
+        Spacer(Modifier.height(8.dp))
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
             items(
                 count = state.stations.size,
                 key = { state.stations[it].id },
                 contentType = { "UiStation" },
-                itemContent = { StationItem(state.stations[it]) }
+                itemContent = {
+                    StationItem(
+                        modifier = Modifier.fillMaxWidth(),
+                        station = state.stations[it],
+                        onPlayClick = {}
+                    )
+                }
             )
         }
     }
