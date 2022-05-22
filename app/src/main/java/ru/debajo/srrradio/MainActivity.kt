@@ -4,17 +4,23 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.launch
-import ru.debajo.srrradio.domain.di.DomainApiHolder
+import ru.debajo.srrradio.common.presentation.viewModelsBy
+import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.list.StationsList
+import ru.debajo.srrradio.ui.list.StationsListViewModel
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
-import timber.log.Timber
 
 class MainActivity : ComponentActivity() {
+
+    private val stationsListViewModel: StationsListViewModel by viewModelsBy {
+        AppApiHolder.get().stationsListViewModel()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -31,20 +37,25 @@ class MainActivity : ComponentActivity() {
         //exoPlayer.prepare()
         //exoPlayer.playWhenReady = true
 
-        lifecycleScope.launch(IO) {
-            val stations = DomainApiHolder.get().searchStationsUseCase().search("synthwave")
-            Timber.d(stations.toString())
-        }
-
         setContent {
-            SrrradioTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-
+            CompositionLocalProvider(
+                StationsListViewModel.Local provides stationsListViewModel,
+            ) {
+                SrrradioTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        color = MaterialTheme.colorScheme.background
+                    ) {
+                        MainScreen()
+                    }
                 }
             }
         }
     }
+}
+
+
+@Composable
+fun MainScreen() {
+    StationsList()
 }

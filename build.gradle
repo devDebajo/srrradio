@@ -1,7 +1,7 @@
 buildscript {
     ext {
         compose_version = '1.2.0-beta02'
-        compose__material3_version = '1.0.0-alpha-12'
+        compose_meterial3_version = '1.0.0-alpha12'
         compose_activity_version = '1.6.0-alpha03'
         compose_view_model_version = '2.5.0-rc01'
         compose_navigation_version = '2.4.2'

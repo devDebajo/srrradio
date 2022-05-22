@@ -1,11 +1,20 @@
 package ru.debajo.srrradio.common.presentation
 
+import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
 import androidx.annotation.MainThread
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified VM : ViewModel> ComponentActivity.viewModelsBy(crossinline factory: () -> VM): Lazy<VM> {
+    return viewModels {
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T = factory() as T
+        }
+    }
+}
 
 @MainThread
 fun <T> Flow<T>.collect(scope: CoroutineScope, @MainThread collector: (T) -> Unit) {
