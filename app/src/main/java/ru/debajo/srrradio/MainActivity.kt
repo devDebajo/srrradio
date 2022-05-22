@@ -17,25 +17,10 @@ import ru.debajo.srrradio.ui.theme.SrrradioTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val stationsListViewModel: StationsListViewModel by viewModelsBy {
-        AppApiHolder.get().stationsListViewModel()
-    }
+    private val stationsListViewModel: StationsListViewModel by viewModelsBy { AppApiHolder.get().stationsListViewModel() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-//        val url = "https://radiorecord.hostingradio.ru/synth96.aacp"
-//
-//        val exoPlayer = ExoPlayer
-//            .Builder(this)
-//            .build()
-//
-//        val dataSourceFactory = DefaultDataSource.Factory(applicationContext)
-//        exoPlayer.addMediaSource(ProgressiveMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(url)))
-
-        //exoPlayer.addMediaItem(MediaItem.fromUri(url))
-        //exoPlayer.prepare()
-        //exoPlayer.playWhenReady = true
 
         setContent {
             CompositionLocalProvider(
@@ -53,7 +38,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
 
 @Composable
 fun MainScreen() {

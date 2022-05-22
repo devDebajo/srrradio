@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.skydoves.landscapist.glide.GlideImage
 import ru.debajo.srrradio.ui.model.UiStation
+import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 private val HEIGHT = 80.dp
 
@@ -29,11 +30,18 @@ fun StationItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            IconButton(onClick = { onPlayClick(station) }) {
-                Icon(
-                    imageVector = if (station.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                    contentDescription = null,
-                )
+            when (station.playingState) {
+                UiStationPlayingState.BUFFERING -> CircularProgressIndicator()
+                UiStationPlayingState.PLAYING,
+                UiStationPlayingState.NONE -> {
+                    IconButton(onClick = { onPlayClick(station) }) {
+                        Icon(
+                            tint = MaterialTheme.colorScheme.primary,
+                            imageVector = if (station.playingState == UiStationPlayingState.PLAYING) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                            contentDescription = null,
+                        )
+                    }
+                }
             }
             Spacer(Modifier.width(8.dp))
             Text(

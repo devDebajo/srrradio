@@ -32,7 +32,6 @@ class SearchStationsCommandProcessor(
         return UiStation(
             id = id,
             name = name,
-            playing = false,
             stream = stream,
             image = image
         )

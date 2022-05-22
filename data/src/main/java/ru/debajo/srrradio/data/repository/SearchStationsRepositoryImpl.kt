@@ -13,9 +13,17 @@ internal class SearchStationsRepositoryImpl(
             Station(
                 id = station.id,
                 name = station.name,
-                stream = station.stream,
+                stream = station.stream.replaceHttp(),
                 image = station.image,
             )
+        }
+    }
+
+    private fun String.replaceHttp(): String {
+        return if (startsWith("http://")) {
+            replace("http://", "https://")
+        } else {
+            this
         }
     }
 }

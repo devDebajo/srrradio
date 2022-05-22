@@ -49,11 +49,11 @@ private fun ListContent(state: StationsListState.Data) {
                 count = state.stations.size,
                 key = { state.stations[it].id },
                 contentType = { "UiStation" },
-                itemContent = {
+                itemContent = { index ->
                     StationItem(
                         modifier = Modifier.fillMaxWidth(),
-                        station = state.stations[it],
-                        onPlayClick = {}
+                        station = state.stations[index],
+                        onPlayClick = { viewModel.onEvent(StationsListEvent.OnPlayPauseClick(it)) }
                     )
                 }
             )
