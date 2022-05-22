@@ -14,7 +14,7 @@ import retrofit2.Retrofit
 import java.net.InetAddress
 import java.net.UnknownHostException
 
-class ServiceHolder(
+internal class ServiceHolder(
     private val json: Json,
     private val httpClient: OkHttpClient,
 ) {

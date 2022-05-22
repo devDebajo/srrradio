@@ -1,0 +1,5 @@
+apply from: '../gradle/android_module.gradle'
+
+dependencies {
+    implementation project(":common-di")
+}

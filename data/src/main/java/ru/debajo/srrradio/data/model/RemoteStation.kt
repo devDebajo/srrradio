@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class RemoteStation(
+internal data class RemoteStation(
     @SerialName("stationuuid")
     val id: String,
 
