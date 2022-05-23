@@ -7,8 +7,7 @@ import org.koin.dsl.module
 object CommonApiHolder : ExtDependenciesModuleApiHolder<CommonApi, CommonDependencies>() {
     override val koinModules: List<Module> = listOf(
         module {
-            single { dependencies.context }
-            single { dependencies.context.getSharedPreferences("srrradio.prefs", Context.MODE_PRIVATE) }
+            single { get<Context>().getSharedPreferences("srrradio.prefs", Context.MODE_PRIVATE) }
         }
     )
 }

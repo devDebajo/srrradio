@@ -15,11 +15,11 @@ internal object AppApiHolder : ModuleApiHolder<AppApi, AppDependencies>() {
         module {
             single { StationsListReduktor(get()) }
             single { StationsListCommandResultReduktor() }
-            single { SearchStationsCommandProcessor(dependencies.searchStationsUseCase) }
+            single { SearchStationsCommandProcessor(get()) }
             single { PlayerStateListenerCommandProcessor(get()) }
             factory { StationsListViewModel(get(), get(), get(), get()) }
 
-            single { RadioPlayer(dependencies.context) }
+            single { RadioPlayer(get()) }
         }
     )
     override val dependencies: AppDependencies = AppDependencies.Impl
