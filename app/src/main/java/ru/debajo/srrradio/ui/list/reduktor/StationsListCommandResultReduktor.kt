@@ -28,8 +28,6 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
             is StationsListState.Data -> Akt(
                 state = state.copy(
                     stations = event.stations,
-                    nextStation = event.stations.findNextStation(playerState = state.playerState, deltaIndex = 1),
-                    previousStation = event.stations.findNextStation(playerState = state.playerState, deltaIndex = -1),
                 )
             )
         }
@@ -65,8 +63,6 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
                     state = state.copy(
                         stations = newStationList,
                         playerState = event.state,
-                        nextStation = newStationList.findNextStation(playerState = event.state, deltaIndex = 1),
-                        previousStation = newStationList.findNextStation(playerState = event.state, deltaIndex = -1),
                     )
                 )
             }

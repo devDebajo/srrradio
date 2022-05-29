@@ -8,5 +8,5 @@ sealed interface StationsListEvent {
     class OnPlayPauseClick(val station: UiStation) : StationsListEvent
     object OnPlayClick : StationsListEvent
     object OnPauseClick : StationsListEvent
-    class ChangeStation(val station: UiStation) : StationsListEvent
+    class ChangeStation(val station: UiStation, val play: Boolean? = null) : StationsListEvent
 }

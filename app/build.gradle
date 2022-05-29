@@ -70,6 +70,7 @@ dependencies {
 
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.17.1'
+    implementation "dev.chrisbanes.snapper:snapper:0.2.1"
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }

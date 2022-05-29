@@ -16,9 +16,15 @@ sealed interface StationsListState {
     data class Data(
         val searchQuery: String = "",
         val title: String? = null,
-        val playerState: RadioPlayer.State? = null,
-        val previousStation: UiStation? = null,
-        val nextStation: UiStation? = null,
+        val playerState: RadioPlayer.State = RadioPlayer.State.None,
         val stations: List<UiStation> = emptyList(),
-    ) : StationsListState
+    ) : StationsListState {
+        val currentStationIndex: Int
+            get() {
+                return when (playerState) {
+                    is RadioPlayer.State.None -> -1
+                    is RadioPlayer.State.HasStation -> stations.indexOfFirst { it.id == playerState.station.id }
+                }
+            }
+    }
 }

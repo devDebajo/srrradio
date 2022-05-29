@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import ru.debajo.srrradio.ui.model.UiStation
 
-class RadioPlayer(private val context: Context) {
+class RadioPlayer(
+    private val context: Context,
+) {
 
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val audioAttributes: AudioAttributes by lazy {
@@ -77,13 +79,14 @@ class RadioPlayer(private val context: Context) {
 
     @AnyThread
     fun changeStation(station: UiStation, playWhenReady: Boolean = isPlaying) = runOnMainThread {
-        if (station == currentStation) {
+        if (station.id == currentStation?.id) {
             if (playWhenReady) play() else pause()
         } else {
             statesMutable.value = State.HasStation(station)
             exoPlayer.pause()
             exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
             exoPlayer.prepare()
+            PlayerNotificationService.show(context)
             if (playWhenReady) {
                 exoPlayer.play()
             }

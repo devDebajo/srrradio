@@ -16,9 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.skydoves.landscapist.glide.GlideImage
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.player.StationCover
 
 private val HEIGHT = 80.dp
 
@@ -36,37 +36,13 @@ fun StationItem(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             AnimatedContent(
-                modifier = Modifier.padding(start = 4.dp).size(40.dp),
+                modifier = Modifier
+                    .padding(start = 4.dp)
+                    .size(40.dp),
                 targetState = station.playingState
             ) {
-                Box(
-                    Modifier
-                        .size(40.dp)
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() },
-                            enabled = station.playingState != UiStationPlayingState.BUFFERING,
-                            onClick = { onPlayClick(station) },
-                        )
-                ) {
-                    when (it) {
-                        UiStationPlayingState.BUFFERING -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(24.dp).align(Alignment.Center),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
-                        }
-                        UiStationPlayingState.PLAYING,
-                        UiStationPlayingState.NONE -> {
-                            Icon(
-                                modifier = Modifier.size(24.dp).align(Alignment.Center),
-                                tint = MaterialTheme.colorScheme.primary,
-                                imageVector = if (station.playingState == UiStationPlayingState.PLAYING) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                                contentDescription = null,
-                            )
-                        }
-                    }
+                PlayPauseButton(state = it) {
+                    onPlayClick(station)
                 }
             }
             Spacer(Modifier.width(8.dp))
@@ -75,10 +51,51 @@ fun StationItem(
                 text = station.name
             )
             Spacer(Modifier.width(8.dp))
-            GlideImage(
+            StationCover(
                 modifier = Modifier.size(HEIGHT),
-                imageModel = station.image,
+                url = station.image
             )
+        }
+    }
+}
+
+@Composable
+fun PlayPauseButton(
+    modifier: Modifier = Modifier,
+    state: UiStationPlayingState,
+    onPlayClick: () -> Unit,
+) {
+    Box(
+        modifier
+            .size(40.dp)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                enabled = state != UiStationPlayingState.BUFFERING,
+                onClick = { onPlayClick() },
+            )
+    ) {
+        when (state) {
+            UiStationPlayingState.BUFFERING -> {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.Center),
+                    strokeWidth = 2.dp,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            UiStationPlayingState.PLAYING,
+            UiStationPlayingState.NONE -> {
+                Icon(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .align(Alignment.Center),
+                    tint = MaterialTheme.colorScheme.primary,
+                    imageVector = if (state == UiStationPlayingState.PLAYING) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                    contentDescription = null,
+                )
+            }
         }
     }
 }
