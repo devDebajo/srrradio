@@ -12,8 +12,6 @@ import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -27,7 +25,6 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import ru.debajo.srrradio.di.AppApiHolder
 import kotlin.math.roundToInt
-
 
 class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(SupervisorJob()) {
 
@@ -72,8 +69,15 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
     private fun buildNotification(playerState: RadioPlayer.State.HasStation): Flow<Notification> {
         return playerState.station.image.observe().map { coverBitmap ->
             val style = androidx.media.app.NotificationCompat.MediaStyle()
-            val mediaSession = buildMediaSession(playerState, coverBitmap)
-            style.setMediaSession(mediaSession.sessionToken)
+            // TODO придумать, как это сделать красивее
+            radioPlayer.mediaSession.setMetadata(
+                MediaMetadataCompat.Builder()
+                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
+                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
+                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+                    .build()
+            )
+            style.setMediaSession(radioPlayer.mediaSession.sessionToken)
             style.setShowActionsInCompactView(0)
             NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_radio)
@@ -87,28 +91,6 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
                     }
                 }
                 .build()
-        }
-    }
-
-    private fun buildMediaSession(playerState: RadioPlayer.State.HasStation, coverBitmap: Bitmap): MediaSessionCompat {
-        return MediaSessionCompat(this, "TheFan").apply {
-            setMetadata(
-                MediaMetadataCompat.Builder()
-                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
-                    .build()
-            )
-            val playbackState = when {
-                playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
-                playerState.playing -> PlaybackStateCompat.STATE_PLAYING
-                else -> PlaybackStateCompat.STATE_PAUSED
-            }
-            setPlaybackState(
-                PlaybackStateCompat.Builder()
-                    .setState(playbackState, 0L, 1f)
-                    .build()
-            )
         }
     }
 

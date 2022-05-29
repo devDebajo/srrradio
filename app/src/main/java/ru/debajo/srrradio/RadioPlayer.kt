@@ -3,6 +3,9 @@ package ru.debajo.srrradio
 import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.support.v4.media.MediaMetadataCompat
+import android.support.v4.media.session.MediaSessionCompat
+import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.AnyThread
 import androidx.compose.runtime.Stable
 import com.google.android.exoplayer2.C
@@ -10,6 +13,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
+import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,10 +33,14 @@ class RadioPlayer(
             .build()
     }
     private val exoPlayer: ExoPlayer by lazy {
-        ExoPlayer.Builder(context)
+        val player = ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
             .build()
+        MediaSessionConnector(mediaSession).setPlayer(player)
+        player
     }
+
+
     private val mediaSourceFactory: ProgressiveMediaSource.Factory by lazy {
         val dataSourceFactory = DefaultDataSource.Factory(context)
         ProgressiveMediaSource.Factory(dataSourceFactory)
@@ -52,6 +60,10 @@ class RadioPlayer(
     val isPlaying: Boolean
         get() = (states.value as? State.HasStation)?.playing == true
 
+    val mediaSession: MediaSessionCompat by lazy {
+        MediaSessionCompat(context, "Srrradio media session")
+    }
+
     init {
         exoPlayer.addListener(object : Player.Listener {
             override fun onPlaybackStateChanged(playbackState: Int) {
@@ -66,6 +78,7 @@ class RadioPlayer(
                     is State.HasStation -> state.copy(playbackState = localPlaybackState)
                     is State.None -> return
                 }
+                updateMediaSession()
             }
 
             override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
@@ -73,8 +86,30 @@ class RadioPlayer(
                     is State.HasStation -> state.copy(playWhenReady = playWhenReady)
                     is State.None -> return
                 }
+                updateMediaSession()
             }
         })
+    }
+
+    private fun updateMediaSession() {
+        val playerState = statesMutable.value as? State.HasStation ?: return
+        mediaSession.setMetadata(
+            MediaMetadataCompat.Builder()
+                //.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
+                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+                .build()
+        )
+        val playbackState = when {
+            playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
+            playerState.playing -> PlaybackStateCompat.STATE_PLAYING
+            else -> PlaybackStateCompat.STATE_PAUSED
+        }
+        mediaSession.setPlaybackState(
+            PlaybackStateCompat.Builder()
+                .setState(playbackState, 0L, 1f)
+                .build()
+        )
     }
 
     @AnyThread
@@ -83,6 +118,7 @@ class RadioPlayer(
             if (playWhenReady) play() else pause()
         } else {
             statesMutable.value = State.HasStation(station)
+            updateMediaSession()
             exoPlayer.pause()
             exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
             exoPlayer.prepare()
