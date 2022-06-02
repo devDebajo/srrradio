@@ -1,8 +1,8 @@
 package ru.debajo.srrradio.ui.list.reduktor
 
+import ru.debajo.reduktor.Akt
+import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.RadioPlayer
-import ru.debajo.srrradio.common.presentation.Akt
-import ru.debajo.srrradio.common.presentation.Reduktor
 import ru.debajo.srrradio.ui.list.reduktor.processor.PlayerStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.model.UiStationPlayingState

@@ -3,10 +3,10 @@ package ru.debajo.srrradio.ui.list.reduktor.processor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
+import ru.debajo.reduktor.Command
+import ru.debajo.reduktor.CommandProcessor
+import ru.debajo.reduktor.CommandResult
 import ru.debajo.srrradio.RadioPlayer
-import ru.debajo.srrradio.common.presentation.Command
-import ru.debajo.srrradio.common.presentation.CommandProcessor
-import ru.debajo.srrradio.common.presentation.CommandResult
 
 @OptIn(FlowPreview::class)
 class PlayerStateListenerCommandProcessor(

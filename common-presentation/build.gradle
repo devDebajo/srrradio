@@ -1,6 +1,0 @@
-apply from: '../gradle/android_module.gradle'
-
-dependencies {
-    implementation project(":common")
-    implementation "androidx.activity:activity-ktx:$activity_ktx_version"
-}

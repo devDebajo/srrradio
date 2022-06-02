@@ -3,8 +3,8 @@ package ru.debajo.srrradio.ui.list
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
-import ru.debajo.srrradio.common.presentation.ReduktorViewModel
-import ru.debajo.srrradio.common.presentation.reduktorStore
+import ru.debajo.reduktor.ReduktorViewModel
+import ru.debajo.reduktor.reduktorStore
 import ru.debajo.srrradio.ui.list.reduktor.*
 import ru.debajo.srrradio.ui.list.reduktor.processor.PlayerStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor

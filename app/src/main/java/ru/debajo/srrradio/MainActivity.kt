@@ -19,7 +19,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.chrisbanes.snapper.ExperimentalSnapperApi
-import ru.debajo.srrradio.common.presentation.viewModelsBy
+import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.list.StationsList
 import ru.debajo.srrradio.ui.list.StationsListViewModel
@@ -29,7 +29,7 @@ import ru.debajo.srrradio.ui.theme.SrrradioTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val stationsListViewModel: StationsListViewModel by viewModelsBy { AppApiHolder.get().stationsListViewModel() }
+    private val stationsListViewModel: StationsListViewModel by lazyViewModel { AppApiHolder.get().stationsListViewModel() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
