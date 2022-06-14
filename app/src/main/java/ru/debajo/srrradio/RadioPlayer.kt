@@ -1,13 +1,17 @@
 package ru.debajo.srrradio
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
+import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.AnyThread
 import androidx.compose.runtime.Stable
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -16,16 +20,19 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
+import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import ru.debajo.srrradio.ui.model.UiStation
 
 class RadioPlayer(
     private val context: Context,
-) {
+) : CoroutineScope by CoroutineScope(SupervisorJob() + Default) {
 
-    private val handler: Handler = Handler(Looper.getMainLooper())
     private val audioAttributes: AudioAttributes by lazy {
         AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
@@ -39,7 +46,6 @@ class RadioPlayer(
         MediaSessionConnector(mediaSession).setPlayer(player)
         player
     }
-
 
     private val mediaSourceFactory: ProgressiveMediaSource.Factory by lazy {
         val dataSourceFactory = DefaultDataSource.Factory(context)
@@ -66,40 +72,44 @@ class RadioPlayer(
 
     init {
         exoPlayer.addListener(object : Player.Listener {
+            private val playWhenReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
+            private val playbackState: MutableStateFlow<Int> = MutableStateFlow(Player.STATE_IDLE)
+
+            init {
+                launch {
+                    combine(playWhenReady, playbackState, statesMutable) { playWhenReady, playbackState, currentState ->
+                        when (playbackState) {
+                            Player.STATE_IDLE -> PlaybackState.PAUSED
+                            Player.STATE_BUFFERING -> PlaybackState.BUFFERING
+                            Player.STATE_READY -> if (playWhenReady) PlaybackState.PLAYING else PlaybackState.PAUSED
+                            Player.STATE_ENDED -> PlaybackState.PAUSED
+                            else -> PlaybackState.PAUSED
+                        } to currentState
+                    }.collect { (playbackState, currentState) ->
+                        val newState = when (currentState) {
+                            is State.HasStation -> currentState.copy(playbackState = playbackState)
+                            is State.None -> currentState
+                        }
+                        statesMutable.value = newState
+                        if (newState is State.HasStation) {
+                            updateMediaSession(newState)
+                        }
+                    }
+                }
+            }
+
             override fun onPlaybackStateChanged(playbackState: Int) {
-                val localPlaybackState = when (playbackState) {
-                    Player.STATE_IDLE -> PlaybackState.IDLE
-                    Player.STATE_BUFFERING -> PlaybackState.BUFFERING
-                    Player.STATE_READY -> PlaybackState.READY
-                    Player.STATE_ENDED -> PlaybackState.ENDED
-                    else -> PlaybackState.IDLE
-                }
-                statesMutable.value = when (val state = statesMutable.value) {
-                    is State.HasStation -> state.copy(playbackState = localPlaybackState)
-                    is State.None -> return
-                }
-                updateMediaSession()
+                this.playbackState.value = playbackState
             }
 
             override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
-                statesMutable.value = when (val state = statesMutable.value) {
-                    is State.HasStation -> state.copy(playWhenReady = playWhenReady)
-                    is State.None -> return
-                }
-                updateMediaSession()
+                this.playWhenReady.value = playWhenReady
             }
         })
     }
 
-    private fun updateMediaSession() {
-        val playerState = statesMutable.value as? State.HasStation ?: return
-        mediaSession.setMetadata(
-            MediaMetadataCompat.Builder()
-                //.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
-                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
-                .build()
-        )
+    private suspend fun updateMediaSession(playerState: State.HasStation) = runCatching {
+        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, null))
         val playbackState = when {
             playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
             playerState.playing -> PlaybackStateCompat.STATE_PLAYING
@@ -110,61 +120,107 @@ class RadioPlayer(
                 .setState(playbackState, 0L, 1f)
                 .build()
         )
+
+        val bitmap = playerState.station.image?.loadImage()
+        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, bitmap))
     }
 
+    private var playPauseJob: Job? = null
+
     @AnyThread
-    fun changeStation(station: UiStation, playWhenReady: Boolean = isPlaying) = runOnMainThread {
-        if (station.id == currentStation?.id) {
-            if (playWhenReady) play() else pause()
-        } else {
-            statesMutable.value = State.HasStation(station)
-            updateMediaSession()
-            exoPlayer.pause()
-            exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
-            exoPlayer.prepare()
-            PlayerNotificationService.show(context)
-            if (playWhenReady) {
-                exoPlayer.play()
+    fun changeStation(station: UiStation, playWhenReady: Boolean = isPlaying) {
+        playPauseJob?.cancel()
+        playPauseJob = launch(Main) {
+            if (station.id == currentStation?.id) {
+                if (playWhenReady) play() else pause()
+            } else {
+                statesMutable.value = State.HasStation(station)
+                exoPlayer.pause()
+                exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
+                exoPlayer.prepare()
+                PlayerNotificationService.show(context)
+                if (playWhenReady) {
+                    exoPlayer.play()
+                }
             }
         }
     }
 
     @AnyThread
-    fun play() = runOnMainThread {
-        when (states.value) {
-            is State.None -> Unit
-            is State.HasStation -> exoPlayer.play()
+    fun play() {
+        playPauseJob?.cancel()
+        playPauseJob = launch(Main) {
+            when (states.value) {
+                is State.None -> Unit
+                is State.HasStation -> exoPlayer.play()
+            }
         }
     }
 
     @AnyThread
-    fun pause() = runOnMainThread {
-        when (states.value) {
-            is State.None -> Unit
-            is State.HasStation -> exoPlayer.pause()
+    fun pause() {
+        playPauseJob?.cancel()
+        playPauseJob = launch(Main) {
+            when (states.value) {
+                is State.None -> Unit
+                is State.HasStation -> exoPlayer.pause()
+            }
         }
     }
 
-    private inline fun runOnMainThread(crossinline block: () -> Unit) {
-        if (Looper.getMainLooper() === Looper.myLooper()) {
-            block()
-        } else {
-            handler.post { block() }
+    private fun createMediaMetadataCompat(stationName: String, coverBitmap: Bitmap?): MediaMetadataCompat {
+        return MediaMetadataCompat.Builder()
+            .apply {
+                if (coverBitmap != null) {
+                    putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
+                }
+            }
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+            .build()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private suspend fun String.loadImage(): Bitmap? {
+        return suspendCancellableCoroutine {
+            val task = Glide
+                .with(context)
+                .asBitmap()
+                .load(this)
+                .addListener(object : RequestListener<Bitmap> {
+                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
+                        it.resume(null, null)
+                        return false
+                    }
+
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        model: Any?,
+                        target: Target<Bitmap>?,
+                        dataSource: DataSource?,
+                        isFirstResource: Boolean
+                    ): Boolean {
+                        it.resume(resource, null)
+                        return false
+                    }
+
+                })
+                .submit()
+
+            it.invokeOnCancellation { task.cancel(true) }
         }
     }
 
     @Stable
     sealed interface State {
-
         object None : State
 
         data class HasStation(
             val station: UiStation,
-            val playbackState: PlaybackState = PlaybackState.IDLE,
-            val playWhenReady: Boolean = false,
+            val playbackState: PlaybackState = PlaybackState.PAUSED,
         ) : State {
             val playing: Boolean
-                get() = playbackState == PlaybackState.READY && playWhenReady
+                get() = playbackState == PlaybackState.PLAYING
 
             val buffering: Boolean
                 get() = playbackState == PlaybackState.BUFFERING
@@ -172,9 +228,8 @@ class RadioPlayer(
     }
 
     enum class PlaybackState {
-        IDLE,
+        PAUSED,
         BUFFERING,
-        READY,
-        ENDED
+        PLAYING,
     }
 }

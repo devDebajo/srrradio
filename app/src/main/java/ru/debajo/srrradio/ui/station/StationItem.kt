@@ -26,7 +26,8 @@ private val HEIGHT = 80.dp
 fun StationItem(
     modifier: Modifier = Modifier,
     station: UiStation,
-    onPlayClick: (UiStation) -> Unit,
+    playingState: UiStationPlayingState,
+    onPlayClick: (UiStation, UiStationPlayingState) -> Unit,
 ) {
     OutlinedCard(modifier = modifier) {
         Row(
@@ -39,10 +40,10 @@ fun StationItem(
                 modifier = Modifier
                     .padding(start = 4.dp)
                     .size(40.dp),
-                targetState = station.playingState
+                targetState = playingState
             ) {
                 PlayPauseButton(state = it) {
-                    onPlayClick(station)
+                    onPlayClick(station, playingState)
                 }
             }
             Spacer(Modifier.width(8.dp))

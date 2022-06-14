@@ -57,7 +57,7 @@ class StationsListReduktor(
             is StationsListState.Empty,
             is StationsListState.Loading -> Akt()
             is StationsListState.Data -> {
-                radioPlayer.changeStation(event.station, playWhenReady = event.station.playingState != UiStationPlayingState.PLAYING)
+                radioPlayer.changeStation(event.station, playWhenReady = event.playingState != UiStationPlayingState.PLAYING)
                 Akt()
             }
         }

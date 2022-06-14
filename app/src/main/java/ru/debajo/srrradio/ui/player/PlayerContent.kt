@@ -95,7 +95,7 @@ fun PlayerContent(
             else -> UiStationPlayingState.NONE
         }
         PlayPauseButton(state = uiState) {
-            if (playerState.playWhenReady) {
+            if (playerState.playing) {
                 viewModel.onEvent(StationsListEvent.OnPauseClick)
             } else {
                 viewModel.onEvent(StationsListEvent.OnPlayClick)
@@ -194,10 +194,10 @@ fun PlayerContent(
             PlayBackButton(
                 visible = true,
                 size = 80.dp,
-                icon = if (playerState.playWhenReady) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                contentDescription = if (playerState.playWhenReady) "Пауза" else "Продолжить воспроизведение",
+                icon = if (playerState.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                contentDescription = if (playerState.playing) "Пауза" else "Продолжить воспроизведение",
                 onClick = {
-                    if (playerState.playWhenReady) {
+                    if (playerState.playing) {
                         viewModel.onEvent(StationsListEvent.OnPauseClick)
                     } else {
                         viewModel.onEvent(StationsListEvent.OnPlayClick)

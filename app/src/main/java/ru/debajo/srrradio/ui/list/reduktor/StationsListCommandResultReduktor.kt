@@ -7,7 +7,6 @@ import ru.debajo.srrradio.RadioPlayer
 import ru.debajo.srrradio.ui.list.reduktor.processor.PlayerStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.model.UiStation
-import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandResult, StationsListNews> {
     override fun invoke(state: StationsListState, event: CommandResult): Akt<StationsListState, StationsListNews> {
@@ -40,32 +39,7 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
         return when (state) {
             is StationsListState.Empty -> Akt()
             is StationsListState.Loading -> Akt(state = state.copy(playerState = event.state))
-            is StationsListState.Data -> {
-                val newStationList = when (val playerState = event.state) {
-                    is RadioPlayer.State.None -> state.stations.map { it.copy(playingState = UiStationPlayingState.NONE) }
-                    is RadioPlayer.State.HasStation -> {
-                        state.stations.map { station ->
-                            if (station.id == playerState.station.id) {
-                                station.copy(
-                                    playingState = when {
-                                        playerState.buffering -> UiStationPlayingState.BUFFERING
-                                        playerState.playing -> UiStationPlayingState.PLAYING
-                                        else -> UiStationPlayingState.NONE
-                                    }
-                                )
-                            } else {
-                                station.copy(playingState = UiStationPlayingState.NONE)
-                            }
-                        }
-                    }
-                }
-                Akt(
-                    state = state.copy(
-                        stations = newStationList,
-                        playerState = event.state,
-                    )
-                )
-            }
+            is StationsListState.Data -> Akt(state = state.copy(playerState = event.state))
         }
     }
 }

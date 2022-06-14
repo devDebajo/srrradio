@@ -11,7 +11,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
-import android.support.v4.media.MediaMetadataCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -67,31 +66,64 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
     }
 
     private fun buildNotification(playerState: RadioPlayer.State.HasStation): Flow<Notification> {
-        return playerState.station.image.observe().map { coverBitmap ->
-            val style = androidx.media.app.NotificationCompat.MediaStyle()
-            // TODO придумать, как это сделать красивее
-            radioPlayer.mediaSession.setMetadata(
-                MediaMetadataCompat.Builder()
-                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
-                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
-                    .build()
-            )
-            style.setMediaSession(radioPlayer.mediaSession.sessionToken)
-            style.setShowActionsInCompactView(0)
-            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_radio)
-                .setContentTitle(getString(R.string.app_name))
-                .setStyle(style)
-                .run {
-                    if (playerState.playWhenReady) {
-                        addAction(R.drawable.ic_pause, null, PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService))
-                    } else {
-                        addAction(R.drawable.ic_play, null, PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService))
-                    }
+        val style = androidx.media.app.NotificationCompat.MediaStyle()
+        style.setMediaSession(radioPlayer.mediaSession.sessionToken)
+        style.setShowActionsInCompactView(0)
+        val n = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_radio)
+            .setContentTitle(getString(R.string.app_name))
+            .setStyle(style)
+            .run {
+                when {
+                    playerState.playing -> addAction(
+                        R.drawable.ic_pause,
+                        null,
+                        PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
+                    )
+                    !playerState.playing && !playerState.buffering -> addAction(
+                        R.drawable.ic_play,
+                        null,
+                        PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
+                    )
+                    else -> this
                 }
-                .build()
-        }
+            }
+            .build()
+
+        return flowOf(n)
+//        return playerState.station.image.observe().map { coverBitmap ->
+//            val style = androidx.media.app.NotificationCompat.MediaStyle()
+//            // TODO придумать, как это сделать красивее
+//            radioPlayer.mediaSession.setMetadata(
+//                MediaMetadataCompat.Builder()
+//                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
+//                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
+//                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
+//                    .build()
+//            )
+//            style.setMediaSession(radioPlayer.mediaSession.sessionToken)
+//            style.setShowActionsInCompactView(0)
+//            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+//                .setSmallIcon(R.drawable.ic_radio)
+//                .setContentTitle(getString(R.string.app_name))
+//                .setStyle(style)
+//                .run {
+//                    when {
+//                        playerState.playing -> addAction(
+//                            R.drawable.ic_pause,
+//                            null,
+//                            PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
+//                        )
+//                        !playerState.playing && !playerState.buffering -> addAction(
+//                            R.drawable.ic_play,
+//                            null,
+//                            PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
+//                        )
+//                        else -> this
+//                    }
+//                }
+//                .build()
+//        }
     }
 
     private fun prepareChannel() {

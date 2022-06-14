@@ -6,13 +6,6 @@ import androidx.compose.runtime.Immutable
 data class UiStation(
     val id: String,
     val name: String,
-    val playingState: UiStationPlayingState = UiStationPlayingState.NONE,
     val stream: String,
     val image: String?,
 )
-
-enum class UiStationPlayingState {
-    BUFFERING,
-    PLAYING,
-    NONE,
-}
