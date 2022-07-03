@@ -17,8 +17,8 @@ import timber.log.Timber
 
 class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJob()) {
 
-    private val mediaController: MediaController by AppApiHolder.inject()
-    private val apiHostDiscovery: ApiHostDiscovery by DataApiHolder.inject()
+    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
+    private val apiHostDiscovery: ApiHostDiscovery by lazy { DataApiHolder.get().apiHostDiscovery }
 
     override fun onCreate() {
         super.onCreate()

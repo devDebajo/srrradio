@@ -36,10 +36,10 @@ import kotlin.math.roundToInt
 class PlayerNotificationService : Service(), CoroutineScope {
 
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
-    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController() }
+    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
     private val emptyBitmap: Bitmap by lazy { createEmptyBitmap() }
     private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
-    private val coroutineScope: CoroutineScope by AppApiHolder.inject()
+    private val coroutineScope: CoroutineScope by lazy { AppApiHolder.get().coroutineScope }
 
     override val coroutineContext: CoroutineContext
         get() = coroutineScope.coroutineContext

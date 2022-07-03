@@ -8,7 +8,7 @@ import ru.debajo.srrradio.data.di.DataApiHolder
 
 internal class SrrradioDbConverter {
 
-    private val json: Json by lazy { DataApiHolder.internalApi.json() }
+    private val json: Json by lazy { DataApiHolder.internalApi.json }
 
     @TypeConverter
     fun toString(input: List<String>): String {

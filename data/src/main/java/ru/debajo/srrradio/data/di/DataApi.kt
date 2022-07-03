@@ -9,10 +9,13 @@ import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
 interface DataApi : ModuleApi {
-    fun searchStationsRepository(): SearchStationsRepository
-    fun sharedPreferences(): SharedPreferences
-    fun apiHostDiscovery(): ApiHostDiscovery
-    fun lastStationUseCase(): LastStationUseCase
-    fun loadPlaylistUseCase(): LoadPlaylistUseCase
-    fun json(): Json
+    val searchStationsRepository: SearchStationsRepository
+    val sharedPreferences: SharedPreferences
+    val apiHostDiscovery: ApiHostDiscovery
+    val lastStationUseCase: LastStationUseCase
+    val loadPlaylistUseCase: LoadPlaylistUseCase
+}
+
+internal interface DataApiInternal : DataApi {
+    val json: Json
 }

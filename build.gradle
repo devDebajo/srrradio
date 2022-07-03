@@ -21,7 +21,6 @@ buildscript {
         timber_version = '5.0.1'
         okhttp_version = '5.0.0-alpha.9'
         room_version = '2.5.0-alpha02'
-        koin_version = "2.2.3"
         joda_time_version = '2.10.14'
 
         kotlin_version = '1.7.0'

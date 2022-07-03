@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 
 interface CommonApi : ModuleApi {
-    fun context(): Context
-    fun sharedPreferences(): SharedPreferences
-    fun notificationManager(): NotificationManager
+    val context: Context
+    val sharedPreferences: SharedPreferences
+    val notificationManager: NotificationManager
 }
