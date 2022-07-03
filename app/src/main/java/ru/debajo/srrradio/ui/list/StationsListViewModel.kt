@@ -6,7 +6,8 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import ru.debajo.reduktor.ReduktorViewModel
 import ru.debajo.reduktor.reduktorStore
 import ru.debajo.srrradio.ui.list.reduktor.*
-import ru.debajo.srrradio.ui.list.reduktor.processor.PlayerStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.list.reduktor.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.list.reduktor.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
 import timber.log.Timber
 
@@ -15,7 +16,8 @@ class StationsListViewModel(
     reduktor: StationsListReduktor,
     commandResultReduktor: StationsListCommandResultReduktor,
     searchStationsCommandProcessor: SearchStationsCommandProcessor,
-    playerStateListenerCommandProcessor: PlayerStateListenerCommandProcessor,
+    mediaStateListener: MediaStateListenerCommandProcessor,
+    newPlayCommandProcessor: NewPlayCommandProcessor,
 ) : ReduktorViewModel<StationsListState, StationsListEvent, StationsListNews>(
     store = reduktorStore(
         initialState = StationsListState.Empty,
@@ -24,7 +26,8 @@ class StationsListViewModel(
         initialEvents = listOf(StationsListEvent.Start),
         commandProcessors = listOf(
             searchStationsCommandProcessor,
-            playerStateListenerCommandProcessor,
+            mediaStateListener,
+            newPlayCommandProcessor,
         ),
         errorDispatcher = { Timber.e(it) },
     )

@@ -4,7 +4,7 @@ abstract class ExtDependenciesModuleApiHolder<Api : ModuleApi, Dependencies : Mo
 
     private var extDependencies: Dependencies? = null
 
-    override val dependencies: Dependencies
+    final override val dependencies: Dependencies
         get() = extDependencies!!
 
     fun init(dependencies: Dependencies) {

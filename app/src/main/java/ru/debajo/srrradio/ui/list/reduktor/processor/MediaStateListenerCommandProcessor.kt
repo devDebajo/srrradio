@@ -1,16 +1,15 @@
 package ru.debajo.srrradio.ui.list.reduktor.processor
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
-import ru.debajo.srrradio.RadioPlayer
+import ru.debajo.srrradio.MediaController
+import ru.debajo.srrradio.model.MediaState
 
-@OptIn(FlowPreview::class)
-class PlayerStateListenerCommandProcessor(
-    private val radioPlayer: RadioPlayer,
+class MediaStateListenerCommandProcessor(
+    private val mediaController: MediaController,
 ) : CommandProcessor {
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -21,7 +20,10 @@ class PlayerStateListenerCommandProcessor(
             .flatMapLatest { command ->
                 when (command) {
                     ListenerCommand.Stop -> flowOf(CommandResult.EMPTY)
-                    ListenerCommand.Start -> radioPlayer.states.map { OnNewPlayerState(it) }
+                    ListenerCommand.Start -> {
+                        mediaController.prepare()
+                        mediaController.state.map { OnNewMediaState(it) }
+                    }
                 }
             }
     }
@@ -31,5 +33,5 @@ class PlayerStateListenerCommandProcessor(
         object Stop : ListenerCommand
     }
 
-    data class OnNewPlayerState(val state: RadioPlayer.State) : CommandResult
+    data class OnNewMediaState(val state: MediaState) : CommandResult
 }

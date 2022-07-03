@@ -23,13 +23,14 @@ import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.list.StationsList
 import ru.debajo.srrradio.ui.list.StationsListViewModel
-import ru.debajo.srrradio.ui.list.reduktor.StationsListState
-import ru.debajo.srrradio.ui.player.PlayerContent
+import ru.debajo.srrradio.ui.player.PlayerBottomSheetContent
+import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
 
 class MainActivity : ComponentActivity() {
 
     private val stationsListViewModel: StationsListViewModel by lazyViewModel { AppApiHolder.get().stationsListViewModel() }
+    private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by lazyViewModel { AppApiHolder.get().playerBottomSheetViewModel() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,6 +38,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(
                 StationsListViewModel.Local provides stationsListViewModel,
+                PlayerBottomSheetViewModel.Local provides playerBottomSheetViewModel,
             ) {
                 SrrradioTheme {
                     Surface(
@@ -54,12 +56,12 @@ class MainActivity : ComponentActivity() {
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
 fun MainScreen() {
-    val viewModel = StationsListViewModel.Local.current
-    val state by viewModel.state.collectAsState()
-    val dataState = state as? StationsListState.Data ?: return
-    val playerState = dataState.playerState as? RadioPlayer.State.HasStation
-    val showBottomSheet = playerState != null
+    val bottomSheetViewModel = PlayerBottomSheetViewModel.Local.current
+    val bottomSheetState by bottomSheetViewModel.state.collectAsState()
+
+    val showBottomSheet = bottomSheetState.showBottomSheet
     val scaffoldState = rememberBottomSheetScaffoldState()
+
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         backgroundColor = MaterialTheme.colorScheme.background,
@@ -68,13 +70,8 @@ fun MainScreen() {
         content = { StationsList() },
         sheetPeekHeight = if (showBottomSheet) 60.dp else 0.dp,
         sheetContent = {
-            if (playerState != null) {
-                PlayerContent(
-                    playerState = playerState,
-                    scaffoldState = scaffoldState,
-                    playlist = dataState.stations,
-                    currentStationIndex = dataState.currentStationIndex,
-                )
+            if (showBottomSheet) {
+                PlayerBottomSheetContent(scaffoldState = scaffoldState)
             }
         },
     )

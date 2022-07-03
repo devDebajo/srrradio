@@ -6,7 +6,6 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.AnyThread
-import androidx.compose.runtime.Stable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -21,7 +20,6 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,14 +29,16 @@ import ru.debajo.srrradio.ui.model.UiStation
 
 class RadioPlayer(
     private val context: Context,
-) : CoroutineScope by CoroutineScope(SupervisorJob() + Default) {
+    coroutineScope: CoroutineScope,
+) : CoroutineScope by coroutineScope {
 
     private val audioAttributes: AudioAttributes by lazy {
         AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
-            .setContentType(C.CONTENT_TYPE_MUSIC)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .build()
     }
+
     private val exoPlayer: ExoPlayer by lazy {
         val player = ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
@@ -158,6 +158,29 @@ class RadioPlayer(
     }
 
     @AnyThread
+    fun toggle() {
+        playPauseJob?.cancel()
+        playPauseJob = launch(Main) {
+            when (val state = states.value) {
+                is State.None -> Unit
+                is State.HasStation -> {
+                    when (state.playbackState) {
+                        PlaybackState.PAUSED -> exoPlayer.play()
+                        PlaybackState.PLAYING -> exoPlayer.pause()
+                        PlaybackState.BUFFERING -> {
+                            if (exoPlayer.playWhenReady) {
+                                exoPlayer.pause()
+                            } else {
+                                exoPlayer.play()
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @AnyThread
     fun pause() {
         playPauseJob?.cancel()
         playPauseJob = launch(Main) {
@@ -211,7 +234,6 @@ class RadioPlayer(
         }
     }
 
-    @Stable
     sealed interface State {
         object None : State
 

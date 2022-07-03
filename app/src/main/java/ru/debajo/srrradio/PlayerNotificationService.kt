@@ -19,18 +19,30 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.launch
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.model.MediaState
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.roundToInt
 
-class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(SupervisorJob()) {
+class PlayerNotificationService : Service(), CoroutineScope {
 
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
-    private val radioPlayer: RadioPlayer by lazy { AppApiHolder.get().radioPlayer() }
+    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController() }
     private val emptyBitmap: Bitmap by lazy { createEmptyBitmap() }
-    private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(radioPlayer) }
+    private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
+    private val coroutineScope: CoroutineScope by AppApiHolder.inject()
+
+    override val coroutineContext: CoroutineContext
+        get() = coroutineScope.coroutineContext
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -39,13 +51,15 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
         super.onCreate()
         prepareChannel()
         launch {
-            radioPlayer.states.flatMapLatest { state ->
+            mediaController.state.mapLatest { state ->
                 when (state) {
-                    is RadioPlayer.State.HasStation -> buildNotification(state)
-                    is RadioPlayer.State.None -> flowOf(null)
-                }.map { notification -> notification to state }
+                    MediaState.Empty,
+                    MediaState.Loading,
+                    MediaState.None -> null
+                    is MediaState.Loaded -> buildNotification(state)
+                } to state
             }.collect { (notification, state) ->
-                if (notification == null || state !is RadioPlayer.State.HasStation) {
+                if (notification == null || state !is MediaState.Loaded) {
                     stopForeground(true)
                 } else {
                     startForeground(notification)
@@ -65,22 +79,22 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
         unregisterReceiver(receiver)
     }
 
-    private fun buildNotification(playerState: RadioPlayer.State.HasStation): Flow<Notification> {
+    private fun buildNotification(mediaState: MediaState.Loaded): Notification {
         val style = androidx.media.app.NotificationCompat.MediaStyle()
-        style.setMediaSession(radioPlayer.mediaSession.sessionToken)
+        style.setMediaSession(mediaController.mediaSession.sessionToken)
         style.setShowActionsInCompactView(0)
-        val n = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentTitle(getString(R.string.app_name))
             .setStyle(style)
             .run {
                 when {
-                    playerState.playing -> addAction(
+                    mediaState.playing -> addAction(
                         R.drawable.ic_pause,
                         null,
                         PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
                     )
-                    !playerState.playing && !playerState.buffering -> addAction(
+                    !mediaState.playing && !mediaState.buffering -> addAction(
                         R.drawable.ic_play,
                         null,
                         PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
@@ -89,41 +103,6 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
                 }
             }
             .build()
-
-        return flowOf(n)
-//        return playerState.station.image.observe().map { coverBitmap ->
-//            val style = androidx.media.app.NotificationCompat.MediaStyle()
-//            // TODO придумать, как это сделать красивее
-//            radioPlayer.mediaSession.setMetadata(
-//                MediaMetadataCompat.Builder()
-//                    .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-//                    .putString(MediaMetadataCompat.METADATA_KEY_TITLE, playerState.station.name)
-//                    .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
-//                    .build()
-//            )
-//            style.setMediaSession(radioPlayer.mediaSession.sessionToken)
-//            style.setShowActionsInCompactView(0)
-//            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-//                .setSmallIcon(R.drawable.ic_radio)
-//                .setContentTitle(getString(R.string.app_name))
-//                .setStyle(style)
-//                .run {
-//                    when {
-//                        playerState.playing -> addAction(
-//                            R.drawable.ic_pause,
-//                            null,
-//                            PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
-//                        )
-//                        !playerState.playing && !playerState.buffering -> addAction(
-//                            R.drawable.ic_play,
-//                            null,
-//                            PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
-//                        )
-//                        else -> this
-//                    }
-//                }
-//                .build()
-//        }
     }
 
     private fun prepareChannel() {
@@ -204,13 +183,13 @@ class PlayerNotificationService : Service(), CoroutineScope by CoroutineScope(Su
     }
 
     private class PlaybackBroadcastReceiver(
-        private val radioPlayer: RadioPlayer,
+        private val mediaController: MediaController,
     ) : BroadcastReceiver() {
 
         override fun onReceive(context: Context, intent: Intent) {
             when (intent.action) {
-                ACTION_PAUSE -> radioPlayer.pause()
-                ACTION_RESUME -> radioPlayer.play()
+                ACTION_PAUSE -> mediaController.pause()
+                ACTION_RESUME -> mediaController.play()
             }
         }
 

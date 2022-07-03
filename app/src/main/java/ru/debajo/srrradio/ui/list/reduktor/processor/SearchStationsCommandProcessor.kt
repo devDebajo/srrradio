@@ -9,6 +9,7 @@ import ru.debajo.reduktor.CommandResult
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.ui.model.UiStation
+import ru.debajo.srrradio.ui.model.toUi
 
 @OptIn(FlowPreview::class)
 class SearchStationsCommandProcessor(
@@ -26,16 +27,7 @@ class SearchStationsCommandProcessor(
             .map { SearchResult(it) }
     }
 
-    private fun List<Station>.convert(): List<UiStation> = map { it.convert() }
-
-    private fun Station.convert(): UiStation {
-        return UiStation(
-            id = id,
-            name = name,
-            stream = stream,
-            image = image
-        )
-    }
+    private fun List<Station>.convert(): List<UiStation> = map { it.toUi() }
 
     data class SearchCommand(val query: String) : Command
 

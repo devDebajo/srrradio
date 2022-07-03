@@ -54,7 +54,7 @@ private fun ListContent(state: StationsListState.Data) {
                         modifier = Modifier.fillMaxWidth(),
                         station = state.stations[index],
                         playingState = state.stationPlayingState(index),
-                        onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseClick(station, playingState)) }
+                        onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState)) }
                     )
                 }
             )

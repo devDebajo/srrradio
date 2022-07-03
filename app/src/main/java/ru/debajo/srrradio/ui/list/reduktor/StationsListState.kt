@@ -1,50 +1,46 @@
 package ru.debajo.srrradio.ui.list.reduktor
 
 import androidx.compose.runtime.Immutable
-import ru.debajo.srrradio.RadioPlayer
+import ru.debajo.srrradio.model.MediaState
+import ru.debajo.srrradio.model.asLoaded
+import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 @Immutable
 sealed interface StationsListState {
 
+    @Immutable
     object Empty : StationsListState
 
-    data class Loading(
-        val playerState: RadioPlayer.State,
-    ) : StationsListState
+    @Immutable
+    data class Loading(val mediaState: MediaState) : StationsListState
 
+    @Immutable
     data class Data(
         val searchQuery: String = "",
+
         val title: String? = null,
-        val playerState: RadioPlayer.State = RadioPlayer.State.None,
-        val stations: List<UiStation> = emptyList(),
+
+        // local playlist, may be not in MediaState
+        val playlist: UiPlaylist? = null,
+
+        val mediaState: MediaState = MediaState.None,
     ) : StationsListState {
 
-        fun stationPlayingState(index: Int): UiStationPlayingState {
-            val station = stations.getOrNull(index) ?: return UiStationPlayingState.NONE
-            return when (playerState) {
-                is RadioPlayer.State.None -> UiStationPlayingState.NONE
-                is RadioPlayer.State.HasStation -> {
-                    if (station.id == playerState.station.id) {
-                        when (playerState.playbackState) {
-                            RadioPlayer.PlaybackState.PAUSED -> UiStationPlayingState.NONE
-                            RadioPlayer.PlaybackState.BUFFERING -> UiStationPlayingState.BUFFERING
-                            RadioPlayer.PlaybackState.PLAYING -> UiStationPlayingState.PLAYING
-                        }
-                    } else {
-                        UiStationPlayingState.NONE
-                    }
-                }
-            }
-        }
+        private val loadedMediaState: MediaState.Loaded? = mediaState.asLoaded
 
-        val currentStationIndex: Int
-            get() {
-                return when (playerState) {
-                    is RadioPlayer.State.None -> -1
-                    is RadioPlayer.State.HasStation -> stations.indexOfFirst { it.id == playerState.station.id }
-                }
+        val stations: List<UiStation> = playlist?.stations.orEmpty()
+
+        fun stationPlayingState(index: Int): UiStationPlayingState {
+            val playlist = playlist ?: return UiStationPlayingState.NONE
+            val station = playlist.stations.getOrNull(index) ?: return UiStationPlayingState.NONE
+
+            val mediaStationInfo = loadedMediaState?.mediaStationInfo
+            if (station.id != mediaStationInfo?.currentStationId) {
+                return UiStationPlayingState.NONE
             }
+            return mediaStationInfo.playingState
+        }
     }
 }

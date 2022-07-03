@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.common.di
 
+import android.util.Log
 import org.koin.core.KoinApplication
 import org.koin.core.definition.BeanDefinition
 import org.koin.core.definition.Definition
@@ -25,8 +26,26 @@ abstract class ModuleApiHolder<Api : ModuleApi, Dependencies : ModuleDependencie
 
     abstract val dependencies: Dependencies
 
+    @Suppress("UNCHECKED_CAST")
+    inline fun <reified T> inject(): Lazy<T> {
+        val javaPropertyType = T::class.java
+        Log.d("yopta", "javaPropertyType $javaPropertyType")
+        return lazy {
+            val api = get()
+            Log.d("yopta", "api $api")
+            val method = api.javaClass.declaredMethods.first { it.returnType == javaPropertyType }
+            method.invoke(api) as T
+        }
+    }
+
     fun get(): Api {
         return api ?: buildApi().also { api = it }
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    open fun getApiType(): Class<out Api> {
+        val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
+        return parameterizedType.actualTypeArguments[0] as Class<out Api>
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -34,9 +53,8 @@ abstract class ModuleApiHolder<Api : ModuleApi, Dependencies : ModuleDependencie
         val context = KoinModuleContext()
         val koinApp = context.startKoin { modules(koinModules + buildDependenciesModule()) }
 
-        val parameterizedType = this::class.java.genericSuperclass as ParameterizedType
-        val apiType = parameterizedType.actualTypeArguments[0] as Class<*>
-
+        val apiType = getApiType()
+        // TODO throw when several same types
         return Proxy.newProxyInstance(
             this::class.java.classLoader,
             arrayOf(apiType)

@@ -36,30 +36,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.skydoves.landscapist.glide.GlideImage
 import dev.chrisbanes.snapper.*
-import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.RadioPlayer
-import ru.debajo.srrradio.ui.list.StationsListViewModel
-import ru.debajo.srrradio.ui.list.reduktor.StationsListEvent
-import ru.debajo.srrradio.ui.model.UiStation
-import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.station.PlayPauseButton
-import timber.log.Timber
 
-@ExperimentalSnapperApi
 @Composable
+@ExperimentalSnapperApi
 @ExperimentalMaterialApi
-fun PlayerContent(
-    playerState: RadioPlayer.State.HasStation,
-    playlist: List<UiStation>,
-    currentStationIndex: Int,
-    scaffoldState: BottomSheetScaffoldState,
-) {
-    val viewModel = StationsListViewModel.Local.current
-
-    val nextStation = playlist.getOrNull(currentStationIndex + 1)
-    val previousStation = playlist.getOrNull(currentStationIndex - 1)
+fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
+    val viewModel = PlayerBottomSheetViewModel.Local.current
+    val state: PlayerBottomSheetState by viewModel.state.collectAsState()
 
     var contentAlpha by remember { mutableStateOf(0f) }
     LaunchedEffect(scaffoldState) {
@@ -83,23 +68,14 @@ fun PlayerContent(
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = playerState.station.name,
+            text = state.currentStationNameOrEmpty,
             fontSize = 16.sp,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
 
-        val uiState = when {
-            playerState.buffering -> UiStationPlayingState.BUFFERING
-            playerState.playing -> UiStationPlayingState.PLAYING
-            else -> UiStationPlayingState.NONE
-        }
-        PlayPauseButton(state = uiState) {
-            if (playerState.playing) {
-                viewModel.onEvent(StationsListEvent.OnPauseClick)
-            } else {
-                viewModel.onEvent(StationsListEvent.OnPlayClick)
-            }
+        PlayPauseButton(state = state.playingState) {
+            viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
         }
     }
 
@@ -109,7 +85,7 @@ fun PlayerContent(
             .alpha(contentAlpha)
     ) {
         Spacer(modifier = Modifier.height(10.dp))
-        val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = currentStationIndex)
+        val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = state.currentStationIndex)
         val layoutInfo = rememberLazyListSnapperLayoutInfo(
             lazyListState = lazyListState,
         )
@@ -123,23 +99,23 @@ fun PlayerContent(
             },
         )
         LaunchedEffect(layoutInfo) {
-            launch {
-                snapshotFlow { layoutInfo.currentItem?.offset }.collect {
-                    Timber.d("yopta currentItem?.offset ${it}")
-                }
-            }
+//            launch {
+//                snapshotFlow { layoutInfo.currentItem?.offset }.collect {
+//                    Timber.d("yopta currentItem?.offset ${it}")
+//                }
+//            }
 
-            combine(
-                snapshotFlow { layoutInfo.currentItem?.index }.filterNotNull().distinctUntilChanged(),
-                snapshotFlow { lazyListState.isScrollInProgress }
-            ) { currentItem, isScrollInProgress -> currentItem to isScrollInProgress }
-                .filter { (_, isScrollInProgress) -> !isScrollInProgress }
-                .map { (currentItem, _) -> currentItem }
-                .filter { it != currentStationIndex }
-                .mapNotNull { playlist.getOrNull(it - 1) }
-                .collect { station ->
-                    viewModel.onEvent(StationsListEvent.ChangeStation(station, playerState.playing))
-                }
+//            combine(
+//                snapshotFlow { layoutInfo.currentItem?.index }.filterNotNull().distinctUntilChanged(),
+//                snapshotFlow { lazyListState.isScrollInProgress }
+//            ) { currentItem, isScrollInProgress -> currentItem to isScrollInProgress }
+//                .filter { (_, isScrollInProgress) -> !isScrollInProgress }
+//                .map { (currentItem, _) -> currentItem }
+//                .filter { it != currentStationIndex }
+//                .mapNotNull { playlist.getOrNull(it - 1) }
+//                .collect { station ->
+//                    viewModel.onEvent(PlayerBottomSheetEvent.ChangeStation(station, playerState.playing))
+//                }
         }
         var textStartPadding by remember { mutableStateOf(0.dp) }
         BoxWithConstraints(
@@ -155,12 +131,12 @@ fun PlayerContent(
                 flingBehavior = flingBehavior,
             ) {
                 items(
-                    count = playlist.size + 2,
+                    count = state.stations.size + 2,
                 ) {
-                    if (it == 0 || it == playlist.size + 1) {
+                    if (it == 0 || it == state.stations.size + 1) {
                         Spacer(Modifier.width(spacerSize))
                     } else {
-                        val station = playlist[it - 1]
+                        val station = state.stations[it - 1]
                         StationCover(
                             modifier = Modifier.size(itemSize),
                             url = station.image,
@@ -172,7 +148,7 @@ fun PlayerContent(
         Spacer(modifier = Modifier.height(12.dp))
         Text(
             modifier = Modifier.padding(horizontal = textStartPadding),
-            text = playerState.station.name
+            text = state.currentStationNameOrEmpty
         )
         Spacer(modifier = Modifier.height(20.dp))
         Row(
@@ -180,41 +156,27 @@ fun PlayerContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             PlayBackButton(
-                visible = previousStation != null,
+                visible = state.hasPreviousStation,
                 size = 46.dp,
                 icon = Icons.Rounded.SkipPrevious,
                 contentDescription = "Прошлая радиостанция",
-                onClick = {
-                    if (previousStation != null) {
-                        viewModel.onEvent(StationsListEvent.ChangeStation(previousStation))
-                    }
-                }
+                onClick = { viewModel.onEvent(PlayerBottomSheetEvent.PreviousStation) }
             )
             Spacer(Modifier.width(18.dp))
             PlayBackButton(
                 visible = true,
                 size = 80.dp,
-                icon = if (playerState.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                contentDescription = if (playerState.playing) "Пауза" else "Продолжить воспроизведение",
-                onClick = {
-                    if (playerState.playing) {
-                        viewModel.onEvent(StationsListEvent.OnPauseClick)
-                    } else {
-                        viewModel.onEvent(StationsListEvent.OnPlayClick)
-                    }
-                }
+                icon = if (state.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                contentDescription = if (state.playing) "Пауза" else "Продолжить воспроизведение",
+                onClick = { viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick) }
             )
             Spacer(Modifier.width(18.dp))
             PlayBackButton(
-                visible = nextStation != null,
+                visible = state.hasNextStation,
                 size = 46.dp,
                 icon = Icons.Rounded.SkipNext,
                 contentDescription = "Следующая радиостанция",
-                onClick = {
-                    if (nextStation != null) {
-                        viewModel.onEvent(StationsListEvent.ChangeStation(nextStation))
-                    }
-                }
+                onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
