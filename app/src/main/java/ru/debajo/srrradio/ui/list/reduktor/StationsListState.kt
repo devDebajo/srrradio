@@ -8,39 +8,28 @@ import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 @Immutable
-sealed interface StationsListState {
+data class StationsListState(
+    val searchQuery: String = "",
 
-    @Immutable
-    object Empty : StationsListState
+    val title: String? = null,
 
-    @Immutable
-    data class Loading(val mediaState: MediaState) : StationsListState
+    // local playlist, may be not in MediaState
+    val playlist: UiPlaylist? = null,
 
-    @Immutable
-    data class Data(
-        val searchQuery: String = "",
+    val mediaState: MediaState = MediaState.None
+) {
+    private val loadedMediaState: MediaState.Loaded? = mediaState.asLoaded
 
-        val title: String? = null,
+    val stations: List<UiStation> = playlist?.stations.orEmpty()
 
-        // local playlist, may be not in MediaState
-        val playlist: UiPlaylist? = null,
+    fun stationPlayingState(index: Int): UiStationPlayingState {
+        val playlist = playlist ?: return UiStationPlayingState.NONE
+        val station = playlist.stations.getOrNull(index) ?: return UiStationPlayingState.NONE
 
-        val mediaState: MediaState = MediaState.None,
-    ) : StationsListState {
-
-        private val loadedMediaState: MediaState.Loaded? = mediaState.asLoaded
-
-        val stations: List<UiStation> = playlist?.stations.orEmpty()
-
-        fun stationPlayingState(index: Int): UiStationPlayingState {
-            val playlist = playlist ?: return UiStationPlayingState.NONE
-            val station = playlist.stations.getOrNull(index) ?: return UiStationPlayingState.NONE
-
-            val mediaStationInfo = loadedMediaState?.mediaStationInfo
-            if (station.id != mediaStationInfo?.currentStationId) {
-                return UiStationPlayingState.NONE
-            }
-            return mediaStationInfo.playingState
+        val mediaStationInfo = loadedMediaState?.mediaStationInfo
+        if (station.id != mediaStationInfo?.currentStationId) {
+            return UiStationPlayingState.NONE
         }
+        return mediaStationInfo.playingState
     }
 }

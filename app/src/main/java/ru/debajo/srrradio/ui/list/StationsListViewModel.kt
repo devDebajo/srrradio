@@ -20,10 +20,10 @@ class StationsListViewModel(
     newPlayCommandProcessor: NewPlayCommandProcessor,
 ) : ReduktorViewModel<StationsListState, StationsListEvent, StationsListNews>(
     store = reduktorStore(
-        initialState = StationsListState.Empty,
+        initialState = StationsListState(),
         eventReduktor = reduktor,
         commandResultReduktor = commandResultReduktor,
-        initialEvents = listOf(StationsListEvent.Start),
+        initialEvents = listOf(StationsListEvent.Start, StationsListEvent.OnSearchQueryChanged("synth")),
         commandProcessors = listOf(
             searchStationsCommandProcessor,
             mediaStateListener,

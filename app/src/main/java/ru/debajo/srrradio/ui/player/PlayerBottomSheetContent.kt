@@ -42,8 +42,11 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.station.PlayPauseButton
 import kotlin.math.absoluteValue
+
+val PlayerBottomSheetPeekHeight = 60.dp
 
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
@@ -66,7 +69,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(60.dp)
+            .height(PlayerBottomSheetPeekHeight)
             .padding(horizontal = 16.dp)
             .alpha(1f - contentAlpha),
         verticalAlignment = Alignment.CenterVertically,
@@ -157,7 +160,33 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             PlayBackButton(
                 visible = true,
                 size = 80.dp,
-                icon = if (state.playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                icon = { size ->
+                    when (state.playingState) {
+                        UiStationPlayingState.PLAYING -> {
+                            Icon(
+                                modifier = Modifier.size(size),
+                                imageVector = Icons.Rounded.Pause,
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                contentDescription = null,
+                            )
+                        }
+                        UiStationPlayingState.NONE -> {
+                            Icon(
+                                modifier = Modifier.size(size),
+                                imageVector = Icons.Rounded.PlayArrow,
+                                tint = MaterialTheme.colorScheme.onPrimary,
+                                contentDescription = null,
+                            )
+                        }
+                        UiStationPlayingState.BUFFERING -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(size / 2f),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                            )
+                        }
+                    }
+                },
                 contentDescription = if (state.playing) "Пауза" else "Продолжить воспроизведение",
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick) }
             )
@@ -182,6 +211,30 @@ private fun PlayBackButton(
     contentDescription: String,
     onClick: () -> Unit,
 ) {
+    PlayBackButton(
+        visible = visible,
+        size = size,
+        icon = { iconSize ->
+            Icon(
+                modifier = Modifier.size(iconSize),
+                imageVector = icon,
+                tint = MaterialTheme.colorScheme.onPrimary,
+                contentDescription = null,
+            )
+        },
+        contentDescription = contentDescription,
+        onClick = onClick,
+    )
+}
+
+@Composable
+private fun PlayBackButton(
+    visible: Boolean,
+    size: Dp,
+    icon: @Composable (Dp) -> Unit,
+    contentDescription: String,
+    onClick: () -> Unit,
+) {
     if (!visible) {
         Spacer(modifier = Modifier.size(size))
         return
@@ -200,14 +253,9 @@ private fun PlayBackButton(
                 this.contentDescription = contentDescription
             }
     ) {
-        Icon(
-            modifier = Modifier
-                .size((size.value * 0.6).dp)
-                .align(Alignment.Center),
-            imageVector = icon,
-            tint = MaterialTheme.colorScheme.onPrimary,
-            contentDescription = null,
-        )
+        Box(modifier = Modifier.align(Alignment.Center)) {
+            icon((size.value * 0.6).dp)
+        }
     }
 }
 

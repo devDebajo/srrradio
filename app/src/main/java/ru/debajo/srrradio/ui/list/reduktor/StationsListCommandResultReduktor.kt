@@ -21,31 +21,21 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
         state: StationsListState,
         event: SearchStationsCommandProcessor.SearchResult
     ): Akt<StationsListState, StationsListNews> {
-        return when (state) {
-            is StationsListState.Empty,
-            is StationsListState.Loading -> Akt()
-            is StationsListState.Data -> {
-                Akt(
-                    state = state.copy(
-                        playlist = UiPlaylist(
-                            id = UUID.randomUUID().toString(),
-                            name = "No named playlist",
-                            stations = event.stations,
-                        )
-                    )
+        return Akt(
+            state = state.copy(
+                playlist = UiPlaylist(
+                    id = UUID.randomUUID().toString(),
+                    name = "No named playlist",
+                    stations = event.stations,
                 )
-            }
-        }
+            )
+        )
     }
 
     private fun reduceOnNewMediaState(
         state: StationsListState,
         event: MediaStateListenerCommandProcessor.OnNewMediaState,
     ): Akt<StationsListState, StationsListNews> {
-        return when (state) {
-            is StationsListState.Empty -> Akt()
-            is StationsListState.Loading -> Akt(state = state.copy(mediaState = event.state))
-            is StationsListState.Data -> Akt(state = state.copy(mediaState = event.state))
-        }
+        return Akt(state = state.copy(mediaState = event.state))
     }
 }

@@ -1,29 +1,30 @@
-@file:OptIn(ExperimentalSnapperApi::class)
-
 package ru.debajo.srrradio
 
+import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.snapper.ExperimentalSnapperApi
+import androidx.core.view.WindowCompat
 import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.list.StationsList
 import ru.debajo.srrradio.ui.list.StationsListViewModel
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetContent
+import ru.debajo.srrradio.ui.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
 
@@ -34,6 +35,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
 
         setContent {
             CompositionLocalProvider(
@@ -41,6 +48,7 @@ class MainActivity : ComponentActivity() {
                 PlayerBottomSheetViewModel.Local provides playerBottomSheetViewModel,
             ) {
                 SrrradioTheme {
+                    ConfigureNavigationColor()
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
@@ -48,6 +56,16 @@ class MainActivity : ComponentActivity() {
                         MainScreen()
                     }
                 }
+            }
+        }
+    }
+
+    @Composable
+    private fun ConfigureNavigationColor() {
+        val navigationColor = rememberUpdatedState(MaterialTheme.colorScheme.secondaryContainer)
+        LaunchedEffect(Unit) {
+            snapshotFlow { navigationColor.value }.collect {
+                window.navigationBarColor = it.colorInt
             }
         }
     }
@@ -63,12 +81,13 @@ fun MainScreen() {
     val scaffoldState = rememberBottomSheetScaffoldState()
 
     BottomSheetScaffold(
+        modifier = Modifier.systemBarsPadding(),
         scaffoldState = scaffoldState,
         backgroundColor = MaterialTheme.colorScheme.background,
         sheetBackgroundColor = MaterialTheme.colorScheme.secondaryContainer,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         content = { StationsList() },
-        sheetPeekHeight = if (showBottomSheet) 60.dp else 0.dp,
+        sheetPeekHeight = if (showBottomSheet) PlayerBottomSheetPeekHeight else 0.dp,
         sheetContent = {
             if (showBottomSheet) {
                 PlayerBottomSheetContent(scaffoldState = scaffoldState)

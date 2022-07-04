@@ -11,8 +11,8 @@ data class PlayerBottomSheetState(
     val playingState: UiStationPlayingState = UiStationPlayingState.NONE,
     val currentStationIndex: Int = -1,
     val stations: List<UiStation> = emptyList(),
-    val playing: Boolean = false,
 ) {
+    val playing: Boolean = playingState == UiStationPlayingState.PLAYING
     val hasPreviousStation: Boolean = stations.getOrNull(currentStationIndex - 1) != null
     val hasNextStation: Boolean = stations.getOrNull(currentStationIndex + 1) != null
 }

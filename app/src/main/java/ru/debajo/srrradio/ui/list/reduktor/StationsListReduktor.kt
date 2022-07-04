@@ -11,58 +11,39 @@ class StationsListReduktor : Reduktor<StationsListState, StationsListEvent, Stat
 
     override fun invoke(state: StationsListState, event: StationsListEvent): Akt<StationsListState, StationsListNews> {
         return when (event) {
-            is StationsListEvent.Start -> reduceStart(state)
+            is StationsListEvent.Start -> reduceStart()
             is StationsListEvent.OnSearchQueryChanged -> reduceOnSearchQueryChanged(state, event)
             is StationsListEvent.OnPlayPauseStation -> reduceOnPlayPauseClick(state, event)
         }
     }
 
-    private fun reduceStart(state: StationsListState): Akt<StationsListState, StationsListNews> {
-        return when (state) {
-            is StationsListState.Loading,
-            is StationsListState.Data -> Akt()
-            is StationsListState.Empty -> Akt(
-                state = StationsListState.Data(),
-                commands = listOf(MediaStateListenerCommandProcessor.ListenerCommand.Start)
-            )
-        }
+    private fun reduceStart(): Akt<StationsListState, StationsListNews> {
+        return Akt(commands = listOf(MediaStateListenerCommandProcessor.ListenerCommand.Start))
     }
 
     private fun reduceOnSearchQueryChanged(
         state: StationsListState,
         event: StationsListEvent.OnSearchQueryChanged
     ): Akt<StationsListState, StationsListNews> {
-        return when (state) {
-            is StationsListState.Empty,
-            is StationsListState.Loading -> Akt()
-            is StationsListState.Data -> {
-                Akt(
-                    state = state.copy(searchQuery = event.query),
-                    commands = listOf(SearchStationsCommandProcessor.SearchCommand(event.query))
-                )
-            }
-        }
+        return Akt(
+            state = state.copy(searchQuery = event.query),
+            commands = listOf(SearchStationsCommandProcessor.SearchCommand(event.query))
+        )
     }
 
     private fun reduceOnPlayPauseClick(
         state: StationsListState,
         event: StationsListEvent.OnPlayPauseStation,
     ): Akt<StationsListState, StationsListNews> {
-        return when (state) {
-            is StationsListState.Empty,
-            is StationsListState.Loading -> Akt()
-            is StationsListState.Data -> {
-                val playlist = state.playlist ?: return Akt()
-                Akt(
-                    commands = listOf(
-                        NewPlayCommandProcessor.NewPlay(
-                            playlist = playlist,
-                            stationId = event.station.id,
-                            play = event.playingState != UiStationPlayingState.PLAYING,
-                        )
-                    )
+        val playlist = state.playlist ?: return Akt()
+        return Akt(
+            commands = listOf(
+                NewPlayCommandProcessor.NewPlay(
+                    playlist = playlist,
+                    stationId = event.station.id,
+                    play = event.playingState != UiStationPlayingState.PLAYING,
                 )
-            }
-        }
+            )
+        )
     }
 }

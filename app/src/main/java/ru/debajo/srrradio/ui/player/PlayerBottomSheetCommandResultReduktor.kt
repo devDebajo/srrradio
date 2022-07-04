@@ -28,7 +28,6 @@ class PlayerBottomSheetCommandResultReduktor : Reduktor<PlayerBottomSheetState, 
                 playingState = loadedMediaState?.mediaStationInfo?.playingState ?: UiStationPlayingState.NONE,
                 currentStationIndex = loadedMediaState?.currentStationIndex ?: -1,
                 stations = loadedMediaState?.playlist?.stations.orEmpty(),
-                playing = loadedMediaState?.mediaStationInfo?.playingState == UiStationPlayingState.PLAYING
             )
         )
     }
