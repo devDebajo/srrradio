@@ -42,8 +42,9 @@ internal interface DataModule : DataApiInternal {
 
     fun provideLoadPlaylistUseCase(
         playlistDao: DbPlaylistDao,
-        stationDao: DbStationDao
-    ): LoadPlaylistUseCase = LoadPlaylistUseCaseImpl(playlistDao, stationDao)
+        stationDao: DbStationDao,
+        dbPlaylistMappingDao: DbPlaylistMappingDao,
+    ): LoadPlaylistUseCase = LoadPlaylistUseCaseImpl(playlistDao, stationDao, dbPlaylistMappingDao)
 
     class Impl(private val dependencies: DataDependencies) : DataModule {
 
@@ -84,6 +85,6 @@ internal interface DataModule : DataApiInternal {
             get() = provideLastStationUseCase(sharedPreferences)
 
         override val loadPlaylistUseCase: LoadPlaylistUseCase
-            get() = provideLoadPlaylistUseCase(dbPlaylistDao, dbStationDao)
+            get() = provideLoadPlaylistUseCase(dbPlaylistDao, dbStationDao, dbPlaylistMappingDao)
     }
 }

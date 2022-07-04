@@ -11,6 +11,9 @@ internal interface DbPlaylistMappingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(mapping: DbPlaylistMapping)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(mappings: List<DbPlaylistMapping>)
+
     @Query("DELETE FROM DbPlaylistMapping WHERE playlistId=:playlistId")
     suspend fun deleteByPlaylistId(playlistId: String)
 }
