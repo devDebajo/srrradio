@@ -9,15 +9,14 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import kotlinx.coroutines.launch
 import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.ext.colorInt
@@ -78,7 +77,9 @@ fun MainScreen() {
     val bottomSheetState by bottomSheetViewModel.state.collectAsState()
 
     val showBottomSheet = bottomSheetState.showBottomSheet
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    val bottomSheetScaffoldState = rememberBottomSheetState(BottomSheetValue.Collapsed)
+    val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetScaffoldState)
+    val coroutineScope = rememberCoroutineScope()
 
     BottomSheetScaffold(
         modifier = Modifier.systemBarsPadding(),
@@ -86,7 +87,15 @@ fun MainScreen() {
         backgroundColor = MaterialTheme.colorScheme.background,
         sheetBackgroundColor = MaterialTheme.colorScheme.secondaryContainer,
         sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        content = { StationsList() },
+        content = {
+            StationsList {
+                if (bottomSheetScaffoldState.isExpanded) {
+                    coroutineScope.launch {
+                        bottomSheetScaffoldState.animateTo(BottomSheetValue.Collapsed)
+                    }
+                }
+            }
+        },
         sheetPeekHeight = if (showBottomSheet) PlayerBottomSheetPeekHeight else 0.dp,
         sheetContent = {
             if (showBottomSheet) {

@@ -2,18 +2,18 @@ package ru.debajo.srrradio.ui.list
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.flow.filter
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
@@ -26,7 +26,7 @@ import ru.debajo.srrradio.ui.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.station.StationItem
 
 @Composable
-fun StationsList() {
+fun StationsList(onScroll: () -> Unit) {
     val viewModel = StationsListViewModel.Local.current
     val state by viewModel.state.collectAsState()
 
@@ -57,17 +57,32 @@ fun StationsList() {
             }
         },
         body = {
-            ListContent(state, contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + 12.dp))
+            ListContent(
+                state = state,
+                onScroll = onScroll,
+                contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + 12.dp)
+            )
         },
         scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed
     )
 }
 
 @Composable
-private fun ListContent(state: StationsListState, contentPadding: PaddingValues = PaddingValues(0.dp)) {
+private fun ListContent(
+    state: StationsListState,
+    onScroll: () -> Unit,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
     val viewModel = StationsListViewModel.Local.current
+    val listState = rememberLazyListState()
+    LaunchedEffect(listState, onScroll) {
+        snapshotFlow { listState.isScrollInProgress }
+            .filter { it }
+            .collect { onScroll() }
+    }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
+        state = listState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = contentPadding.addPadding(horizontal = 16.dp),
     ) {
