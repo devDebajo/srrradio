@@ -23,7 +23,7 @@ class StationsListViewModel(
         initialState = StationsListState(),
         eventReduktor = reduktor,
         commandResultReduktor = commandResultReduktor,
-        initialEvents = listOf(StationsListEvent.Start, StationsListEvent.OnSearchQueryChanged("synth")),
+        initialEvents = listOf(StationsListEvent.Start),
         commandProcessors = listOf(
             searchStationsCommandProcessor,
             mediaStateListener,

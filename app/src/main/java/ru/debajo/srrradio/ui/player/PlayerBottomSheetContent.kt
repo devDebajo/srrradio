@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,8 +49,8 @@ import kotlin.math.absoluteValue
 
 val PlayerBottomSheetPeekHeight = 60.dp
 
-@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val state: PlayerBottomSheetState by viewModel.state.collectAsState()
@@ -153,7 +154,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 visible = state.hasPreviousStation,
                 size = 46.dp,
                 icon = Icons.Rounded.SkipPrevious,
-                contentDescription = "Прошлая радиостанция",
+                contentDescription = stringResource(R.string.accessibility_previous_station),
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.PreviousStation) }
             )
             Spacer(Modifier.width(18.dp))
@@ -187,7 +188,9 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                         }
                     }
                 },
-                contentDescription = if (state.playing) "Пауза" else "Продолжить воспроизведение",
+                contentDescription = stringResource(
+                    if (state.playing) R.string.accessibility_pause else R.string.accessibility_play,
+                ),
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick) }
             )
             Spacer(Modifier.width(18.dp))
@@ -195,7 +198,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 visible = state.hasNextStation,
                 size = 46.dp,
                 icon = Icons.Rounded.SkipNext,
-                contentDescription = "Следующая радиостанция",
+                contentDescription = stringResource(R.string.accessibility_next_station),
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
             )
         }

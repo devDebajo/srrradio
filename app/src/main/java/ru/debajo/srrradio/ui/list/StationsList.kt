@@ -10,15 +10,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
+import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.addPadding
 import ru.debajo.srrradio.ui.list.reduktor.StationsListEvent
 import ru.debajo.srrradio.ui.list.reduktor.StationsListState
+import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.station.StationItem
 
@@ -37,7 +40,7 @@ fun StationsList() {
                     .padding(horizontal = 16.dp)
             ) {
                 Text(
-                    text = "Радио",
+                    text = stringResource(R.string.radio_title),
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
                     fontSize = 36.sp,
@@ -45,7 +48,7 @@ fun StationsList() {
                 Spacer(Modifier.height(10.dp))
                 OutlinedTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text("Поиск") },
+                    placeholder = { Text(stringResource(R.string.search)) },
                     value = state.searchQuery,
                     onValueChange = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(it)) },
                     shape = RoundedCornerShape(12.dp)
@@ -69,20 +72,21 @@ private fun ListContent(state: StationsListState, contentPadding: PaddingValues 
         contentPadding = contentPadding.addPadding(horizontal = 16.dp),
     ) {
         items(
-            count = state.stations.size,
-            key = { state.stations[it].id },
-            contentType = { "UiStation" },
+            count = state.uiElements.size,
+            key = { state.uiElements[it].id },
+            contentType = { state.uiElements[it].contentType },
             itemContent = { index ->
-                StationItem(
-                    modifier = Modifier.fillMaxWidth(),
-                    station = state.stations[index],
-                    playingState = state.stationPlayingState(index),
-                    onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState)) }
-                )
+                when (val element = state.uiElements[index]) {
+                    is UiStationElement -> {
+                        StationItem(
+                            modifier = Modifier.fillMaxWidth(),
+                            station = element.station,
+                            playingState = element.playingState,
+                            onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState)) }
+                        )
+                    }
+                }
             }
         )
     }
 }
-
-val <T> T.exhaustive: T
-    get() = this
