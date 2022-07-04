@@ -15,6 +15,7 @@ class PlayerBottomSheetReduktor(
             PlayerBottomSheetEvent.NextStation -> reduceNextStation()
             PlayerBottomSheetEvent.PreviousStation -> reducePreviousStation()
             PlayerBottomSheetEvent.OnPlayPauseClick -> reduceOnPlayPauseClick()
+            is PlayerBottomSheetEvent.OnSelectStation -> reduceOnSelectStation(state, event)
         }
     }
 
@@ -36,6 +37,15 @@ class PlayerBottomSheetReduktor(
 
     private fun reduceOnPlayPauseClick(): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
         mediaController.toggle()
+        return Akt()
+    }
+
+    private fun reduceOnSelectStation(
+        state: PlayerBottomSheetState,
+        event: PlayerBottomSheetEvent.OnSelectStation
+    ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
+        val station = state.stations.getOrNull(event.page) ?: return Akt()
+        mediaController.changeStation(station.id, state.playing)
         return Akt()
     }
 }

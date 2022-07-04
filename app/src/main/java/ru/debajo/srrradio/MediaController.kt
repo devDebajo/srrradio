@@ -9,6 +9,7 @@ import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.model.MediaState
 import ru.debajo.srrradio.model.MediaStationInfo
+import ru.debajo.srrradio.model.asLoaded
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.model.toDomain
@@ -93,6 +94,19 @@ class MediaController(
 
         stateMutable.value = MediaState.Loaded(
             playlist = playlist,
+            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE)
+        )
+
+        savePlaylistInfoToPrefs()
+
+        player.changeStation(station, play)
+    }
+
+    fun changeStation(stationId: String, play: Boolean) {
+        val state = state.value.asLoaded ?: return
+        val station = state.playlist.stations.firstOrNull { it.id == stationId } ?: return
+
+        stateMutable.value = state.copy(
             mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE)
         )
 

@@ -7,4 +7,6 @@ sealed interface PlayerBottomSheetEvent {
     object PreviousStation : PlayerBottomSheetEvent
 
     object OnPlayPauseClick : PlayerBottomSheetEvent
+
+    class OnSelectStation(val page: Int) : PlayerBottomSheetEvent
 }

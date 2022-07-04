@@ -4,8 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.BottomSheetValue
@@ -26,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -34,14 +33,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.lerp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.calculateCurrentOffsetForPage
+import com.google.accompanist.pager.rememberPagerState
 import com.skydoves.landscapist.glide.GlideImage
-import dev.chrisbanes.snapper.*
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.station.PlayPauseButton
+import kotlin.math.absoluteValue
 
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 @Composable
-@ExperimentalSnapperApi
-@ExperimentalMaterialApi
 fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val state: PlayerBottomSheetState by viewModel.state.collectAsState()
@@ -85,71 +90,57 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             .alpha(contentAlpha)
     ) {
         Spacer(modifier = Modifier.height(10.dp))
-        val lazyListState = rememberLazyListState(initialFirstVisibleItemIndex = state.currentStationIndex)
-        val layoutInfo = rememberLazyListSnapperLayoutInfo(
-            lazyListState = lazyListState,
-        )
-        val flingBehavior = rememberSnapperFlingBehavior(
-            lazyListState = lazyListState,
-            snapOffsetForItem = SnapOffsets.Center,
-            springAnimationSpec = SnapperFlingBehaviorDefaults.SpringAnimationSpec,
-            endContentPadding = 0.dp,
-            snapIndex = { _, startIndex, targetIndex ->
-                if (targetIndex > startIndex) startIndex + 1 else startIndex - 1
-            },
-        )
-        LaunchedEffect(layoutInfo) {
-//            launch {
-//                snapshotFlow { layoutInfo.currentItem?.offset }.collect {
-//                    Timber.d("yopta currentItem?.offset ${it}")
-//                }
-//            }
 
-//            combine(
-//                snapshotFlow { layoutInfo.currentItem?.index }.filterNotNull().distinctUntilChanged(),
-//                snapshotFlow { lazyListState.isScrollInProgress }
-//            ) { currentItem, isScrollInProgress -> currentItem to isScrollInProgress }
-//                .filter { (_, isScrollInProgress) -> !isScrollInProgress }
-//                .map { (currentItem, _) -> currentItem }
-//                .filter { it != currentStationIndex }
-//                .mapNotNull { playlist.getOrNull(it - 1) }
-//                .collect { station ->
-//                    viewModel.onEvent(PlayerBottomSheetEvent.ChangeStation(station, playerState.playing))
-//                }
-        }
-        var textStartPadding by remember { mutableStateOf(0.dp) }
-        BoxWithConstraints(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            val maxWidth = maxWidth
-            val itemSize = 270.dp
-            val spacerSize = (maxWidth - itemSize) / 2f
-            textStartPadding = spacerSize
-
-            LazyRow(
-                state = lazyListState,
-                flingBehavior = flingBehavior,
-            ) {
-                items(
-                    count = state.stations.size + 2,
-                ) {
-                    if (it == 0 || it == state.stations.size + 1) {
-                        Spacer(Modifier.width(spacerSize))
-                    } else {
-                        val station = state.stations[it - 1]
-                        StationCover(
-                            modifier = Modifier.size(itemSize),
-                            url = station.image,
-                        )
+        val currentStationIndexState = rememberUpdatedState(state.currentStationIndex)
+        val pagerState = rememberPagerState(state.currentStationIndex.coerceAtLeast(0))
+        LaunchedEffect(pagerState) {
+            launch {
+                snapshotFlow { pagerState.currentPage }
+                    .filter { state.currentStationIndex != it }
+                    .collect {
+                        viewModel.onEvent(PlayerBottomSheetEvent.OnSelectStation(it))
                     }
+            }
+
+            launch {
+                snapshotFlow { currentStationIndexState.value }.filter { it >= 0 }.collect {
+                    pagerState.animateScrollToPage(it)
                 }
             }
         }
+
+        val itemSize = 270.dp
+        HorizontalPager(
+            count = state.stations.size,
+            state = pagerState,
+        ) { index ->
+            val station = state.stations[index]
+            StationCover(
+                modifier = Modifier
+                    .size(itemSize)
+                    .graphicsLayer {
+                        val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
+                        lerp(
+                            start = 0.85f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        ).also { scale ->
+                            scaleX = scale
+                            scaleY = scale
+                        }
+
+                        alpha = lerp(
+                            start = 0.5f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                    },
+                url = station.image,
+            )
+        }
+
         Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            modifier = Modifier.padding(horizontal = textStartPadding),
-            text = state.currentStationNameOrEmpty
-        )
+        Text(state.currentStationNameOrEmpty)
         Spacer(modifier = Modifier.height(20.dp))
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally),

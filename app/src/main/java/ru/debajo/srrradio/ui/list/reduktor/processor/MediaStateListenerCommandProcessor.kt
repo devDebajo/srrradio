@@ -21,7 +21,6 @@ class MediaStateListenerCommandProcessor(
                 when (command) {
                     ListenerCommand.Stop -> flowOf(CommandResult.EMPTY)
                     ListenerCommand.Start -> {
-                        mediaController.prepare()
                         mediaController.state.map { OnNewMediaState(it) }
                     }
                 }
