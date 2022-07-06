@@ -1,5 +1,7 @@
 package ru.debajo.srrradio.ui.player
 
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -23,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -56,6 +59,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val state: PlayerBottomSheetState by viewModel.state.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
     var contentAlpha by remember { mutableStateOf(0f) }
     LaunchedEffect(scaffoldState) {
         snapshotFlow { scaffoldState.bottomSheetState.progress }
@@ -68,12 +72,25 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 }
             }
     }
+    BackHandler(enabled = scaffoldState.bottomSheetState.isExpanded) {
+        coroutineScope.launch {
+            scaffoldState.bottomSheetState.animateTo(BottomSheetValue.Collapsed)
+        }
+    }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(PlayerBottomSheetPeekHeight)
             .padding(horizontal = 16.dp)
-            .alpha(1f - contentAlpha),
+            .alpha(1f - contentAlpha)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+            ) {
+                coroutineScope.launch {
+                    scaffoldState.bottomSheetState.animateTo(BottomSheetValue.Expanded)
+                }
+            },
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -229,6 +246,29 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
 //            ActionButton(Icons.Rounded.LockClock) {}
         }
         Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) {
+    val currentOnBack by rememberUpdatedState(onBack)
+    val backCallback = remember {
+        object : OnBackPressedCallback(enabled) {
+            override fun handleOnBackPressed() {
+                currentOnBack()
+            }
+        }
+    }
+    SideEffect {
+        backCallback.isEnabled = enabled
+    }
+    val backDispatcher = checkNotNull(LocalOnBackPressedDispatcherOwner.current) {
+        "No OnBackPressedDispatcherOwner was provided via LocalOnBackPressedDispatcherOwner"
+    }.onBackPressedDispatcher
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner, backDispatcher) {
+        backDispatcher.addCallback(lifecycleOwner, backCallback)
+        onDispose { backCallback.remove() }
     }
 }
 
