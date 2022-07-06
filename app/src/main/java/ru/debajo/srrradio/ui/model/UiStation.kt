@@ -44,3 +44,9 @@ data class UiStationElement(
     override val id: String = station.id
     override val contentType: String = "UiStationElement"
 }
+
+@Immutable
+data class UiTextElement(val text: String) : UiElement {
+    override val id: String = "UiTextElement_$text"
+    override val contentType: String = "UiTextElement"
+}

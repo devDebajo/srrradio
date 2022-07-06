@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.list
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -22,6 +23,7 @@ import ru.debajo.srrradio.ui.ext.addPadding
 import ru.debajo.srrradio.ui.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.UiStationElement
+import ru.debajo.srrradio.ui.model.UiTextElement
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.station.StationItem
 
@@ -67,6 +69,7 @@ fun StationsList(onScroll: () -> Unit) {
     )
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ListContent(
     state: StationsListState,
@@ -94,14 +97,32 @@ private fun ListContent(
                 when (val element = state.uiElements[index]) {
                     is UiStationElement -> {
                         StationItem(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItemPlacement(),
                             station = element.station,
                             playingState = element.playingState,
                             onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState)) }
                         )
                     }
+
+                    is UiTextElement -> TextElement(
+                        modifier = Modifier.animateItemPlacement(),
+                        element = element
+                    )
                 }
             }
         )
     }
+}
+
+@Composable
+private fun TextElement(modifier: Modifier = Modifier, element: UiTextElement) {
+    Text(
+        modifier = modifier.padding(vertical = 8.dp),
+        text = element.text,
+        fontSize = 11.sp,
+        fontWeight = FontWeight.Medium,
+        color = MaterialTheme.colorScheme.primary,
+    )
 }

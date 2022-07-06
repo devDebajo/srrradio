@@ -22,19 +22,21 @@ internal interface AppModule : AppApi {
         searchStationsCommandProcessor: SearchStationsCommandProcessor,
         mediaStateListener: MediaStateListenerCommandProcessor,
         newPlayCommandProcessor: NewPlayCommandProcessor,
+        listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
     ): StationsListViewModel {
         return StationsListViewModel(
             reduktor = reduktor,
             commandResultReduktor = commandResultReduktor,
             searchStationsCommandProcessor = searchStationsCommandProcessor,
             mediaStateListener = mediaStateListener,
-            newPlayCommandProcessor = newPlayCommandProcessor
+            newPlayCommandProcessor = newPlayCommandProcessor,
+            listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
         )
     }
 
-    fun provideStationsListReduktor(): StationsListReduktor = StationsListReduktor()
+    fun provideStationsListReduktor(context: Context): StationsListReduktor = StationsListReduktor(context)
 
-    fun provideStationsListCommandResultReduktor(): StationsListCommandResultReduktor = StationsListCommandResultReduktor()
+    fun provideStationsListCommandResultReduktor(context: Context): StationsListCommandResultReduktor = StationsListCommandResultReduktor(context)
 
     fun provideSearchStationsCommandProcessor(searchStationsUseCase: SearchStationsUseCase): SearchStationsCommandProcessor {
         return SearchStationsCommandProcessor(searchStationsUseCase)
@@ -85,11 +87,12 @@ internal interface AppModule : AppApi {
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
-                reduktor = provideStationsListReduktor(),
-                commandResultReduktor = provideStationsListCommandResultReduktor(),
+                reduktor = provideStationsListReduktor(dependencies.context),
+                commandResultReduktor = provideStationsListCommandResultReduktor(dependencies.context),
                 searchStationsCommandProcessor = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase),
                 mediaStateListener = provideMediaStateListenerCommandProcessor(mediaController),
-                newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController)
+                newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController),
+                listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase)
             )
 
         override val playerBottomSheetViewModel: PlayerBottomSheetViewModel

@@ -1,16 +1,21 @@
 package ru.debajo.srrradio.ui.list.reduktor
 
+import android.content.Context
 import ru.debajo.reduktor.Akt
+import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.ui.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.list.model.StationsListNews
 import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 
-class StationsListReduktor : Reduktor<StationsListState, StationsListEvent, StationsListNews> {
+class StationsListReduktor(
+    private val context: Context,
+) : Reduktor<StationsListState, StationsListEvent, StationsListNews> {
 
     override fun invoke(state: StationsListState, event: StationsListEvent): Akt<StationsListState, StationsListNews> {
         return when (event) {
@@ -21,16 +26,35 @@ class StationsListReduktor : Reduktor<StationsListState, StationsListEvent, Stat
     }
 
     private fun reduceStart(): Akt<StationsListState, StationsListNews> {
-        return Akt(commands = listOf(MediaStateListenerCommandProcessor.ListenerCommand.Start))
+        return Akt(
+            commands = listOf(
+                MediaStateListenerCommandProcessor.ListenerCommand.Start,
+                ListenFavoriteStationsProcessor.Listen,
+            )
+        )
     }
 
     private fun reduceOnSearchQueryChanged(
         state: StationsListState,
         event: StationsListEvent.OnSearchQueryChanged
     ): Akt<StationsListState, StationsListNews> {
+        var newState = state.copy(searchQuery = event.query)
+        val commands = mutableListOf<Command>()
+        if (event.query.isEmpty()) {
+            val playlist = state.favoriteStations.toFavoritePlaylist()
+            val uiElements = playlist.buildUiElements(context, state.mediaState)
+            newState = newState.copy(
+                playlist = playlist,
+                uiElements = uiElements,
+            )
+            commands.add(SearchStationsCommandProcessor.Action.Cancel)
+        } else {
+            commands.add(SearchStationsCommandProcessor.Action.Search(event.query))
+        }
+
         return Akt(
-            state = state.copy(searchQuery = event.query),
-            commands = listOf(SearchStationsCommandProcessor.SearchCommand(event.query))
+            state = newState,
+            commands = commands,
         )
     }
 

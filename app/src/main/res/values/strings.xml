@@ -2,6 +2,7 @@
     <string name="app_name">Srrradio</string>
     <string name="radio_title">Радио</string>
     <string name="search">Поиск</string>
+    <string name="favorite">Избранное</string>
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>
     <string name="accessibility_play">Продолжить воспроизведение</string>

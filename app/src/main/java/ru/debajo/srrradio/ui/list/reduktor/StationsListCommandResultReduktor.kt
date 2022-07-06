@@ -1,21 +1,26 @@
 package ru.debajo.srrradio.ui.list.reduktor
 
+import android.content.Context
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
-import ru.debajo.srrradio.model.MediaState
 import ru.debajo.srrradio.ui.list.model.StationsListNews
 import ru.debajo.srrradio.ui.list.model.StationsListState
-import ru.debajo.srrradio.ui.model.*
+import ru.debajo.srrradio.ui.model.UiPlaylist
+import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import java.util.*
 
-class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandResult, StationsListNews> {
+class StationsListCommandResultReduktor(
+    private val context: Context,
+) : Reduktor<StationsListState, CommandResult, StationsListNews> {
+
     override fun invoke(state: StationsListState, event: CommandResult): Akt<StationsListState, StationsListNews> {
         return when (event) {
             is SearchStationsCommandProcessor.SearchResult -> reduceSearchResult(state, event)
             is MediaStateListenerCommandProcessor.OnNewMediaState -> reduceOnNewMediaState(state, event)
+            is ListenFavoriteStationsProcessor.Result -> reduceNewFavoriteStations(state, event)
             else -> Akt()
         }
     }
@@ -32,7 +37,7 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
         return Akt(
             state = state.copy(
                 playlist = playlist,
-                uiElements = playlist.buildUiElements(state.mediaState)
+                uiElements = playlist.buildUiElements(context, state.mediaState)
             )
         )
     }
@@ -44,22 +49,27 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
         return Akt(
             state = state.copy(
                 mediaState = event.state,
-                uiElements = state.playlist?.buildUiElements(event.state).orEmpty()
+                uiElements = state.playlist.buildUiElements(context, event.state)
             )
         )
     }
 
-    private fun UiPlaylist.buildUiElements(mediaState: MediaState?): List<UiElement> {
-        return stations.map { station ->
-            UiStationElement(station, stationPlayingState(mediaState, station))
+    private fun reduceNewFavoriteStations(
+        state: StationsListState,
+        event: ListenFavoriteStationsProcessor.Result
+    ): Akt<StationsListState, StationsListNews> {
+        val playlist = if (state.playlist == null || state.playlist.isFavorite) {
+            event.stations.toFavoritePlaylist()
+        } else {
+            state.playlist
         }
-    }
 
-    private fun stationPlayingState(mediaState: MediaState?, station: UiStation): UiStationPlayingState {
-        val mediaStationInfo = (mediaState as? MediaState.Loaded)?.mediaStationInfo
-        if (station.id != mediaStationInfo?.currentStationId) {
-            return UiStationPlayingState.NONE
-        }
-        return mediaStationInfo.playingState
+        return Akt(
+            state.copy(
+                playlist = playlist,
+                uiElements = playlist.buildUiElements(context, state.mediaState),
+                favoriteStations = event.stations
+            )
+        )
     }
 }

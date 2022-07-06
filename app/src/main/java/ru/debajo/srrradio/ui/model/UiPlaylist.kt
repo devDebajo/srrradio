@@ -27,3 +27,11 @@ fun UiPlaylist.toDomain(): Playlist {
         stations = stations.map { it.toDomain() },
     )
 }
+
+fun List<UiStation>.toPlaylist(id: String, name: String): UiPlaylist {
+    return UiPlaylist(
+        id = id,
+        name = name,
+        stations = this
+    )
+}
