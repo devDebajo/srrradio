@@ -15,7 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.player.StationCover
@@ -94,7 +96,11 @@ fun PlayPauseButton(
                         .align(Alignment.Center),
                     tint = MaterialTheme.colorScheme.primary,
                     imageVector = if (state == UiStationPlayingState.PLAYING) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                    contentDescription = null,
+                    contentDescription = if (state == UiStationPlayingState.PLAYING) {
+                        stringResource(R.string.accessibility_pause)
+                    } else {
+                        stringResource(R.string.accessibility_play)
+                    },
                 )
             }
         }

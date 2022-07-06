@@ -40,6 +40,8 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.ext.select
+import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
@@ -208,17 +210,23 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 .height(42.dp)
                 .padding(horizontal = 16.dp),
         ) {
-            ActionButton(if (state.currentStationInFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder) {
+            ActionButton(
+                icon = state.currentStationInFavorite.select(Icons.Rounded.Favorite, Icons.Rounded.FavoriteBorder),
+                contentDescription = state.currentStationInFavorite.stringResource(
+                    positiveId = R.string.accessibility_remove_favorite,
+                    negativeId = R.string.accessibility_add_favorite
+                )
+            ) {
                 viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
             }
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 5.dp)
-                    .width(1.dp)
-                    .fillMaxHeight()
-                    .background(Color.White.copy(0.4f))
-            )
-            ActionButton(Icons.Rounded.LockClock) {}
+//            Box(
+//                modifier = Modifier
+//                    .padding(vertical = 5.dp)
+//                    .width(1.dp)
+//                    .fillMaxHeight()
+//                    .background(Color.White.copy(0.4f))
+//            )
+//            ActionButton(Icons.Rounded.LockClock) {}
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
@@ -239,7 +247,7 @@ private fun ActionsBar(
 }
 
 @Composable
-private fun RowScope.ActionButton(icon: ImageVector, onClick: () -> Unit) {
+private fun RowScope.ActionButton(icon: ImageVector, contentDescription: String, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .weight(1f)
@@ -250,7 +258,7 @@ private fun RowScope.ActionButton(icon: ImageVector, onClick: () -> Unit) {
             modifier = Modifier.align(Alignment.Center),
             imageVector = icon,
             tint = MaterialTheme.colorScheme.primary,
-            contentDescription = null
+            contentDescription = contentDescription
         )
     }
 }
@@ -329,7 +337,7 @@ fun StationCover(
                         modifier = Modifier
                             .size(maxHeight * 0.45f)
                             .align(Alignment.Center),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.accessibility_station_poster),
                         painter = painterResource(R.drawable.ic_radio),
                         tint = Color(0xff907A88),
                     )

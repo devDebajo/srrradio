@@ -3,8 +3,13 @@
     <string name="radio_title">Радио</string>
     <string name="search">Поиск</string>
     <string name="favorite">Избранное</string>
+
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>
     <string name="accessibility_play">Продолжить воспроизведение</string>
     <string name="accessibility_pause">Пауза</string>
+    <string name="accessibility_clear_search">Очистить поиск</string>
+    <string name="accessibility_add_favorite">Добавить станцию в избранные</string>
+    <string name="accessibility_remove_favorite">Удалить станцию из избранных</string>
+    <string name="accessibility_station_poster">Обложка радиостанции</string>
 </resources>

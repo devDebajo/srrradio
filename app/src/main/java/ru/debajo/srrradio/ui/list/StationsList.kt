@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -53,7 +53,18 @@ fun StationsList(onScroll: () -> Unit) {
                     placeholder = { Text(stringResource(R.string.search)) },
                     value = state.searchQuery,
                     onValueChange = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(it)) },
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
+                    trailingIcon = {
+                        if (state.searchQuery.isNotEmpty()) {
+                            IconButton(onClick = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged("")) }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Clear,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    contentDescription = stringResource(R.string.accessibility_clear_search)
+                                )
+                            }
+                        }
+                    }
                 )
                 Spacer(Modifier.height(8.dp))
             }
