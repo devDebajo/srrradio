@@ -2,10 +2,13 @@ package ru.debajo.srrradio.ui.list.reduktor
 
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Reduktor
-import ru.debajo.srrradio.ui.list.reduktor.processor.MediaStateListenerCommandProcessor
-import ru.debajo.srrradio.ui.list.reduktor.processor.NewPlayCommandProcessor
-import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.list.model.StationsListEvent
+import ru.debajo.srrradio.ui.list.model.StationsListNews
+import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
+import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 
 class StationsListReduktor : Reduktor<StationsListState, StationsListEvent, StationsListNews> {
 

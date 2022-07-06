@@ -9,16 +9,7 @@ data class UiPlaylist(
     val name: String,
     val stations: List<UiStation>,
 ) {
-
     operator fun contains(station: UiStation): Boolean = stations.any { it.id == station.id }
-
-    companion object {
-        val EMPTY = UiPlaylist(
-            id = "",
-            name = "",
-            stations = emptyList(),
-        )
-    }
 }
 
 fun Playlist.toUi(): UiPlaylist {

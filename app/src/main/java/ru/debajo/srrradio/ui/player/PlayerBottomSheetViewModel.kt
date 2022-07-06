@@ -5,7 +5,14 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
 import ru.debajo.reduktor.ReduktorViewModel
 import ru.debajo.reduktor.reduktorStore
-import ru.debajo.srrradio.ui.list.reduktor.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetEvent
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetNews
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
+import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetCommandResultReduktor
+import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetReduktor
+import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
+import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import timber.log.Timber
 
 @Stable
@@ -13,12 +20,16 @@ class PlayerBottomSheetViewModel(
     reduktor: PlayerBottomSheetReduktor,
     commandResultReduktor: PlayerBottomSheetCommandResultReduktor,
     mediaStateListenerCommandProcessor: MediaStateListenerCommandProcessor,
+    addFavoriteStationProcessor: AddFavoriteStationProcessor,
+    listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
 ) : ReduktorViewModel<PlayerBottomSheetState, PlayerBottomSheetEvent, PlayerBottomSheetNews>(
     store = reduktorStore(
         initialState = PlayerBottomSheetState(),
         eventReduktor = reduktor,
         commandProcessors = listOf(
             mediaStateListenerCommandProcessor,
+            addFavoriteStationProcessor,
+            listenFavoriteStationsProcessor,
         ),
         commandResultReduktor = commandResultReduktor,
         initialEvents = listOf(PlayerBottomSheetEvent.Start),

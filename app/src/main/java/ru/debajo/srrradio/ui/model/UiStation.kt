@@ -17,7 +17,7 @@ internal fun Station.toUi(): UiStation {
         id = id,
         name = name,
         stream = stream,
-        image = image
+        image = image,
     )
 }
 

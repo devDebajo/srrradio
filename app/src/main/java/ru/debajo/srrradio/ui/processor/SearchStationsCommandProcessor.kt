@@ -1,4 +1,4 @@
-package ru.debajo.srrradio.ui.list.reduktor.processor
+package ru.debajo.srrradio.ui.processor
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview

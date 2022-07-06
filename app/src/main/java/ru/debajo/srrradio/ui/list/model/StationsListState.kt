@@ -1,4 +1,4 @@
-package ru.debajo.srrradio.ui.list.reduktor
+package ru.debajo.srrradio.ui.list.model
 
 import androidx.compose.runtime.Immutable
 import ru.debajo.srrradio.model.MediaState

@@ -4,16 +4,16 @@ import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.MediaController
 import ru.debajo.srrradio.RadioPlayer
+import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.ui.list.StationsListViewModel
 import ru.debajo.srrradio.ui.list.reduktor.StationsListCommandResultReduktor
 import ru.debajo.srrradio.ui.list.reduktor.StationsListReduktor
-import ru.debajo.srrradio.ui.list.reduktor.processor.MediaStateListenerCommandProcessor
-import ru.debajo.srrradio.ui.list.reduktor.processor.NewPlayCommandProcessor
-import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
-import ru.debajo.srrradio.ui.player.PlayerBottomSheetCommandResultReduktor
-import ru.debajo.srrradio.ui.player.PlayerBottomSheetReduktor
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
+import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetCommandResultReduktor
+import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetReduktor
+import ru.debajo.srrradio.ui.processor.*
 
 internal interface AppModule : AppApi {
     fun provideStationsListViewModel(
@@ -54,17 +54,29 @@ internal interface AppModule : AppApi {
         reduktor: PlayerBottomSheetReduktor,
         commandResultReduktor: PlayerBottomSheetCommandResultReduktor,
         mediaStateListenerCommandProcessor: MediaStateListenerCommandProcessor,
+        addFavoriteStationProcessor: AddFavoriteStationProcessor,
+        listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor
     ): PlayerBottomSheetViewModel {
         return PlayerBottomSheetViewModel(
             reduktor = reduktor,
             commandResultReduktor = commandResultReduktor,
             mediaStateListenerCommandProcessor = mediaStateListenerCommandProcessor,
+            addFavoriteStationProcessor = addFavoriteStationProcessor,
+            listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
         )
     }
 
     fun provideCommandResultReduktor(): PlayerBottomSheetCommandResultReduktor = PlayerBottomSheetCommandResultReduktor()
 
     fun providePlayerBottomSheetReduktor(mediaController: MediaController): PlayerBottomSheetReduktor = PlayerBottomSheetReduktor(mediaController)
+
+    fun provideAddFavoriteStationProcessor(useCase: UpdateFavoriteStationStateUseCase): AddFavoriteStationProcessor {
+        return AddFavoriteStationProcessor(useCase)
+    }
+
+    fun provideListenFavoriteStationsProcessor(useCase: FavoriteStationsStateUseCase): ListenFavoriteStationsProcessor {
+        return ListenFavoriteStationsProcessor(useCase)
+    }
 
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
@@ -85,6 +97,8 @@ internal interface AppModule : AppApi {
                 reduktor = providePlayerBottomSheetReduktor(mediaController),
                 commandResultReduktor = provideCommandResultReduktor(),
                 mediaStateListenerCommandProcessor = provideMediaStateListenerCommandProcessor(mediaController),
+                addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
+                listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase)
             )
 
         override val mediaController: MediaController by lazy {

@@ -7,9 +7,11 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import ru.debajo.srrradio.data.BuildConfig
 import ru.debajo.srrradio.data.db.SrrradioDatabase
+import ru.debajo.srrradio.data.db.dao.DbFavoriteStationDao
 import ru.debajo.srrradio.data.db.dao.DbPlaylistDao
 import ru.debajo.srrradio.data.db.dao.DbPlaylistMappingDao
 import ru.debajo.srrradio.data.db.dao.DbStationDao
+import ru.debajo.srrradio.data.repository.FavoriteStationsRepositoryImpl
 import ru.debajo.srrradio.data.repository.SearchStationsRepositoryImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
@@ -17,6 +19,7 @@ import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
 import ru.debajo.srrradio.data.usecase.LoadPlaylistUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
 internal interface DataModule : DataApiInternal {
@@ -46,6 +49,10 @@ internal interface DataModule : DataApiInternal {
         dbPlaylistMappingDao: DbPlaylistMappingDao,
     ): LoadPlaylistUseCase = LoadPlaylistUseCaseImpl(playlistDao, stationDao, dbPlaylistMappingDao)
 
+    fun provideFavoriteStationsRepository(dbFavoriteStationDao: DbFavoriteStationDao): FavoriteStationsRepository {
+        return FavoriteStationsRepositoryImpl(dbFavoriteStationDao)
+    }
+
     class Impl(private val dependencies: DataDependencies) : DataModule {
 
         private val okHttpClient: OkHttpClient by lazy {
@@ -72,9 +79,15 @@ internal interface DataModule : DataApiInternal {
 
         private val dbPlaylistMappingDao: DbPlaylistMappingDao by lazy { database.dbPlaylistMappingDao() }
 
+        private val dbFavoriteStationDao: DbFavoriteStationDao by lazy { database.dbFavoriteStationDao() }
+
         override val json: Json by lazy { provideJson() }
 
         override val searchStationsRepository: SearchStationsRepository by lazy { provideSearchStationsRepository(serviceHolder) }
+
+        override val favoriteStationsRepository: FavoriteStationsRepository by lazy {
+            provideFavoriteStationsRepository(dbFavoriteStationDao)
+        }
 
         override val sharedPreferences: SharedPreferences
             get() = dependencies.sharedPreferences

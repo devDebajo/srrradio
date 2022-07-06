@@ -10,10 +10,7 @@ import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Pause
-import androidx.compose.material.icons.rounded.PlayArrow
-import androidx.compose.material.icons.rounded.SkipNext
-import androidx.compose.material.icons.rounded.SkipPrevious
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +41,8 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetEvent
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.station.PlayPauseButton
 import kotlin.math.absoluteValue
 
@@ -203,6 +202,56 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
+        ActionsBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(42.dp)
+                .padding(horizontal = 16.dp),
+        ) {
+            ActionButton(if (state.currentStationInFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder) {
+                viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
+            }
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(Color.White.copy(0.4f))
+            )
+            ActionButton(Icons.Rounded.LockClock) {}
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun ActionsBar(
+    modifier: Modifier = Modifier,
+    content: @Composable RowScope.() -> Unit
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White.copy(alpha = 0.1f))
+    ) {
+        content()
+    }
+}
+
+@Composable
+private fun RowScope.ActionButton(icon: ImageVector, onClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .fillMaxHeight()
+            .clickable(onClick = onClick),
+    ) {
+        Icon(
+            modifier = Modifier.align(Alignment.Center),
+            imageVector = icon,
+            tint = MaterialTheme.colorScheme.primary,
+            contentDescription = null
+        )
     }
 }
 

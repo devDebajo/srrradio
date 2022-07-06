@@ -81,7 +81,7 @@ dependencies {
     implementation 'androidx.palette:palette:1.0.0'
     implementation 'com.google.android.exoplayer:exoplayer:2.18.0'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.18.0'
-    implementation 'com.github.devDebajo:reduktor:1.0.0-alpha01'
+    implementation 'com.github.devDebajo:reduktor:1.0.0-alpha04'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }

@@ -29,3 +29,12 @@ internal fun Station.toDb(): DbStation {
         image = image,
     )
 }
+
+internal fun DbStation.toDomain(): Station {
+    return Station(
+        id = id,
+        name = name,
+        stream = stream,
+        image = image,
+    )
+}

@@ -1,12 +1,10 @@
-package ru.debajo.srrradio.ui.player
+package ru.debajo.srrradio.ui.player.model
 
 sealed interface PlayerBottomSheetEvent {
     object Start : PlayerBottomSheetEvent
-
     object NextStation : PlayerBottomSheetEvent
     object PreviousStation : PlayerBottomSheetEvent
-
     object OnPlayPauseClick : PlayerBottomSheetEvent
-
+    class UpdateStationFavorite(val favorite: Boolean) : PlayerBottomSheetEvent
     class OnSelectStation(val page: Int) : PlayerBottomSheetEvent
 }

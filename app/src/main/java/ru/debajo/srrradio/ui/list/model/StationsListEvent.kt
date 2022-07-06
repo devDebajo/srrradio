@@ -1,4 +1,4 @@
-package ru.debajo.srrradio.ui.list.reduktor
+package ru.debajo.srrradio.ui.list.model
 
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState

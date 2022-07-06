@@ -1,4 +1,4 @@
-package ru.debajo.srrradio.ui.list.reduktor.processor
+package ru.debajo.srrradio.ui.processor
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -20,9 +20,7 @@ class MediaStateListenerCommandProcessor(
             .flatMapLatest { command ->
                 when (command) {
                     ListenerCommand.Stop -> flowOf(CommandResult.EMPTY)
-                    ListenerCommand.Start -> {
-                        mediaController.state.map { OnNewMediaState(it) }
-                    }
+                    ListenerCommand.Start -> { mediaController.state.map { OnNewMediaState(it) } }
                 }
             }
     }

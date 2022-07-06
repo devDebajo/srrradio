@@ -1,9 +1,14 @@
-package ru.debajo.srrradio.ui.player
+package ru.debajo.srrradio.ui.player.reduktor
 
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.MediaController
-import ru.debajo.srrradio.ui.list.reduktor.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetEvent
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetNews
+import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
+import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
+import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 
 class PlayerBottomSheetReduktor(
     private val mediaController: MediaController,
@@ -16,12 +21,16 @@ class PlayerBottomSheetReduktor(
             PlayerBottomSheetEvent.PreviousStation -> reducePreviousStation()
             PlayerBottomSheetEvent.OnPlayPauseClick -> reduceOnPlayPauseClick()
             is PlayerBottomSheetEvent.OnSelectStation -> reduceOnSelectStation(state, event)
+            is PlayerBottomSheetEvent.UpdateStationFavorite -> reduceUpdateStationFavorite(state, event)
         }
     }
 
     private fun reduceStart(): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
         return Akt(
-            commands = listOf(MediaStateListenerCommandProcessor.ListenerCommand.Start)
+            commands = listOf(
+                MediaStateListenerCommandProcessor.ListenerCommand.Start,
+                ListenFavoriteStationsProcessor.Listen,
+            )
         )
     }
 
@@ -47,5 +56,15 @@ class PlayerBottomSheetReduktor(
         val station = state.stations.getOrNull(event.page) ?: return Akt()
         mediaController.changeStation(station.id, state.playing)
         return Akt()
+    }
+
+    private fun reduceUpdateStationFavorite(
+        state: PlayerBottomSheetState,
+        event: PlayerBottomSheetEvent.UpdateStationFavorite
+    ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
+        val station = state.stations.getOrNull(state.currentStationIndex) ?: return Akt()
+        return Akt(
+            commands = listOf(AddFavoriteStationProcessor.Update(station.id, event.favorite))
+        )
     }
 }

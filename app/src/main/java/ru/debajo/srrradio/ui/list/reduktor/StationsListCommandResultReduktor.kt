@@ -4,9 +4,11 @@ import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.model.MediaState
-import ru.debajo.srrradio.ui.list.reduktor.processor.MediaStateListenerCommandProcessor
-import ru.debajo.srrradio.ui.list.reduktor.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.list.model.StationsListNews
+import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.*
+import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import java.util.*
 
 class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandResult, StationsListNews> {

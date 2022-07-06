@@ -20,6 +20,7 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
@@ -50,7 +51,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
     override fun onCreate() {
         super.onCreate()
         prepareChannel()
-        launch {
+        launch(Main) {
             mediaController.state.mapLatest { state ->
                 when (state) {
                     MediaState.Empty,

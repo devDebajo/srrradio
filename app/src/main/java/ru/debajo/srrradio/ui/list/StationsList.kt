@@ -19,8 +19,8 @@ import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.addPadding
-import ru.debajo.srrradio.ui.list.reduktor.StationsListEvent
-import ru.debajo.srrradio.ui.list.reduktor.StationsListState
+import ru.debajo.srrradio.ui.list.model.StationsListEvent
+import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.station.StationItem
