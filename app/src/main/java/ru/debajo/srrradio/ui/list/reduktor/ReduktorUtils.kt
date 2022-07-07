@@ -8,10 +8,14 @@ import ru.debajo.srrradio.ui.model.*
 private const val FAVORITE_PLAYLIST_ID = "Favorite_id"
 private const val FAVORITE_PLAYLIST_NAME = "Favorite"
 
-fun UiPlaylist?.buildUiElements(context: Context, mediaState: MediaState?): List<UiElement> {
+fun UiPlaylist?.buildUiElements(
+    context: Context,
+    favoriteStationsIds: Set<String>,
+    mediaState: MediaState?
+): List<UiElement> {
     this ?: return emptyList()
     val result = stations.map { station ->
-        UiStationElement(station, stationPlayingState(mediaState, station))
+        UiStationElement(station, stationPlayingState(mediaState, station), station.id in favoriteStationsIds)
     }
 
     return if (id == FAVORITE_PLAYLIST_ID) {

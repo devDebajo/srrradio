@@ -15,4 +15,6 @@ data class StationsListState(
     val mediaState: MediaState = MediaState.None,
     val uiElements: List<UiElement> = emptyList(),
     val favoriteStations: List<UiStation> = emptyList(),
-)
+) {
+    val favoriteStationsIds: Set<String> = favoriteStations.map { it.id }.toSet()
+}

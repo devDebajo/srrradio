@@ -23,6 +23,7 @@ internal interface AppModule : AppApi {
         mediaStateListener: MediaStateListenerCommandProcessor,
         newPlayCommandProcessor: NewPlayCommandProcessor,
         listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
+        addFavoriteStationProcessor: AddFavoriteStationProcessor,
     ): StationsListViewModel {
         return StationsListViewModel(
             reduktor = reduktor,
@@ -31,6 +32,7 @@ internal interface AppModule : AppApi {
             mediaStateListener = mediaStateListener,
             newPlayCommandProcessor = newPlayCommandProcessor,
             listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
+            addFavoriteStationProcessor = addFavoriteStationProcessor,
         )
     }
 
@@ -92,7 +94,8 @@ internal interface AppModule : AppApi {
                 searchStationsCommandProcessor = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase),
                 mediaStateListener = provideMediaStateListenerCommandProcessor(mediaController),
                 newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController),
-                listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase)
+                listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase),
+                addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
             )
 
         override val playerBottomSheetViewModel: PlayerBottomSheetViewModel

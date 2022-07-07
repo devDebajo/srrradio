@@ -9,9 +9,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.filter
@@ -70,11 +72,21 @@ fun StationsList(onScroll: () -> Unit) {
             }
         },
         body = {
-            ListContent(
-                state = state,
-                onScroll = onScroll,
-                contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + 12.dp)
-            )
+            if (state.uiElements.isEmpty()) {
+                Text(
+                    modifier = Modifier.align(Alignment.Center),
+                    text = stringResource(R.string.empty_items_placeholder),
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            } else {
+                ListContent(
+                    state = state,
+                    onScroll = onScroll,
+                    contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + 12.dp)
+                )
+            }
         },
         scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed
     )
@@ -112,7 +124,9 @@ private fun ListContent(
                                 .fillMaxWidth()
                                 .animateItemPlacement(),
                             station = element.station,
+                            favorite = element.favorite,
                             playingState = element.playingState,
+                            onFavoriteClick = { station, favorite -> viewModel.onEvent(StationsListEvent.ChangeFavorite(station, favorite)) },
                             onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState)) }
                         )
                     }

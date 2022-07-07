@@ -10,10 +10,7 @@ import ru.debajo.srrradio.ui.list.model.StationsListNews
 import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.list.reduktor.StationsListCommandResultReduktor
 import ru.debajo.srrradio.ui.list.reduktor.StationsListReduktor
-import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
-import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
-import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
-import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.processor.*
 import timber.log.Timber
 
 @Stable
@@ -24,6 +21,7 @@ class StationsListViewModel(
     mediaStateListener: MediaStateListenerCommandProcessor,
     newPlayCommandProcessor: NewPlayCommandProcessor,
     listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
+    addFavoriteStationProcessor: AddFavoriteStationProcessor,
 ) : ReduktorViewModel<StationsListState, StationsListEvent, StationsListNews>(
     store = reduktorStore(
         initialState = StationsListState(),
@@ -35,6 +33,7 @@ class StationsListViewModel(
             mediaStateListener,
             newPlayCommandProcessor,
             listenFavoriteStationsProcessor,
+            addFavoriteStationProcessor,
         ),
         errorDispatcher = { Timber.e(it) },
     )

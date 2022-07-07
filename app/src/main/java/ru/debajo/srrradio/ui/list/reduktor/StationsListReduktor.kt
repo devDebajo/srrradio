@@ -8,10 +8,7 @@ import ru.debajo.srrradio.ui.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.list.model.StationsListNews
 import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
-import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
-import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
-import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
-import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.processor.*
 
 class StationsListReduktor(
     private val context: Context,
@@ -22,6 +19,7 @@ class StationsListReduktor(
             is StationsListEvent.Start -> reduceStart()
             is StationsListEvent.OnSearchQueryChanged -> reduceOnSearchQueryChanged(state, event)
             is StationsListEvent.OnPlayPauseStation -> reduceOnPlayPauseClick(state, event)
+            is StationsListEvent.ChangeFavorite -> reduceChangeFavorite(event)
         }
     }
 
@@ -42,7 +40,7 @@ class StationsListReduktor(
         val commands = mutableListOf<Command>()
         if (event.query.isEmpty()) {
             val playlist = state.favoriteStations.toFavoritePlaylist()
-            val uiElements = playlist.buildUiElements(context, state.mediaState)
+            val uiElements = playlist.buildUiElements(context, state.favoriteStationsIds, state.mediaState)
             newState = newState.copy(
                 playlist = playlist,
                 uiElements = uiElements,
@@ -71,6 +69,12 @@ class StationsListReduktor(
                     play = event.playingState != UiStationPlayingState.PLAYING,
                 )
             )
+        )
+    }
+
+    private fun reduceChangeFavorite(event: StationsListEvent.ChangeFavorite): Akt<StationsListState, StationsListNews> {
+        return Akt(
+            commands = listOf(AddFavoriteStationProcessor.Update(event.station.id, event.favorite))
         )
     }
 }

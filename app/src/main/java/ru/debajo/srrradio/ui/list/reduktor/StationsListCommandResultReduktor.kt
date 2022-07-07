@@ -37,7 +37,7 @@ class StationsListCommandResultReduktor(
         return Akt(
             state = state.copy(
                 playlist = playlist,
-                uiElements = playlist.buildUiElements(context, state.mediaState)
+                uiElements = playlist.buildUiElements(context, state.favoriteStationsIds, state.mediaState)
             )
         )
     }
@@ -49,7 +49,7 @@ class StationsListCommandResultReduktor(
         return Akt(
             state = state.copy(
                 mediaState = event.state,
-                uiElements = state.playlist.buildUiElements(context, event.state)
+                uiElements = state.playlist.buildUiElements(context, state.favoriteStationsIds, event.state)
             )
         )
     }
@@ -67,7 +67,7 @@ class StationsListCommandResultReduktor(
         return Akt(
             state.copy(
                 playlist = playlist,
-                uiElements = playlist.buildUiElements(context, state.mediaState),
+                uiElements = playlist.buildUiElements(context, event.stations.map { it.id }.toSet(), state.mediaState),
                 favoriteStations = event.stations
             )
         )

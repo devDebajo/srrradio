@@ -7,4 +7,5 @@ sealed interface StationsListEvent {
     object Start : StationsListEvent
     class OnSearchQueryChanged(val query: String) : StationsListEvent
     class OnPlayPauseStation(val station: UiStation, val playingState: UiStationPlayingState) : StationsListEvent
+    class ChangeFavorite(val station: UiStation, val favorite: Boolean) : StationsListEvent
 }

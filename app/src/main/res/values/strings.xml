@@ -3,6 +3,7 @@
     <string name="radio_title">Радио</string>
     <string name="search">Поиск</string>
     <string name="favorite">Избранное</string>
+    <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
 
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>

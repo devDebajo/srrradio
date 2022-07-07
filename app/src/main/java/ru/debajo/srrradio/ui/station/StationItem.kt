@@ -8,6 +8,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.*
@@ -16,8 +18,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.ext.select
+import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.player.StationCover
@@ -28,8 +33,10 @@ private val HEIGHT = 80.dp
 fun StationItem(
     modifier: Modifier = Modifier,
     station: UiStation,
+    favorite: Boolean,
     playingState: UiStationPlayingState,
     onPlayClick: (UiStation, UiStationPlayingState) -> Unit,
+    onFavoriteClick: (UiStation, Boolean) -> Unit,
 ) {
     OutlinedCard(modifier = modifier) {
         Row(
@@ -50,9 +57,17 @@ fun StationItem(
             }
             Spacer(Modifier.width(8.dp))
             Text(
-                modifier = Modifier.weight(1f),
-                text = station.name
+                modifier = Modifier.weight(1f).padding(vertical = 6.dp),
+                text = station.name,
+                overflow = TextOverflow.Ellipsis
             )
+            Spacer(Modifier.width(8.dp))
+            IconButton(onClick = { onFavoriteClick(station, !favorite) }) {
+                Icon(
+                    imageVector = favorite.select(Icons.Rounded.Favorite, Icons.Rounded.FavoriteBorder),
+                    contentDescription = favorite.stringResource(R.string.accessibility_remove_favorite, R.string.accessibility_add_favorite)
+                )
+            }
             Spacer(Modifier.width(8.dp))
             StationCover(
                 modifier = Modifier.size(HEIGHT),
