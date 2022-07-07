@@ -1,5 +1,7 @@
 package ru.debajo.srrradio.ui.player
 
+import android.text.TextUtils
+import android.widget.TextView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
@@ -32,9 +34,11 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -43,6 +47,7 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
@@ -102,7 +107,9 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
         )
 
         PlayPauseButton(state = state.playingState) {
-            viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
+            if (contentAlpha < 1f) {
+                viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
+            }
         }
     }
 
@@ -137,32 +144,39 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             state = pagerState,
         ) { index ->
             val station = state.stations[index]
-            StationCover(
-                modifier = Modifier
-                    .size(itemSize)
-                    .graphicsLayer {
-                        val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
-                        lerp(
-                            start = 0.85f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        ).also { scale ->
-                            scaleX = scale
-                            scaleY = scale
-                        }
+            Column(
+                modifier = Modifier.graphicsLayer {
+                    val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
+                    lerp(
+                        start = 0.85f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    ).also { scale ->
+                        scaleX = scale
+                        scaleY = scale
+                    }
 
-                        alpha = lerp(
-                            start = 0.5f,
-                            stop = 1f,
-                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                        )
-                    },
-                url = station.image,
-            )
+                    alpha = lerp(
+                        start = 0.5f,
+                        stop = 1f,
+                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                    )
+                }
+            ) {
+                StationCover(
+                    modifier = Modifier.size(itemSize),
+                    url = station.image,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                TickerTextView(
+                    modifier = Modifier.width(itemSize),
+                    text = station.name,
+                    textSize = 18.sp,
+                    textColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-        Text(state.currentStationNameOrEmpty)
         Spacer(modifier = Modifier.height(20.dp))
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -284,6 +298,34 @@ private fun ActionsBar(
     ) {
         content()
     }
+}
+
+@Composable
+private fun TickerTextView(
+    modifier: Modifier = Modifier,
+    text: String,
+    textSize: TextUnit = 14.sp,
+    textColor: Color = Color.Black,
+) {
+    val textColorInt = textColor.colorInt
+    AndroidView(
+        modifier = modifier,
+        factory = {
+            TextView(it).apply {
+                isSingleLine = true
+                ellipsize = TextUtils.TruncateAt.MARQUEE
+                marqueeRepeatLimit = -1
+                isSelected = true
+                isFocusableInTouchMode = true
+
+            }
+        },
+        update = {
+            it.textSize = textSize.value
+            it.setTextColor(textColorInt)
+            it.text = text
+        }
+    )
 }
 
 @Composable
