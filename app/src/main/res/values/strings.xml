@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Srrradio</string>
     <string name="radio_title">Радио</string>
+    <string name="settings_title">Настройки</string>
     <string name="search">Поиск</string>
     <string name="favorite">Избранное</string>
     <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>

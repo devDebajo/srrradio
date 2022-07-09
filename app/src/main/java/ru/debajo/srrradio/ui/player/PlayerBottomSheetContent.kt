@@ -9,10 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.ripple.rememberRipple
@@ -58,6 +55,17 @@ import kotlin.math.absoluteValue
 
 val PlayerBottomSheetPeekHeight = 60.dp
 
+@ExperimentalMaterialApi
+val SwipeProgress<BottomSheetValue>.normalizedFraction: Float
+    get() {
+        return when {
+            from == BottomSheetValue.Collapsed && to == BottomSheetValue.Collapsed -> 0f
+            from == BottomSheetValue.Expanded && to == BottomSheetValue.Expanded -> 1f
+            from == BottomSheetValue.Expanded && to == BottomSheetValue.Collapsed -> 1f - fraction
+            else -> fraction
+        }
+    }
+
 @Composable
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
@@ -69,12 +77,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     LaunchedEffect(scaffoldState) {
         snapshotFlow { scaffoldState.bottomSheetState.progress }
             .collect {
-                contentAlpha = when {
-                    it.from == BottomSheetValue.Collapsed && it.to == BottomSheetValue.Collapsed -> 0f
-                    it.from == BottomSheetValue.Expanded && it.to == BottomSheetValue.Expanded -> 1f
-                    it.from == BottomSheetValue.Expanded && it.to == BottomSheetValue.Collapsed -> 1f - it.fraction
-                    else -> it.fraction
-                }
+                contentAlpha = it.normalizedFraction
             }
     }
     BackHandler(enabled = scaffoldState.bottomSheetState.isExpanded) {
