@@ -71,7 +71,7 @@ class MainActivity : ComponentActivity() {
                 PlayerBottomSheetViewModel.Local provides playerBottomSheetViewModel,
                 LocalIndication provides rememberRipple(),
             ) {
-                SrrradioTheme {
+                SrrradioTheme(useDarkTheme = true) {
                     ConfigureNavigationColor()
                     Surface(
                         modifier = Modifier.fillMaxSize(),

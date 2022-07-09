@@ -1,21 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Srrradio</string>
-    <string name="radio_title">Радио</string>
-    <string name="settings_title">Настройки</string>
-    <string name="search">Поиск</string>
-    <string name="favorite">Избранное</string>
-    <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
+    <string name="app_name" translatable="false">Srrradio</string>
 
-    <string name="settings_group_app">Приложение</string>
-    <string name="settings_privacy_policy">Политика конфиденциальности</string>
-    <string name="settings_app_version">Версия приложения: %s</string>
+    <string name="radio_title">Radio</string>
+    <string name="settings_title">Settings</string>
+    <string name="search">Search</string>
+    <string name="favorite">Favorite</string>
+    <string name="empty_items_placeholder">There no favorite stations\nStart search</string>
 
-    <string name="accessibility_next_station">Следующая радиостанция</string>
-    <string name="accessibility_previous_station">Прошлая радиостанция</string>
-    <string name="accessibility_play">Продолжить воспроизведение</string>
-    <string name="accessibility_pause">Пауза</string>
-    <string name="accessibility_clear_search">Очистить поиск</string>
-    <string name="accessibility_add_favorite">Добавить станцию в избранные</string>
-    <string name="accessibility_remove_favorite">Удалить станцию из избранных</string>
-    <string name="accessibility_station_poster">Обложка радиостанции</string>
+    <string name="settings_group_app">Application</string>
+    <string name="settings_privacy_policy">Privacy policy</string>
+    <string name="settings_app_version">App version: %s</string>
+
+    <string name="accessibility_next_station">Next station</string>
+    <string name="accessibility_previous_station">Previous station</string>
+    <string name="accessibility_play">Play</string>
+    <string name="accessibility_pause">Pause</string>
+    <string name="accessibility_clear_search">Clear search</string>
+    <string name="accessibility_add_favorite">Add station to favorites</string>
+    <string name="accessibility_remove_favorite">Delete station from favorites</string>
+    <string name="accessibility_station_poster">Station cover</string>
 </resources>

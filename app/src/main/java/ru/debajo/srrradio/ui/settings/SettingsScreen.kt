@@ -1,5 +1,7 @@
 package ru.debajo.srrradio.ui.settings
 
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.*
@@ -9,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -56,10 +59,14 @@ private fun SettingsList() {
             state = calculateGroupState(expandedGroup, 0),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(0) }
         ) {
+            val context = LocalContext.current
             SettingsText(
                 text = stringResource(R.string.settings_privacy_policy)
             ) {
-
+                context.startActivity(
+                    Intent(Intent.ACTION_VIEW)
+                        .setData(Uri.parse(BuildConfig.PRIVACY_POLICY))
+                )
             }
 
             SettingsText(
