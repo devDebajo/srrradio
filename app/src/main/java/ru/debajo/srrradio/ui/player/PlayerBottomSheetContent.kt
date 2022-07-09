@@ -2,8 +2,7 @@ package ru.debajo.srrradio.ui.player
 
 import android.text.TextUtils
 import android.widget.TextView
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -263,29 +261,6 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
 //            ActionButton(Icons.Rounded.LockClock) {}
         }
         Spacer(modifier = Modifier.height(16.dp))
-    }
-}
-
-@Composable
-private fun BackHandler(enabled: Boolean = true, onBack: () -> Unit) {
-    val currentOnBack by rememberUpdatedState(onBack)
-    val backCallback = remember {
-        object : OnBackPressedCallback(enabled) {
-            override fun handleOnBackPressed() {
-                currentOnBack()
-            }
-        }
-    }
-    SideEffect {
-        backCallback.isEnabled = enabled
-    }
-    val backDispatcher = checkNotNull(LocalOnBackPressedDispatcherOwner.current) {
-        "No OnBackPressedDispatcherOwner was provided via LocalOnBackPressedDispatcherOwner"
-    }.onBackPressedDispatcher
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner, backDispatcher) {
-        backDispatcher.addCallback(lifecycleOwner, backCallback)
-        onDispose { backCallback.remove() }
     }
 }
 
