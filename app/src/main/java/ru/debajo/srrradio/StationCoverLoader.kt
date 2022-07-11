@@ -11,28 +11,25 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.math.roundToInt
 
 class StationCoverLoader(private val context: Context) {
 
-    private val emptyBitmap: Bitmap by lazy { createEmptyBitmap(context) }
+    val emptyBitmap: Bitmap by lazy { createEmptyBitmap(context) }
 
-    fun load(url: String?): Flow<Bitmap> {
-        if (url.isNullOrEmpty()) {
-            return flowOf(emptyBitmap)
-        }
-
-        return callbackFlow {
-            val task = Glide.with(context)
+    @OptIn(ExperimentalCoroutinesApi::class)
+    suspend fun loadImage(url: String?): Bitmap? {
+        url ?: return null
+        return suspendCancellableCoroutine {
+            val task = Glide
+                .with(context)
                 .asBitmap()
                 .load(url)
                 .addListener(object : RequestListener<Bitmap> {
                     override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
-                        trySend(emptyBitmap)
+                        it.resume(null, null)
                         return false
                     }
 
@@ -43,14 +40,14 @@ class StationCoverLoader(private val context: Context) {
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        trySend(resource)
+                        it.resume(resource, null)
                         return false
                     }
 
                 })
                 .submit()
 
-            awaitClose { task.cancel(true) }
+            it.invokeOnCancellation { task.cancel(true) }
         }
     }
 

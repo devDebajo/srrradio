@@ -6,11 +6,6 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.AnyThread
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
@@ -19,12 +14,13 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import ru.debajo.srrradio.ui.model.UiStation
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class RadioPlayer(
     private val context: Context,
     private val stationCoverLoader: StationCoverLoader,
@@ -87,18 +83,14 @@ class RadioPlayer(
                             Player.STATE_ENDED -> PlaybackState.PAUSED
                             else -> PlaybackState.PAUSED
                         } to currentState
-                    }.flatMapLatest { (playbackState, currentState) ->
-                        stationCoverLoader.load((currentState as? State.HasStation)?.station?.image).map {
-                            Triple(playbackState, currentState, it)
-                        }
-                    }.collect { (playbackState, currentState, cover) ->
+                    }.collect { (playbackState, currentState) ->
                         val newState = when (currentState) {
                             is State.HasStation -> currentState.copy(playbackState = playbackState)
                             is State.None -> currentState
                         }
                         statesMutable.value = newState
                         if (newState is State.HasStation) {
-                            updateMediaSession(newState, cover)
+                            updateMediaSession(newState)
                         }
                     }
                 }
@@ -114,8 +106,8 @@ class RadioPlayer(
         })
     }
 
-    private suspend fun updateMediaSession(playerState: State.HasStation, cover: Bitmap) = runCatching {
-        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, cover))
+    private suspend fun updateMediaSession(playerState: State.HasStation) = runCatching {
+        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, stationCoverLoader.emptyBitmap))
         val playbackState = when {
             playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
             playerState.playing -> PlaybackStateCompat.STATE_PLAYING
@@ -126,10 +118,13 @@ class RadioPlayer(
                 .setState(playbackState, 0L, 1f)
                 .build()
         )
-
-        val bitmap = playerState.station.image?.loadImage()
-        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, bitmap))
         mediaSessionUpdatedMutable.emit(Unit)
+
+        val bitmap = stationCoverLoader.loadImage(playerState.station.image)
+        if (bitmap != null) {
+            mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, bitmap))
+            mediaSessionUpdatedMutable.emit(Unit)
+        }
     }
 
     private var playPauseJob: Job? = null
@@ -198,47 +193,12 @@ class RadioPlayer(
         }
     }
 
-    private fun createMediaMetadataCompat(stationName: String, coverBitmap: Bitmap?): MediaMetadataCompat {
+    private fun createMediaMetadataCompat(stationName: String, coverBitmap: Bitmap): MediaMetadataCompat {
         return MediaMetadataCompat.Builder()
-            .apply {
-                if (coverBitmap != null) {
-                    putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-                }
-            }
+            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
             .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
             .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
             .build()
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private suspend fun String.loadImage(): Bitmap? {
-        return suspendCancellableCoroutine {
-            val task = Glide
-                .with(context)
-                .asBitmap()
-                .load(this)
-                .addListener(object : RequestListener<Bitmap> {
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
-                        it.resume(null, null)
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        it.resume(resource, null)
-                        return false
-                    }
-
-                })
-                .submit()
-
-            it.invokeOnCancellation { task.cancel(true) }
-        }
     }
 
     sealed interface State {
