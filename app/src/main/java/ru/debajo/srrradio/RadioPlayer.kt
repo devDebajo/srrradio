@@ -21,14 +21,13 @@ import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import ru.debajo.srrradio.ui.model.UiStation
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RadioPlayer(
     private val context: Context,
+    private val stationCoverLoader: StationCoverLoader,
     coroutineScope: CoroutineScope,
 ) : CoroutineScope by coroutineScope {
 
@@ -70,6 +69,9 @@ class RadioPlayer(
         MediaSessionCompat(context, "Srrradio media session")
     }
 
+    private val mediaSessionUpdatedMutable: MutableSharedFlow<Unit> = MutableSharedFlow()
+    val mediaSessionUpdated: Flow<Unit> = mediaSessionUpdatedMutable.asSharedFlow()
+
     init {
         exoPlayer.addListener(object : Player.Listener {
             private val playWhenReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -85,14 +87,18 @@ class RadioPlayer(
                             Player.STATE_ENDED -> PlaybackState.PAUSED
                             else -> PlaybackState.PAUSED
                         } to currentState
-                    }.collect { (playbackState, currentState) ->
+                    }.flatMapLatest { (playbackState, currentState) ->
+                        stationCoverLoader.load((currentState as? State.HasStation)?.station?.image).map {
+                            Triple(playbackState, currentState, it)
+                        }
+                    }.collect { (playbackState, currentState, cover) ->
                         val newState = when (currentState) {
                             is State.HasStation -> currentState.copy(playbackState = playbackState)
                             is State.None -> currentState
                         }
                         statesMutable.value = newState
                         if (newState is State.HasStation) {
-                            updateMediaSession(newState)
+                            updateMediaSession(newState, cover)
                         }
                     }
                 }
@@ -108,8 +114,8 @@ class RadioPlayer(
         })
     }
 
-    private suspend fun updateMediaSession(playerState: State.HasStation) = runCatching {
-        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, null))
+    private suspend fun updateMediaSession(playerState: State.HasStation, cover: Bitmap) = runCatching {
+        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, cover))
         val playbackState = when {
             playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
             playerState.playing -> PlaybackStateCompat.STATE_PLAYING
@@ -123,6 +129,7 @@ class RadioPlayer(
 
         val bitmap = playerState.station.image?.loadImage()
         mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, bitmap))
+        mediaSessionUpdatedMutable.emit(Unit)
     }
 
     private var playPauseJob: Job? = null

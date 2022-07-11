@@ -9,6 +9,9 @@
     <string name="empty_items_placeholder">There no favorite stations\nStart search</string>
     <string name="sleep_timer">Sleep timer</string>
 
+    <string name="notification_channel_name">Media controls notification</string>
+    <string name="notification_channel_description">Radio controls notification</string>
+
     <string name="settings_group_app">Application</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_app_version">App version: %s</string>

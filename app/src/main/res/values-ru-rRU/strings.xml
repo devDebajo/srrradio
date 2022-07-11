@@ -7,6 +7,9 @@
     <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
     <string name="sleep_timer">Таймер сна</string>
 
+    <string name="notification_channel_name">Управление воспроизведением</string>
+    <string name="notification_channel_description">Уведомление для управления воспроизведением</string>
+
     <string name="settings_group_app">Приложение</string>
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
     <string name="settings_app_version">Версия приложения: %s</string>

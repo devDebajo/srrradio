@@ -21,6 +21,9 @@ sealed interface MediaState {
         val playing: Boolean
             get() = mediaStationInfo?.playingState == UiStationPlayingState.PLAYING
 
+        val paused: Boolean
+            get() = !playing && !buffering
+
         val buffering: Boolean
             get() = mediaStationInfo?.playingState == UiStationPlayingState.BUFFERING
 

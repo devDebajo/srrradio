@@ -17,7 +17,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Srrradio">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,8 +28,8 @@
 
         <service
             android:name=".PlayerNotificationService"
-            android:foregroundServiceType="mediaPlayback"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback" />
     </application>
 
 </manifest>

@@ -4,6 +4,7 @@ import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.MediaController
 import ru.debajo.srrradio.RadioPlayer
+import ru.debajo.srrradio.StationCoverLoader
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
@@ -48,8 +49,16 @@ internal interface AppModule : AppApi {
         return MediaStateListenerCommandProcessor(mediaController)
     }
 
-    fun provideRadioPlayer(context: Context, coroutineScope: CoroutineScope): RadioPlayer {
-        return RadioPlayer(context = context, coroutineScope = coroutineScope)
+    fun provideRadioPlayer(
+        context: Context,
+        stationCoverLoader: StationCoverLoader,
+        coroutineScope: CoroutineScope
+    ): RadioPlayer {
+        return RadioPlayer(
+            context = context,
+            stationCoverLoader = stationCoverLoader,
+            coroutineScope = coroutineScope
+        )
     }
 
     fun provideNewPlayCommandProcessor(mediaController: MediaController): NewPlayCommandProcessor = NewPlayCommandProcessor(mediaController)
@@ -82,6 +91,10 @@ internal interface AppModule : AppApi {
         return ListenFavoriteStationsProcessor(useCase)
     }
 
+    fun provideStationCoverLoader(context: Context): StationCoverLoader {
+        return StationCoverLoader(context)
+    }
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         override val coroutineScope: CoroutineScope
@@ -111,6 +124,7 @@ internal interface AppModule : AppApi {
             MediaController(
                 player = provideRadioPlayer(
                     context = dependencies.context,
+                    stationCoverLoader = provideStationCoverLoader(dependencies.context),
                     coroutineScope = dependencies.applicationCoroutineScope
                 ),
                 lastStationUseCase = dependencies.lastStationUseCase,

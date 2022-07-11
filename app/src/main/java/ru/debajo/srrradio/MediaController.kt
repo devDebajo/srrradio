@@ -2,9 +2,7 @@ package ru.debajo.srrradio
 
 import android.support.v4.media.session.MediaSessionCompat
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.model.MediaState
@@ -26,8 +24,10 @@ class MediaController(
     private val stateMutable: MutableStateFlow<MediaState> = MutableStateFlow(MediaState.None)
     val state: StateFlow<MediaState> = stateMutable.asStateFlow()
 
-    val mediaSession: MediaSessionCompat
-        get() = player.mediaSession
+    val mediaSession: Flow<MediaSessionCompat> = combine(
+        flowOf(player.mediaSession),
+        player.mediaSessionUpdated.onStart { emit(Unit) }
+    ) { session, _ -> session }
 
     suspend fun prepare() {
         if (stateMutable.value !is MediaState.None) {

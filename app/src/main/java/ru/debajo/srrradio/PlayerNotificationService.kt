@@ -6,39 +6,26 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.ServiceInfo
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.model.MediaState
 import kotlin.coroutines.CoroutineContext
-import kotlin.math.roundToInt
 
 class PlayerNotificationService : Service(), CoroutineScope {
 
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
-    private val emptyBitmap: Bitmap by lazy { createEmptyBitmap() }
     private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
     private val coroutineScope: CoroutineScope by lazy { AppApiHolder.get().coroutineScope }
 
@@ -52,13 +39,13 @@ class PlayerNotificationService : Service(), CoroutineScope {
         super.onCreate()
         prepareChannel()
         launch(Main) {
-            mediaController.state.mapLatest { state ->
+            mediaController.state.flatMapLatest { state ->
                 when (state) {
                     MediaState.Empty,
                     MediaState.Loading,
-                    MediaState.None -> null
+                    MediaState.None -> flowOf(null)
                     is MediaState.Loaded -> buildNotification(state)
-                } to state
+                }.map { notification -> notification to state }
             }.collect { (notification, state) ->
                 if (notification == null || state !is MediaState.Loaded) {
                     stopForeground(true)
@@ -86,71 +73,72 @@ class PlayerNotificationService : Service(), CoroutineScope {
         if (mediaState.hasPreviousStation) {
             visibleActions.add(lastAction++)
         }
-        visibleActions.add(lastAction++)
+        if (mediaState.playing || mediaState.paused) {
+            visibleActions.add(lastAction++)
+        }
         if (mediaState.hasNextStation) {
             visibleActions.add(lastAction)
         }
         return setShowActionsInCompactView(*visibleActions.toIntArray())
     }
 
-    // баги:
-    // не обновляется setShowActionsInCompactView
-    // не всега появляется картинка
-    private fun buildNotification(mediaState: MediaState.Loaded): Notification {
-        val style = androidx.media.app.NotificationCompat.MediaStyle()
-        style.setMediaSession(mediaController.mediaSession.sessionToken)
-        style.setShowActionsInCompactView(mediaState)
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_radio)
-            .setContentTitle(getString(R.string.app_name))
-            .setStyle(style)
-            .run {
-                if (mediaState.hasPreviousStation) {
-                    addAction(
-                        R.drawable.ic_skip_previous,
-                        getString(R.string.accessibility_previous_station),
-                        PlaybackBroadcastReceiver.previousIntent(this@PlayerNotificationService)
-                    )
+    private fun buildNotification(mediaState: MediaState.Loaded): Flow<Notification> {
+        return mediaController.mediaSession.map { mediaSession ->
+            val style = androidx.media.app.NotificationCompat.MediaStyle()
+            style.setMediaSession(mediaSession.sessionToken)
+            style.setShowActionsInCompactView(mediaState)
+            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_radio)
+                .setContentTitle(getString(R.string.app_name))
+                .setStyle(style)
+                .run {
+                    if (mediaState.hasPreviousStation) {
+                        addAction(
+                            R.drawable.ic_skip_previous,
+                            getString(R.string.accessibility_previous_station),
+                            PlaybackBroadcastReceiver.previousIntent(this@PlayerNotificationService)
+                        )
+                    }
+                    this
                 }
-                this
-            }
-            .run {
-                when {
-                    mediaState.playing -> addAction(
-                        R.drawable.ic_pause,
-                        getString(R.string.accessibility_pause),
-                        PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
-                    )
-                    !mediaState.playing && !mediaState.buffering -> addAction(
-                        R.drawable.ic_play,
-                        getString(R.string.accessibility_play),
-                        PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
-                    )
-                    else -> this
+                .run {
+                    when {
+                        mediaState.playing -> addAction(
+                            R.drawable.ic_pause,
+                            getString(R.string.accessibility_pause),
+                            PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
+                        )
+                        mediaState.paused -> addAction(
+                            R.drawable.ic_play,
+                            getString(R.string.accessibility_play),
+                            PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
+                        )
+                        else -> this
+                    }
                 }
-            }
-            .run {
-                if (mediaState.hasNextStation) {
-                    addAction(
-                        R.drawable.ic_skip_next,
-                        getString(R.string.accessibility_next_station),
-                        PlaybackBroadcastReceiver.nextIntent(this@PlayerNotificationService)
-                    )
+                .run {
+                    if (mediaState.hasNextStation) {
+                        addAction(
+                            R.drawable.ic_skip_next,
+                            getString(R.string.accessibility_next_station),
+                            PlaybackBroadcastReceiver.nextIntent(this@PlayerNotificationService)
+                        )
+                    }
+                    this
                 }
-                this
-            }
-            .build()
+                .build()
+        }
     }
 
     private fun prepareChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val importance = NotificationManager.IMPORTANCE_LOW
             val systemChannel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                "context.getString(channel.name)",
+                getString(R.string.notification_channel_name),
                 importance
             ).apply {
-                this.description = "context.getString(channel.description)"
+                this.description = getString(R.string.notification_channel_description)
             }
             notificationManager.createNotificationChannel(systemChannel)
         }
@@ -162,61 +150,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
         } else {
             startForeground(ID, notification)
         }
-    }
-
-    private fun String?.observe(): Flow<Bitmap> {
-        if (this.isNullOrEmpty()) {
-            return flowOf(emptyBitmap)
-        }
-
-        return callbackFlow {
-            val task = Glide
-                .with(this@PlayerNotificationService)
-                .asBitmap()
-                .load(this@observe)
-                .addListener(object : RequestListener<Bitmap> {
-                    override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Bitmap>?, isFirstResource: Boolean): Boolean {
-                        trySend(emptyBitmap)
-                        return false
-                    }
-
-                    override fun onResourceReady(
-                        resource: Bitmap,
-                        model: Any?,
-                        target: Target<Bitmap>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        trySend(resource)
-                        return false
-                    }
-
-                })
-                .submit()
-
-            awaitClose { task.cancel(true) }
-        }
-    }
-
-    private fun createEmptyBitmap(): Bitmap {
-        val bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.parseColor("#6c586b"))
-        val drawable = ContextCompat.getDrawable(this, R.drawable.ic_radio)!!
-        val drawableWidth = bitmap.width * 0.45f
-        val drawableHeight = bitmap.height * 0.45f
-        val drawableLeft = (bitmap.width - drawableWidth) / 2f
-        val drawableTop = (bitmap.height - drawableHeight) / 2f
-        drawable.setBounds(
-            drawableLeft.roundToInt(),
-            drawableTop.roundToInt(),
-            (drawableLeft + drawableWidth).roundToInt(),
-            (drawableTop + drawableHeight).roundToInt()
-        )
-        val wrappedDrawable = DrawableCompat.wrap(drawable)
-        DrawableCompat.setTint(wrappedDrawable, Color.parseColor("#907A88"))
-        wrappedDrawable.draw(canvas)
-        return bitmap
     }
 
     private class PlaybackBroadcastReceiver(
