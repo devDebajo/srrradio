@@ -10,15 +10,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Radio
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +32,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -35,10 +40,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.ext.colorInt
+import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.toDp
 import ru.debajo.srrradio.ui.list.StationsList
 import ru.debajo.srrradio.ui.list.StationsListViewModel
@@ -48,13 +58,46 @@ import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.player.normalizedFraction
 import ru.debajo.srrradio.ui.settings.SettingsScreen
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
+import kotlin.math.roundToInt
 
 typealias AndroidColor = android.graphics.Color
+
+class SleepTimerViewModel : ViewModel() {
+
+    private val stateMutable: MutableStateFlow<SleepTimerState> = MutableStateFlow(SleepTimerState())
+    val state: StateFlow<SleepTimerState> = stateMutable.asStateFlow()
+
+    fun onButtonClick() {
+    }
+
+    fun onValueChange(value: Float) {
+        stateMutable.value = stateMutable.value.copy(value = value.roundToInt())
+    }
+
+    fun show() {
+        stateMutable.value = stateMutable.value.copy(displaying = true)
+    }
+
+    fun onVisibleChanged(visible: Boolean) {
+        stateMutable.value = stateMutable.value.copy(displaying = visible)
+    }
+
+    companion object {
+        val Local: ProvidableCompositionLocal<SleepTimerViewModel> = staticCompositionLocalOf { TODO() }
+    }
+}
+
+data class SleepTimerState(
+    val displaying: Boolean = false,
+    val value: Int = 0,
+    val buttonText: String = "Сохранить",
+)
 
 class MainActivity : ComponentActivity() {
 
     private val stationsListViewModel: StationsListViewModel by lazyViewModel { AppApiHolder.get().stationsListViewModel }
     private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by lazyViewModel { AppApiHolder.get().playerBottomSheetViewModel }
+    private val sleepTimerViewModel: SleepTimerViewModel by lazyViewModel { SleepTimerViewModel() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,6 +112,7 @@ class MainActivity : ComponentActivity() {
             CompositionLocalProvider(
                 StationsListViewModel.Local provides stationsListViewModel,
                 PlayerBottomSheetViewModel.Local provides playerBottomSheetViewModel,
+                SleepTimerViewModel.Local provides sleepTimerViewModel,
                 LocalIndication provides rememberRipple(),
             ) {
                 SrrradioTheme(useDarkTheme = true) {
@@ -77,7 +121,7 @@ class MainActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        MainScreen()
+                        MainScreenWithSleepBottomSheet()
                     }
                 }
             }
@@ -86,7 +130,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun ConfigureNavigationColor() {
-        val navigationColor = rememberUpdatedState(bottomSheetBgColor())
+        val navigationColor = rememberUpdatedState(bottomSheetBgColor)
         LaunchedEffect(Unit) {
             snapshotFlow { navigationColor.value }.collect {
                 window.navigationBarColor = it.colorInt
@@ -95,10 +139,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-private fun bottomSheetBgColor(): Color {
-    return MaterialTheme.colorScheme.secondaryContainer
-}
+private val bottomSheetBgColor: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.secondaryContainer
 
 sealed interface NavTree {
 
@@ -125,6 +168,78 @@ sealed interface NavTree {
 
 @Composable
 @OptIn(ExperimentalMaterialApi::class)
+fun MainScreenWithSleepBottomSheet() {
+    val sleepTimerViewModel = SleepTimerViewModel.Local.current
+    val state by sleepTimerViewModel.state.collectAsState()
+    val sheetState = rememberModalBottomSheetState(
+        state.displaying.select(ModalBottomSheetValue.Expanded, ModalBottomSheetValue.Hidden)
+    )
+
+    LaunchedEffect(sheetState) {
+        launch {
+            sleepTimerViewModel.state.map { it.displaying }.collect {
+                if (sheetState.isVisible != it) {
+                    if (it) {
+                        sheetState.show()
+                    } else {
+                        sheetState.hide()
+                    }
+                }
+            }
+        }
+
+        launch {
+            snapshotFlow { sheetState.isVisible }.collect {
+                sleepTimerViewModel.onVisibleChanged(it)
+            }
+        }
+    }
+
+    ModalBottomSheetLayout(
+        modifier = Modifier.systemBarsPadding(),
+        sheetState = sheetState,
+        sheetBackgroundColor = bottomSheetBgColor,
+        sheetElevation = 20.dp,
+        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        sheetContent = { SleepTimerBottomSheet() }
+    ) {
+        MainScreen()
+    }
+}
+
+@Composable
+private fun SleepTimerBottomSheet() {
+    val viewModel = SleepTimerViewModel.Local.current
+    val state by viewModel.state.collectAsState()
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 20.dp)
+    ) {
+        Text(stringResource(R.string.sleep_timer))
+        Spacer(Modifier.height(30.dp))
+
+        Text("${state.value} минут")
+        Spacer(Modifier.height(30.dp))
+        Slider(
+            modifier = Modifier.fillMaxWidth(),
+            value = state.value.toFloat(),
+            onValueChange = { viewModel.onValueChange(it) },
+            valueRange = 0f..90f,
+            steps = 8,
+        )
+        Spacer(Modifier.height(20.dp))
+        OutlinedButton(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = { viewModel.onButtonClick() }
+        ) {
+            Text(state.buttonText)
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterialApi::class)
 fun MainScreen() {
     val bottomSheetViewModel = PlayerBottomSheetViewModel.Local.current
     val bottomSheetState by bottomSheetViewModel.state.collectAsState()
@@ -144,15 +259,11 @@ fun MainScreen() {
         }
     }
 
-    Box(
-        Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
+    Box(Modifier.fillMaxSize()) {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
             backgroundColor = MaterialTheme.colorScheme.background,
-            sheetBackgroundColor = bottomSheetBgColor(),
+            sheetBackgroundColor = bottomSheetBgColor,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             content = {
                 Box(Modifier.fillMaxSize()) {
@@ -205,7 +316,7 @@ private fun Navigation(
                 .background(MaterialTheme.colorScheme.secondary)
         )
         NavigationBar(
-            containerColor = bottomSheetBgColor()
+            containerColor = bottomSheetBgColor
         ) {
             val navBackStackEntry by navigationController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination

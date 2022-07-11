@@ -32,6 +32,15 @@ sealed interface MediaState {
 
         val currentStationId: String?
             get() = mediaStationInfo?.currentStationId
+
+        val hasPreviousStation: Boolean
+            get() = playlist.stations.getOrNull(currentStationIndex - 1) != null
+
+        val hasNextStation: Boolean
+            get() {
+                val currentStationIndex = currentStationIndex
+                return currentStationIndex >= 0 && playlist.stations.getOrNull(currentStationIndex + 1) != null
+            }
     }
 }
 

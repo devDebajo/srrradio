@@ -80,28 +80,64 @@ class PlayerNotificationService : Service(), CoroutineScope {
         unregisterReceiver(receiver)
     }
 
+    private fun androidx.media.app.NotificationCompat.MediaStyle.setShowActionsInCompactView(mediaState: MediaState.Loaded): androidx.media.app.NotificationCompat.MediaStyle {
+        var lastAction = 0
+        val visibleActions = mutableListOf<Int>()
+        if (mediaState.hasPreviousStation) {
+            visibleActions.add(lastAction++)
+        }
+        visibleActions.add(lastAction++)
+        if (mediaState.hasNextStation) {
+            visibleActions.add(lastAction)
+        }
+        return setShowActionsInCompactView(*visibleActions.toIntArray())
+    }
+
+    // баги:
+    // не обновляется setShowActionsInCompactView
+    // не всега появляется картинка
     private fun buildNotification(mediaState: MediaState.Loaded): Notification {
         val style = androidx.media.app.NotificationCompat.MediaStyle()
         style.setMediaSession(mediaController.mediaSession.sessionToken)
-        style.setShowActionsInCompactView(0)
+        style.setShowActionsInCompactView(mediaState)
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentTitle(getString(R.string.app_name))
             .setStyle(style)
             .run {
+                if (mediaState.hasPreviousStation) {
+                    addAction(
+                        R.drawable.ic_skip_previous,
+                        getString(R.string.accessibility_previous_station),
+                        PlaybackBroadcastReceiver.previousIntent(this@PlayerNotificationService)
+                    )
+                }
+                this
+            }
+            .run {
                 when {
                     mediaState.playing -> addAction(
                         R.drawable.ic_pause,
-                        null,
+                        getString(R.string.accessibility_pause),
                         PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
                     )
                     !mediaState.playing && !mediaState.buffering -> addAction(
                         R.drawable.ic_play,
-                        null,
+                        getString(R.string.accessibility_play),
                         PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
                     )
                     else -> this
                 }
+            }
+            .run {
+                if (mediaState.hasNextStation) {
+                    addAction(
+                        R.drawable.ic_skip_next,
+                        getString(R.string.accessibility_next_station),
+                        PlaybackBroadcastReceiver.nextIntent(this@PlayerNotificationService)
+                    )
+                }
+                this
             }
             .build()
     }
@@ -191,26 +227,42 @@ class PlayerNotificationService : Service(), CoroutineScope {
             when (intent.action) {
                 ACTION_PAUSE -> mediaController.pause()
                 ACTION_RESUME -> mediaController.play()
+                ACTION_NEXT -> mediaController.next()
+                ACTION_PREVIOUS -> mediaController.previous()
             }
         }
 
         companion object {
+            fun nextIntent(context: Context): PendingIntent {
+                return Intent(ACTION_NEXT)
+                    .setPackage(context.packageName)
+                    .toPending(context, 0)
+            }
+
+            fun previousIntent(context: Context): PendingIntent {
+                return Intent(ACTION_PREVIOUS)
+                    .setPackage(context.packageName)
+                    .toPending(context, 1)
+            }
+
             fun pauseIntent(context: Context): PendingIntent {
                 return Intent(ACTION_PAUSE)
                     .setPackage(context.packageName)
-                    .toPending(context, 0)
+                    .toPending(context, 2)
             }
 
             fun resumeIntent(context: Context): PendingIntent {
                 return Intent(ACTION_RESUME)
                     .setPackage(context.packageName)
-                    .toPending(context, 1)
+                    .toPending(context, 2)
             }
 
             fun intentFilter(): IntentFilter {
                 return IntentFilter().apply {
                     addAction(ACTION_PAUSE)
                     addAction(ACTION_RESUME)
+                    addAction(ACTION_PREVIOUS)
+                    addAction(ACTION_NEXT)
                 }
             }
 
@@ -225,6 +277,8 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
             private const val ACTION_PAUSE = "ru.debajo.srrradio.ACTION_PAUSE"
             private const val ACTION_RESUME = "ru.debajo.srrradio.ACTION_RESUME"
+            private const val ACTION_PREVIOUS = "ru.debajo.srrradio.ACTION_PREVIOUS"
+            private const val ACTION_NEXT = "ru.debajo.srrradio.ACTION_NEXT"
         }
     }
 

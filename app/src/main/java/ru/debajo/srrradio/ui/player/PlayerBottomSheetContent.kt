@@ -42,6 +42,7 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.SleepTimerViewModel
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
@@ -68,6 +69,7 @@ val SwipeProgress<BottomSheetValue>.normalizedFraction: Float
 @OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
 fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
+    val sleepTimerViewModel = SleepTimerViewModel.Local.current
     val state: PlayerBottomSheetState by viewModel.state.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
@@ -251,14 +253,19 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             ) {
                 viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
             }
-//            Box(
-//                modifier = Modifier
-//                    .padding(vertical = 5.dp)
-//                    .width(1.dp)
-//                    .fillMaxHeight()
-//                    .background(Color.White.copy(0.4f))
-//            )
-//            ActionButton(Icons.Rounded.LockClock) {}
+            Box(
+                modifier = Modifier
+                    .padding(vertical = 5.dp)
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(Color.White.copy(0.4f))
+            )
+            ActionButton(
+                icon = Icons.Rounded.LockClock,
+                contentDescription = stringResource(R.string.accessibility_sleep_timer)
+            ) {
+                sleepTimerViewModel.show()
+            }
         }
         Spacer(modifier = Modifier.height(16.dp))
     }
