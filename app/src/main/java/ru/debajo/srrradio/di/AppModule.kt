@@ -15,6 +15,8 @@ import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetCommandResultReduktor
 import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetReduktor
 import ru.debajo.srrradio.ui.processor.*
+import ru.debajo.srrradio.ui.timer.SleepTimer
+import ru.debajo.srrradio.ui.timer.SleepTimerViewModel
 
 internal interface AppModule : AppApi {
     fun provideStationsListViewModel(
@@ -95,7 +97,15 @@ internal interface AppModule : AppApi {
         return StationCoverLoader(context)
     }
 
+    fun provideSleepTimerViewModel(sleepTimer: SleepTimer): SleepTimerViewModel {
+        return SleepTimerViewModel(sleepTimer)
+    }
+
+    fun provideSleepTimer(): SleepTimer = SleepTimer()
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
+
+        override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
         override val coroutineScope: CoroutineScope
             get() = dependencies.applicationCoroutineScope
@@ -119,6 +129,9 @@ internal interface AppModule : AppApi {
                 addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
                 listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase)
             )
+
+        override val sleepTimerViewModel: SleepTimerViewModel
+            get() = provideSleepTimerViewModel(sleepTimer)
 
         override val mediaController: MediaController by lazy {
             MediaController(

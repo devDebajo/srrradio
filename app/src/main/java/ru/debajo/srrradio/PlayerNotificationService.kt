@@ -9,17 +9,15 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.model.MediaState
+import ru.debajo.srrradio.ui.timer.SleepTimer
 import kotlin.coroutines.CoroutineContext
 
 class PlayerNotificationService : Service(), CoroutineScope {
@@ -28,6 +26,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
     private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
     private val coroutineScope: CoroutineScope by lazy { AppApiHolder.get().coroutineScope }
+    private val sleepTimer: SleepTimer by lazy { AppApiHolder.get().sleepTimer }
 
     override val coroutineContext: CoroutineContext
         get() = coroutineScope.coroutineContext
@@ -49,12 +48,30 @@ class PlayerNotificationService : Service(), CoroutineScope {
             }.collect { (notification, state) ->
                 if (notification == null || state !is MediaState.Loaded) {
                     stopForeground(true)
+                    stopListenPauseTask()
                 } else {
                     startForeground(notification)
+                    listenPauseTask()
                 }
             }
         }
         registerReceiver()
+    }
+
+    private var pauseTask: Job? = null
+
+    private fun stopListenPauseTask() {
+        pauseTask?.cancel()
+        pauseTask = null
+    }
+
+    private fun listenPauseTask() {
+        stopListenPauseTask()
+        pauseTask = launch {
+            sleepTimer.awaitPause {
+                mediaController.pause()
+            }
+        }
     }
 
     private fun registerReceiver() {
@@ -152,7 +169,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
         }
     }
 
-    private class PlaybackBroadcastReceiver(
+    class PlaybackBroadcastReceiver(
         private val mediaController: MediaController,
     ) : BroadcastReceiver() {
 

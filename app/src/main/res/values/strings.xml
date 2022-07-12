@@ -8,6 +8,16 @@
     <string name="favorite">Favorite</string>
     <string name="empty_items_placeholder">There no favorite stations\nStart search</string>
     <string name="sleep_timer">Sleep timer</string>
+    <string name="sleep_timer_save">Start</string>
+    <string name="sleep_timer_cancel">Cancel</string>
+    <plurals name="sleep_timer_minutes">
+        <item quantity="zero">%d minutes</item>
+        <item quantity="one">%d minute</item>
+        <item quantity="two">%d minutes</item>
+        <item quantity="few">%d minutes</item>
+        <item quantity="many">%d minutes</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
 
     <string name="notification_channel_name">Media controls notification</string>
     <string name="notification_channel_description">Radio controls notification</string>

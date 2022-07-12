@@ -42,7 +42,6 @@ import com.skydoves.landscapist.glide.GlideImage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.SleepTimerViewModel
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
@@ -50,6 +49,7 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.station.PlayPauseButton
+import ru.debajo.srrradio.ui.timer.SleepTimerViewModel
 import kotlin.math.absoluteValue
 
 val PlayerBottomSheetPeekHeight = 60.dp

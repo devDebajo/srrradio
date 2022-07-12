@@ -19,8 +19,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -32,7 +30,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -40,9 +37,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.debajo.reduktor.lazyViewModel
@@ -58,46 +52,16 @@ import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.player.normalizedFraction
 import ru.debajo.srrradio.ui.settings.SettingsScreen
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
-import kotlin.math.roundToInt
+import ru.debajo.srrradio.ui.timer.SleepTimerBottomSheet
+import ru.debajo.srrradio.ui.timer.SleepTimerViewModel
 
 typealias AndroidColor = android.graphics.Color
-
-class SleepTimerViewModel : ViewModel() {
-
-    private val stateMutable: MutableStateFlow<SleepTimerState> = MutableStateFlow(SleepTimerState())
-    val state: StateFlow<SleepTimerState> = stateMutable.asStateFlow()
-
-    fun onButtonClick() {
-    }
-
-    fun onValueChange(value: Float) {
-        stateMutable.value = stateMutable.value.copy(value = value.roundToInt())
-    }
-
-    fun show() {
-        stateMutable.value = stateMutable.value.copy(displaying = true)
-    }
-
-    fun onVisibleChanged(visible: Boolean) {
-        stateMutable.value = stateMutable.value.copy(displaying = visible)
-    }
-
-    companion object {
-        val Local: ProvidableCompositionLocal<SleepTimerViewModel> = staticCompositionLocalOf { TODO() }
-    }
-}
-
-data class SleepTimerState(
-    val displaying: Boolean = false,
-    val value: Int = 0,
-    val buttonText: String = "Сохранить",
-)
 
 class MainActivity : ComponentActivity() {
 
     private val stationsListViewModel: StationsListViewModel by lazyViewModel { AppApiHolder.get().stationsListViewModel }
     private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by lazyViewModel { AppApiHolder.get().playerBottomSheetViewModel }
-    private val sleepTimerViewModel: SleepTimerViewModel by lazyViewModel { SleepTimerViewModel() }
+    private val sleepTimerViewModel: SleepTimerViewModel by lazyViewModel { AppApiHolder.get().sleepTimerViewModel }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -204,37 +168,6 @@ fun MainScreenWithSleepBottomSheet() {
         sheetContent = { SleepTimerBottomSheet() }
     ) {
         MainScreen()
-    }
-}
-
-@Composable
-private fun SleepTimerBottomSheet() {
-    val viewModel = SleepTimerViewModel.Local.current
-    val state by viewModel.state.collectAsState()
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 20.dp)
-    ) {
-        Text(stringResource(R.string.sleep_timer))
-        Spacer(Modifier.height(30.dp))
-
-        Text("${state.value} минут")
-        Spacer(Modifier.height(30.dp))
-        Slider(
-            modifier = Modifier.fillMaxWidth(),
-            value = state.value.toFloat(),
-            onValueChange = { viewModel.onValueChange(it) },
-            valueRange = 0f..90f,
-            steps = 8,
-        )
-        Spacer(Modifier.height(20.dp))
-        OutlinedButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = { viewModel.onButtonClick() }
-        ) {
-            Text(state.buttonText)
-        }
     }
 }
 
