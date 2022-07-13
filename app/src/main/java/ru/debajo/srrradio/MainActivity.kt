@@ -81,7 +81,7 @@ class MainActivity : ComponentActivity() {
                 SleepTimerViewModel.Local provides sleepTimerViewModel,
                 LocalIndication provides rememberRipple(),
             ) {
-                SrrradioTheme(useDarkTheme = true) {
+                SrrradioTheme {
                     ConfigureNavigationColor()
                     Surface(
                         modifier = Modifier.fillMaxSize(),
