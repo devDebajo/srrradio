@@ -22,7 +22,9 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
 
     override fun onCreate() {
         super.onCreate()
-        Timber.plant(Timber.DebugTree())
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
 
         initDi()
 
