@@ -108,6 +108,10 @@ class PlayerNotificationService : Service(), CoroutineScope {
                 .setSmallIcon(R.drawable.ic_radio)
                 .setContentTitle(getString(R.string.app_name))
                 .setStyle(style)
+                .setContentIntent(
+                    MainActivity.createIntent(this)
+                        .toPending(this, 0, PendingIntentType.ACTIVITY)
+                )
                 .run {
                     if (mediaState.hasPreviousStation) {
                         addAction(
@@ -186,25 +190,25 @@ class PlayerNotificationService : Service(), CoroutineScope {
             fun nextIntent(context: Context): PendingIntent {
                 return Intent(ACTION_NEXT)
                     .setPackage(context.packageName)
-                    .toPending(context, 0)
+                    .toPending(context, 0, PendingIntentType.BROADCAST)
             }
 
             fun previousIntent(context: Context): PendingIntent {
                 return Intent(ACTION_PREVIOUS)
                     .setPackage(context.packageName)
-                    .toPending(context, 1)
+                    .toPending(context, 1, PendingIntentType.BROADCAST)
             }
 
             fun pauseIntent(context: Context): PendingIntent {
                 return Intent(ACTION_PAUSE)
                     .setPackage(context.packageName)
-                    .toPending(context, 2)
+                    .toPending(context, 2, PendingIntentType.BROADCAST)
             }
 
             fun resumeIntent(context: Context): PendingIntent {
                 return Intent(ACTION_RESUME)
                     .setPackage(context.packageName)
-                    .toPending(context, 2)
+                    .toPending(context, 2, PendingIntentType.BROADCAST)
             }
 
             fun intentFilter(): IntentFilter {
@@ -214,15 +218,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
                     addAction(ACTION_PREVIOUS)
                     addAction(ACTION_NEXT)
                 }
-            }
-
-            private fun Intent.toPending(context: Context, requestCode: Int): PendingIntent {
-                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                } else {
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                }
-                return PendingIntent.getBroadcast(context, requestCode, this, flags)
             }
 
             private const val ACTION_PAUSE = "ru.debajo.srrradio.ACTION_PAUSE"
@@ -243,5 +238,22 @@ class PlayerNotificationService : Service(), CoroutineScope {
         fun createIntent(context: Context): Intent {
             return Intent(context, PlayerNotificationService::class.java)
         }
+    }
+}
+
+enum class PendingIntentType {
+    BROADCAST,
+    ACTIVITY
+}
+
+private fun Intent.toPending(context: Context, requestCode: Int, type: PendingIntentType): PendingIntent {
+    val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+    } else {
+        PendingIntent.FLAG_UPDATE_CURRENT
+    }
+    return when (type) {
+        PendingIntentType.BROADCAST -> PendingIntent.getBroadcast(context, requestCode, this, flags)
+        PendingIntentType.ACTIVITY -> PendingIntent.getActivity(context, requestCode, this, flags)
     }
 }

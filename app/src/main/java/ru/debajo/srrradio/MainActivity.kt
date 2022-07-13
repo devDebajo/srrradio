@@ -1,5 +1,7 @@
 package ru.debajo.srrradio
 
+import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -99,6 +101,12 @@ class MainActivity : ComponentActivity() {
             snapshotFlow { navigationColor.value }.collect {
                 window.navigationBarColor = it.colorInt
             }
+        }
+    }
+
+    companion object {
+        fun createIntent(context: Context): Intent {
+            return Intent(context, MainActivity::class.java)
         }
     }
 }
