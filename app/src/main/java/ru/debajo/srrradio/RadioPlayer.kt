@@ -37,8 +37,11 @@ class RadioPlayer(
     private val exoPlayer: ExoPlayer by lazy {
         val player = ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
+            .setHandleAudioBecomingNoisy(true)
             .build()
-        MediaSessionConnector(mediaSession).setPlayer(player)
+        MediaSessionConnector(mediaSession)
+            .apply { setMediaButtonEventHandler(MediaButtonHandler()) }
+            .setPlayer(player)
         player
     }
 

@@ -9,6 +9,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import androidx.media.session.MediaButtonReceiver
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.flow.Flow
@@ -76,6 +77,10 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
     private fun registerReceiver() {
         registerReceiver(receiver, PlaybackBroadcastReceiver.intentFilter())
+        registerReceiver(
+            MediaButtonReceiver(),
+            IntentFilter().apply { addAction(Intent.ACTION_MEDIA_BUTTON) }
+        )
     }
 
     override fun onDestroy() {

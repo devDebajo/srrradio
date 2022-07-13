@@ -32,10 +32,5 @@
             android:name=".PlayerNotificationService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
-
-        <service
-            android:name=".SleepTimerService"
-            android:exported="false" />
     </application>
-
 </manifest>
