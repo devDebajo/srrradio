@@ -8,8 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import kotlin.math.roundToLong
+import kotlin.math.roundToInt
 
 class SleepTimerViewModel(
     private val sleepTimer: SleepTimer,
@@ -22,7 +21,8 @@ class SleepTimerViewModel(
         viewModelScope.launch {
             sleepTimer.observeState().collect { timerState ->
                 stateMutable.value = stateMutable.value.copy(
-                    seconds = timerState.leftSeconds,
+                    leftMinutes = timerState.leftMinutes,
+                    leftSeconds = timerState.leftSeconds,
                     buttonIsSave = !timerState.scheduled
                 )
             }
@@ -32,27 +32,29 @@ class SleepTimerViewModel(
     fun onButtonClick() {
         val state = stateMutable.value
         stateMutable.value = if (state.buttonIsSave) {
-            sleepTimer.scheduleThrough(state.seconds)
+            sleepTimer.scheduleThrough(state.totalLeftSeconds)
             state.copy(buttonIsSave = false)
         } else {
             sleepTimer.cancel()
             state.copy(
-                seconds = 0,
+                leftMinutes = 0,
+                leftSeconds = 0,
                 buttonIsSave = true
             )
         }
     }
 
     fun onValueChange(value: Float) {
-        val minutes = value.roundToLong()
-        val seconds = TimeUnit.MINUTES.toSeconds(minutes)
-        stateMutable.value = stateMutable.value.copy(seconds = seconds)
+        stateMutable.value = stateMutable.value.copy(
+            leftMinutes = value.roundToInt(),
+            leftSeconds = 0
+        )
     }
 
     fun onValueChangeFinished() {
         val state = stateMutable.value
         if (sleepTimer.anyScheduled) {
-            sleepTimer.scheduleThrough(state.seconds)
+            sleepTimer.scheduleThrough(state.totalLeftSeconds)
         }
     }
 

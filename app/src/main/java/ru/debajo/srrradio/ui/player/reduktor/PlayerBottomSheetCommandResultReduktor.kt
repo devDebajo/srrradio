@@ -9,6 +9,7 @@ import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetNews
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
 
 class PlayerBottomSheetCommandResultReduktor : Reduktor<PlayerBottomSheetState, CommandResult, PlayerBottomSheetNews> {
 
@@ -16,6 +17,7 @@ class PlayerBottomSheetCommandResultReduktor : Reduktor<PlayerBottomSheetState, 
         return when (event) {
             is MediaStateListenerCommandProcessor.OnNewMediaState -> reduceOnNewMediaState(state, event)
             is ListenFavoriteStationsProcessor.Result -> reduceNewFavoriteStations(state, event)
+            is SleepTimerListenerProcessor.SleepTimerStateChanged -> reduceSleepTimerChanged(state, event)
             else -> Akt()
         }
     }
@@ -42,5 +44,17 @@ class PlayerBottomSheetCommandResultReduktor : Reduktor<PlayerBottomSheetState, 
         event: ListenFavoriteStationsProcessor.Result
     ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
         return Akt(state.copy(favoriteStationsIds = event.stations.map { it.id }.toSet()))
+    }
+
+    private fun reduceSleepTimerChanged(
+        state: PlayerBottomSheetState,
+        event: SleepTimerListenerProcessor.SleepTimerStateChanged
+    ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
+        return Akt(
+            state.copy(
+                sleepTimerScheduled = event.scheduled,
+                sleepTimerLeftTimeFormatted = "${event.leftMinutes}:${event.leftSeconds}".takeIf { event.scheduled }
+            )
+        )
     }
 }

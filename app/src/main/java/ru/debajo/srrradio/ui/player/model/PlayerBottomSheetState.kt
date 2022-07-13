@@ -12,6 +12,8 @@ data class PlayerBottomSheetState(
     val currentStationIndex: Int = -1,
     val stations: List<UiStation> = emptyList(),
     val favoriteStationsIds: Set<String> = emptySet(),
+    val sleepTimerScheduled: Boolean = false,
+    val sleepTimerLeftTimeFormatted: String? = null,
 ) {
     val playing: Boolean = playingState == UiStationPlayingState.PLAYING
     val hasPreviousStation: Boolean = stations.getOrNull(currentStationIndex - 1) != null

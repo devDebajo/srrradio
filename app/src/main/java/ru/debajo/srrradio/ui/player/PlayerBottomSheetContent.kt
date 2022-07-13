@@ -12,6 +12,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.Badge
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -45,6 +47,7 @@ import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
+import ru.debajo.srrradio.ui.ext.toDp
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
@@ -261,8 +264,9 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                     .background(Color.White.copy(0.4f))
             )
             ActionButton(
-                icon = Icons.Rounded.LockClock,
-                contentDescription = stringResource(R.string.accessibility_sleep_timer)
+                icon = state.sleepTimerScheduled.select(Icons.Rounded.Timelapse, Icons.Rounded.Timer),
+                contentDescription = stringResource(R.string.accessibility_sleep_timer),
+                badgeText = state.sleepTimerLeftTimeFormatted,
             ) {
                 sleepTimerViewModel.show()
             }
@@ -314,7 +318,12 @@ private fun TickerTextView(
 }
 
 @Composable
-private fun RowScope.ActionButton(icon: ImageVector, contentDescription: String, onClick: () -> Unit) {
+private fun RowScope.ActionButton(
+    icon: ImageVector,
+    contentDescription: String,
+    badgeText: String? = null,
+    onClick: () -> Unit
+) {
     Box(
         modifier = Modifier
             .weight(1f)
@@ -327,6 +336,18 @@ private fun RowScope.ActionButton(icon: ImageVector, contentDescription: String,
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = contentDescription
         )
+
+        if (!badgeText.isNullOrEmpty()) {
+            var badgeWidth by remember { mutableStateOf(0) }
+            Badge(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .onGloballyPositioned { badgeWidth = it.size.width }
+                    .offset(x = (badgeWidth / 2f).toDp() + 4.dp + 12.dp),
+            ) {
+                Text(badgeText)
+            }
+        }
     }
 }
 

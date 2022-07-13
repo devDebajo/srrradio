@@ -9,6 +9,7 @@ import ru.debajo.srrradio.ui.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
 
 class PlayerBottomSheetReduktor(
     private val mediaController: MediaController,
@@ -30,6 +31,7 @@ class PlayerBottomSheetReduktor(
             commands = listOf(
                 MediaStateListenerCommandProcessor.ListenerCommand.Start,
                 ListenFavoriteStationsProcessor.Listen,
+                SleepTimerListenerProcessor.Start,
             )
         )
     }

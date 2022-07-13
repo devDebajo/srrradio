@@ -70,7 +70,8 @@ internal interface AppModule : AppApi {
         commandResultReduktor: PlayerBottomSheetCommandResultReduktor,
         mediaStateListenerCommandProcessor: MediaStateListenerCommandProcessor,
         addFavoriteStationProcessor: AddFavoriteStationProcessor,
-        listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor
+        listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
+        sleepTimerListenerProcessor: SleepTimerListenerProcessor
     ): PlayerBottomSheetViewModel {
         return PlayerBottomSheetViewModel(
             reduktor = reduktor,
@@ -78,6 +79,7 @@ internal interface AppModule : AppApi {
             mediaStateListenerCommandProcessor = mediaStateListenerCommandProcessor,
             addFavoriteStationProcessor = addFavoriteStationProcessor,
             listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
+            sleepTimerListenerProcessor = sleepTimerListenerProcessor,
         )
     }
 
@@ -103,6 +105,10 @@ internal interface AppModule : AppApi {
 
     fun provideSleepTimer(): SleepTimer = SleepTimer()
 
+    fun provideSleepTimerListenerProcessor(sleepTimer: SleepTimer): SleepTimerListenerProcessor {
+        return SleepTimerListenerProcessor(sleepTimer)
+    }
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
@@ -127,7 +133,8 @@ internal interface AppModule : AppApi {
                 commandResultReduktor = provideCommandResultReduktor(),
                 mediaStateListenerCommandProcessor = provideMediaStateListenerCommandProcessor(mediaController),
                 addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
-                listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase)
+                listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase),
+                sleepTimerListenerProcessor = provideSleepTimerListenerProcessor(sleepTimer),
             )
 
         override val sleepTimerViewModel: SleepTimerViewModel

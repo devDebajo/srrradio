@@ -24,7 +24,7 @@ class SleepTimer {
             val deltaMs = at - System.currentTimeMillis()
             var secsLeft = TimeUnit.MILLISECONDS.toSeconds(deltaMs)
             do {
-                emit(State(true, secsLeft--))
+                emit(State(true, (secsLeft--).toInt()))
                 delay(1000)
             } while (secsLeft >= 0)
         }
@@ -60,10 +60,10 @@ class SleepTimer {
             return task.at > now
         }
 
-    fun scheduleThrough(seconds: Long) {
+    fun scheduleThrough(seconds: Int) {
         cancel()
 
-        val millis = TimeUnit.SECONDS.toMillis(seconds)
+        val millis = TimeUnit.SECONDS.toMillis(seconds.toLong())
         val at = System.currentTimeMillis() + millis
         taskMutable.value = Task.Pause(at)
     }
@@ -79,6 +79,9 @@ class SleepTimer {
 
     data class State(
         val scheduled: Boolean,
-        val leftSeconds: Long,
-    )
+        val totalLeftSeconds: Int,
+    ) {
+        val leftMinutes: Int = TimeUnit.SECONDS.toMinutes(totalLeftSeconds.toLong()).toInt()
+        val leftSeconds: Int = totalLeftSeconds - (leftMinutes * 60)
+    }
 }

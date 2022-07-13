@@ -1,14 +1,13 @@
 package ru.debajo.srrradio.ui.timer
 
-import java.util.concurrent.TimeUnit
-
 data class SleepTimerState(
     val displaying: Boolean = false,
-    val seconds: Long = 0L,
+    val leftMinutes: Int = 0,
+    val leftSeconds: Int = 0,
     val buttonIsSave: Boolean = true,
     val minValue: Float = 0f,
     val maxValue: Float = 90f,
-    val steps: Int = 8,
+    val steps: Int = 17,
 ) {
-    val minutes: Float = TimeUnit.SECONDS.toMinutes(seconds).toFloat()
+    val totalLeftSeconds: Int = leftMinutes * 60 + leftSeconds
 }
