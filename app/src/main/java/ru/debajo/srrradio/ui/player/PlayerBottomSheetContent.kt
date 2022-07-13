@@ -261,7 +261,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                     .padding(vertical = 5.dp)
                     .width(1.dp)
                     .fillMaxHeight()
-                    .background(Color.White.copy(0.4f))
+                    .background(MaterialTheme.colorScheme.onSecondaryContainer)
             )
             ActionButton(
                 icon = state.sleepTimerScheduled.select(Icons.Rounded.Timelapse, Icons.Rounded.Timer),
@@ -283,7 +283,7 @@ private fun ActionsBar(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(Color.White.copy(alpha = 0.1f))
+            .background(MaterialTheme.colorScheme.secondaryContainer)
     ) {
         content()
     }

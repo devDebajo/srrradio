@@ -113,7 +113,7 @@ class MainActivity : ComponentActivity() {
 
 private val bottomSheetBgColor: Color
     @Composable
-    get() = MaterialTheme.colorScheme.secondaryContainer
+    get() = MaterialTheme.colorScheme.onSecondary
 
 sealed interface NavTree {
 
@@ -203,7 +203,7 @@ fun MainScreen() {
     Box(Modifier.fillMaxSize()) {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
-            backgroundColor = MaterialTheme.colorScheme.background,
+            backgroundColor = MaterialTheme.colorScheme.surface,
             sheetBackgroundColor = bottomSheetBgColor,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             content = {
