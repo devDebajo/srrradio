@@ -18,6 +18,14 @@
         <item quantity="many">%d minutes</item>
         <item quantity="other">%d minutes</item>
     </plurals>
+    <plurals name="sleep_timer_seconds">
+        <item quantity="zero">%d seconds</item>
+        <item quantity="one">%d second</item>
+        <item quantity="two">%d seconds</item>
+        <item quantity="few">%d seconds</item>
+        <item quantity="many">%d seconds</item>
+        <item quantity="other">%d seconds</item>
+    </plurals>
 
     <string name="notification_channel_name">Media controls notification</string>
     <string name="notification_channel_description">Radio controls notification</string>
