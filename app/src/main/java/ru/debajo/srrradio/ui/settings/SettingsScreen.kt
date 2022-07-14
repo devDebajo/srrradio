@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.settings
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
@@ -63,10 +64,13 @@ private fun SettingsList() {
             SettingsText(
                 text = stringResource(R.string.settings_privacy_policy)
             ) {
-                context.startActivity(
-                    Intent(Intent.ACTION_VIEW)
-                        .setData(Uri.parse(BuildConfig.PRIVACY_POLICY))
-                )
+                context.openUrl(BuildConfig.PRIVACY_POLICY)
+            }
+
+            SettingsText(
+                text = stringResource(R.string.settings_data_source)
+            ) {
+                context.openUrl(BuildConfig.DATABASE_HOMEPAGE)
             }
 
             SettingsText(
@@ -74,6 +78,10 @@ private fun SettingsList() {
             )
         }
     }
+}
+
+private fun Context.openUrl(url: String) {
+    startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)))
 }
 
 @Composable

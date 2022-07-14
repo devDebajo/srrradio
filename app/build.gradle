@@ -14,6 +14,7 @@ android {
         versionName "1.0.0"
 
         buildConfigField "String", "PRIVACY_POLICY", '"http://188.120.246.136/srrradio_privacy_policy.html"'
+        buildConfigField "String", "DATABASE_HOMEPAGE", '"https://www.radio-browser.info/"'
         vectorDrawables {
             useSupportLibrary true
         }

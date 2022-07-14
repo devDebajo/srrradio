@@ -26,6 +26,7 @@
 
     <string name="settings_group_app">Приложение</string>
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
+    <string name="settings_data_source">Источник радиостанций (API)</string>
     <string name="settings_app_version">Версия приложения: %s</string>
 
     <string name="accessibility_next_station">Следующая радиостанция</string>
