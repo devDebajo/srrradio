@@ -42,17 +42,6 @@ class SleepTimer {
             }
     }
 
-    val millisLeft: Long
-        get() {
-            return when (val task = taskMutable.value) {
-                is Task.None -> 0
-                is Task.Pause -> {
-                    val leftMillis = task.at - System.currentTimeMillis()
-                    leftMillis.coerceAtLeast(0)
-                }
-            }
-        }
-
     val anyScheduled: Boolean
         get() {
             val task = taskMutable.value as? Task.Pause ?: return false
