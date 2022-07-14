@@ -344,8 +344,12 @@ private fun RowScope.ActionButton(
                     .align(Alignment.Center)
                     .onGloballyPositioned { badgeWidth = it.size.width }
                     .offset(x = (badgeWidth / 2f).toDp() + 4.dp + 12.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
             ) {
-                Text(badgeText)
+                Text(
+                    text = badgeText,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                )
             }
         }
     }
