@@ -43,5 +43,6 @@
     <string name="accessibility_add_favorite">Add station to favorites</string>
     <string name="accessibility_remove_favorite">Delete station from favorites</string>
     <string name="accessibility_station_poster">Station cover</string>
+    <string name="accessibility_add_custom_station">Add your radio-stream</string>
     <string name="accessibility_sleep_timer" translatable="false">@string/sleep_timer</string>
 </resources>

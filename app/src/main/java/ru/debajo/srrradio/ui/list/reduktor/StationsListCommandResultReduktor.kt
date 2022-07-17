@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.list.reduktor
 
 import android.content.Context
+import java.util.UUID
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
@@ -10,7 +11,6 @@ import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
-import java.util.*
 
 class StationsListCommandResultReduktor(
     private val context: Context,

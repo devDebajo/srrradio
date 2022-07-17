@@ -37,4 +37,5 @@
     <string name="accessibility_add_favorite">Добавить станцию в избранные</string>
     <string name="accessibility_remove_favorite">Удалить станцию из избранных</string>
     <string name="accessibility_station_poster">Обложка радиостанции</string>
+    <string name="accessibility_add_custom_station">Добавить свой радио-поток</string>
 </resources>

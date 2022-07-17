@@ -9,21 +9,43 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.BottomSheetScaffold
+import androidx.compose.material.BottomSheetValue
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Radio
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.rememberBottomSheetScaffoldState
+import androidx.compose.material.rememberBottomSheetState
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -256,21 +278,25 @@ private fun Navigation(
                 .height(1.dp)
                 .background(MaterialTheme.colorScheme.secondary)
         )
-        NavigationBar(
-            containerColor = bottomSheetBgColor
-        ) {
-            val navBackStackEntry by navigationController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
+        BottomAppBar(
+            containerColor = bottomSheetBgColor,
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = { }
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = stringResource(R.string.accessibility_add_custom_station)
+                    )
+                }
+            },
+            icons = {
+                val navBackStackEntry by navigationController.currentBackStackEntryAsState()
+                val currentDestination = navBackStackEntry?.destination
 
-            for (screen in NavTree.screens) {
-                val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                NavigationBarItem(
-                    alwaysShowLabel = false,
-                    colors = NavigationBarItemDefaults.colors(
-                        indicatorColor = MaterialTheme.colorScheme.primary,
-                    ),
-                    selected = selected,
-                    onClick = {
+                for (screen in NavTree.screens) {
+                    val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                    androidx.compose.material3.IconButton(onClick = {
                         navigationController.navigate(screen.route) {
                             popUpTo(navigationController.graph.findStartDestination().id) {
                                 saveState = true
@@ -278,26 +304,19 @@ private fun Navigation(
                             launchSingleTop = true
                             restoreState = true
                         }
-                    },
-                    icon = {
+                    }) {
                         Icon(
                             imageVector = screen.icon,
                             contentDescription = stringResource(screen.titleRes),
                             tint = if (selected) {
-                                MaterialTheme.colorScheme.onPrimary
+                                MaterialTheme.colorScheme.primary
                             } else {
-                                MaterialTheme.colorScheme.secondary
+                                androidx.compose.material3.LocalContentColor.current
                             }
                         )
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(screen.titleRes),
-                            color = MaterialTheme.colorScheme.secondary
-                        )
                     }
-                )
+                }
             }
-        }
+        )
     }
 }

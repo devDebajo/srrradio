@@ -3,7 +3,13 @@ package ru.debajo.srrradio.ui.list.reduktor
 import android.content.Context
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.model.MediaState
-import ru.debajo.srrradio.ui.model.*
+import ru.debajo.srrradio.ui.model.UiElement
+import ru.debajo.srrradio.ui.model.UiPlaylist
+import ru.debajo.srrradio.ui.model.UiStation
+import ru.debajo.srrradio.ui.model.UiStationElement
+import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.model.UiTextElement
+import ru.debajo.srrradio.ui.model.toPlaylist
 
 private const val FAVORITE_PLAYLIST_ID = "Favorite_id"
 private const val FAVORITE_PLAYLIST_NAME = "Favorite"

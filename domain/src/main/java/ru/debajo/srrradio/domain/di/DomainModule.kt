@@ -1,6 +1,12 @@
 package ru.debajo.srrradio.domain.di
 
-import ru.debajo.srrradio.domain.*
+import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
+import ru.debajo.srrradio.domain.FavoriteStationsStateUseCaseImpl
+import ru.debajo.srrradio.domain.LastStationUseCase
+import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
+import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCaseImpl
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 

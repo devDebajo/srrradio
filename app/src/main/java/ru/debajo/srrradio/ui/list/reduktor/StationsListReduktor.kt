@@ -8,7 +8,11 @@ import ru.debajo.srrradio.ui.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.list.model.StationsListNews
 import ru.debajo.srrradio.ui.list.model.StationsListState
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
-import ru.debajo.srrradio.ui.processor.*
+import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
+import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
+import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 
 class StationsListReduktor(
     private val context: Context,

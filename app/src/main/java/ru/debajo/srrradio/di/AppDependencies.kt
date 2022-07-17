@@ -3,7 +3,11 @@ package ru.debajo.srrradio.di
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.common.di.CommonApiHolder
-import ru.debajo.srrradio.domain.*
+import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
+import ru.debajo.srrradio.domain.LastStationUseCase
+import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.di.DomainApiHolder
 
 internal interface AppDependencies {

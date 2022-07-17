@@ -14,7 +14,12 @@ import ru.debajo.srrradio.ui.list.reduktor.StationsListReduktor
 import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetCommandResultReduktor
 import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetReduktor
-import ru.debajo.srrradio.ui.processor.*
+import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
+import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
+import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
 import ru.debajo.srrradio.ui.timer.SleepTimer
 import ru.debajo.srrradio.ui.timer.SleepTimerViewModel
 

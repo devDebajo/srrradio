@@ -1,8 +1,15 @@
 package ru.debajo.srrradio
 
 import android.support.v4.media.session.MediaSessionCompat
+import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onStart
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.model.MediaState
@@ -12,7 +19,6 @@ import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.model.toUi
-import java.util.*
 
 class MediaController(
     private val player: RadioPlayer,
