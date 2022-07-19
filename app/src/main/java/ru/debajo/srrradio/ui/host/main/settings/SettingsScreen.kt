@@ -5,12 +5,19 @@ import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,8 +26,11 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -33,6 +43,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
+import ru.debajo.srrradio.ui.theme.SynthWaveColors
 
 @Composable
 fun SettingsScreen() {
@@ -64,10 +75,31 @@ private fun SettingsList() {
 
     Column(Modifier.fillMaxSize()) {
         Spacer(Modifier.height(8.dp))
+
         SettingsGroup(
-            title = stringResource(R.string.settings_group_app),
+            title = stringResource(R.string.settings_app_theme),
             state = calculateGroupState(expandedGroup, 0),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(0) }
+        ) {
+            SettingsColor(
+                text = "Synthwave",
+                color = SynthWaveColors.primary,
+                selected = false,
+            ) {}
+
+            SettingsColor(
+                text = "Purple",
+                color = Color.Cyan,
+                selected = true,
+            ) {}
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        SettingsGroup(
+            title = stringResource(R.string.settings_group_app),
+            state = calculateGroupState(expandedGroup, 1),
+            onHeaderClick = { expandedGroup.onGroupHeaderClick(1) }
         ) {
             val context = LocalContext.current
             SettingsText(
@@ -117,6 +149,49 @@ fun SettingsText(
         fontSize = fontSize,
         fontWeight = fontWeight,
     )
+}
+
+@Composable
+fun SettingsColor(
+    text: String,
+    color: Color,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 18.dp),
+            text = text,
+        )
+        Box(
+            Modifier
+                .border(
+                    width = 1.dp,
+                    color = if (selected) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        Color.Transparent
+                    },
+                    shape = RoundedCornerShape(7.dp)
+                )
+                .padding(3.dp)
+        ) {
+            Box(
+                Modifier
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(4.dp))
+                    .background(color)
+            )
+        }
+    }
 }
 
 @Composable

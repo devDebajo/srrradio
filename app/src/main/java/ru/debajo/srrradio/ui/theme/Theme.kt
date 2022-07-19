@@ -6,7 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
-private val SynthWaveColors: ColorScheme = darkColorScheme(
+val SynthWaveColors: ColorScheme = darkColorScheme(
     primary = Color(0xFFf8acfb),
     onPrimary = Color(0xFF51145a),
     primaryContainer = Color(0xFF6b2e72),

@@ -82,11 +82,11 @@ import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.ext.toDp
+import ru.debajo.srrradio.ui.host.main.list.PlayPauseButton
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
-import ru.debajo.srrradio.ui.station.PlayPauseButton
 
 val PlayerBottomSheetPeekHeight = 60.dp
 

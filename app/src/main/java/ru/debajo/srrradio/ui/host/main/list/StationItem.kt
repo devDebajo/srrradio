@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 
-package ru.debajo.srrradio.ui.station
+package ru.debajo.srrradio.ui.host.main.list
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -30,6 +30,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -70,12 +72,18 @@ fun StationItem(
             }
             Spacer(Modifier.width(8.dp))
             Text(
-                modifier = Modifier.weight(1f).padding(vertical = 6.dp),
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 6.dp),
                 text = station.name,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(Modifier.width(8.dp))
-            IconButton(onClick = { onFavoriteClick(station, !favorite) }) {
+            val haptic = LocalHapticFeedback.current
+            IconButton(onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onFavoriteClick(station, !favorite)
+            }) {
                 Icon(
                     imageVector = favorite.select(Icons.Rounded.Favorite, Icons.Rounded.FavoriteBorder),
                     contentDescription = favorite.stringResource(R.string.accessibility_remove_favorite, R.string.accessibility_add_favorite)

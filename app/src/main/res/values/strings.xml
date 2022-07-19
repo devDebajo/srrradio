@@ -39,6 +39,7 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_data_source">Stations source (API)</string>
     <string name="settings_app_version">App version: %s</string>
+    <string name="settings_app_theme">App theme</string>
 
     <string name="accessibility_next_station">Next station</string>
     <string name="accessibility_previous_station">Previous station</string>

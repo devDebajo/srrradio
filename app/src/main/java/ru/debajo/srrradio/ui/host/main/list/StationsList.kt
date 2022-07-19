@@ -42,7 +42,6 @@ import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.model.UiTextElement
-import ru.debajo.srrradio.ui.station.StationItem
 
 @Composable
 fun StationsList(onScroll: () -> Unit) {
