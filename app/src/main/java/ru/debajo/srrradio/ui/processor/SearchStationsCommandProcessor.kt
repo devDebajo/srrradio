@@ -26,24 +26,24 @@ class SearchStationsCommandProcessor(
             .mapLatest { action ->
                 when (action) {
                     is Action.Cancel -> CommandResult.EMPTY
-                    is Action.Search -> searchSafe(action.query)
+                    is Action.Search -> searchSafe { searchStationsUseCase.search(action.query) }
+                    is Action.SearchByUrl -> searchSafe { searchStationsUseCase.searchByUrl(action.url) }
                 }
             }
     }
 
-    private suspend fun searchSafe(query: String): CommandResult {
+    private suspend fun searchSafe(searchBlock: suspend () -> List<Station>): CommandResult {
         return runCatching {
             delay(500)
-            searchStationsUseCase.search(query).convert().let { SearchResult(it) }
-        }.getOrElse {
-            CommandResult.EMPTY
-        }
+            SearchResult(searchBlock().convert())
+        }.getOrElse { CommandResult.EMPTY }
     }
 
     private fun List<Station>.convert(): List<UiStation> = map { it.toUi() }
 
     sealed interface Action : Command {
         data class Search(val query: String) : Action
+        data class SearchByUrl(val url: String) : Action
         object Cancel : Action
     }
 

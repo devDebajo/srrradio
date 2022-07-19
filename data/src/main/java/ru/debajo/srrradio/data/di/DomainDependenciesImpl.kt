@@ -2,6 +2,7 @@ package ru.debajo.srrradio.data.di
 
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.di.DomainDependencies
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
@@ -18,4 +19,7 @@ object DomainDependenciesImpl : DomainDependencies {
 
     override val loadPlaylistUseCase: LoadPlaylistUseCase
         get() = DataApiHolder.get().loadPlaylistUseCase
+
+    override val userStationUseCase: UserStationUseCase
+        get() = DataApiHolder.get().userStationUseCase
 }

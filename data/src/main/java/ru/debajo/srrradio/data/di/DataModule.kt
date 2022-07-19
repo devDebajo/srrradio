@@ -17,8 +17,10 @@ import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
 import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
 import ru.debajo.srrradio.data.usecase.LoadPlaylistUseCaseImpl
+import ru.debajo.srrradio.data.usecase.UserStationUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
@@ -52,6 +54,8 @@ internal interface DataModule : DataApiInternal {
     fun provideFavoriteStationsRepository(dbFavoriteStationDao: DbFavoriteStationDao): FavoriteStationsRepository {
         return FavoriteStationsRepositoryImpl(dbFavoriteStationDao)
     }
+
+    fun provideUserStationUseCase(stationDao: DbStationDao): UserStationUseCase = UserStationUseCaseImpl(stationDao)
 
     class Impl(private val dependencies: DataDependencies) : DataModule {
 
@@ -99,5 +103,8 @@ internal interface DataModule : DataApiInternal {
 
         override val loadPlaylistUseCase: LoadPlaylistUseCase
             get() = provideLoadPlaylistUseCase(dbPlaylistDao, dbStationDao, dbPlaylistMappingDao)
+
+        override val userStationUseCase: UserStationUseCase
+            get() = provideUserStationUseCase(dbStationDao)
     }
 }

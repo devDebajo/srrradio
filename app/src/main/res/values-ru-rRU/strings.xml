@@ -3,6 +3,7 @@
     <string name="radio_title">Радио</string>
     <string name="settings_title">Настройки</string>
     <string name="search">Поиск</string>
+    <string name="save">Сохранить</string>
     <string name="favorite">Избранное</string>
     <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
     <string name="sleep_timer">Таймер сна</string>
@@ -21,6 +22,10 @@
         <item quantity="other">%d секунд</item>
     </plurals>
 
+    <string name="add_stream_title">Добавить поток</string>
+    <string name="stream_name">Название потока</string>
+    <string name="stream_url">Url потока</string>
+
     <string name="notification_channel_name">Управление воспроизведением</string>
     <string name="notification_channel_description">Уведомление для управления воспроизведением</string>
 
@@ -38,4 +43,7 @@
     <string name="accessibility_remove_favorite">Удалить станцию из избранных</string>
     <string name="accessibility_station_poster">Обложка радиостанции</string>
     <string name="accessibility_add_custom_station">Добавить свой радио-поток</string>
+
+    <string name="accessibility_clear_stream">Очистить ссылку на радио-поток</string>
+    <string name="accessibility_clear_stream_name">Очистить название радио-потока</string>
 </resources>

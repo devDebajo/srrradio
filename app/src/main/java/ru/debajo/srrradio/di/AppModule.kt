@@ -5,9 +5,14 @@ import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
+import ru.debajo.srrradio.domain.UserStationUseCase
+import ru.debajo.srrradio.domain.UserStationsInteractor
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
+import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
+import ru.debajo.srrradio.ui.host.add.AddCustomStationReduktor
+import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
@@ -20,6 +25,7 @@ import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
+import ru.debajo.srrradio.ui.processor.SaveCustomStationProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
 
@@ -114,7 +120,39 @@ internal interface AppModule : AppApi {
         return SleepTimerListenerProcessor(sleepTimer)
     }
 
+    fun provideAddCustomStationViewModel(
+        reduktor: AddCustomStationReduktor,
+        commandResultReduktor: AddCustomStationCommandResultReduktor,
+        searchStationsCommandProcessor: SearchStationsCommandProcessor,
+        saveCustomStationProcessor: SaveCustomStationProcessor,
+    ): AddCustomStationViewModel = AddCustomStationViewModel(
+        reduktor = reduktor,
+        commandResultReduktor = commandResultReduktor,
+        searchStationsCommandProcessor = searchStationsCommandProcessor,
+        saveCustomStationProcessor = saveCustomStationProcessor,
+    )
+
+    fun provideUserStationsInteractor(
+        userStationUseCase: UserStationUseCase,
+        updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase
+    ): UserStationsInteractor = UserStationsInteractor(userStationUseCase, updateFavoriteStationStateUseCase)
+
+    fun provideSaveCustomStationProcessor(userStationsInteractor: UserStationsInteractor): SaveCustomStationProcessor {
+        return SaveCustomStationProcessor(userStationsInteractor)
+    }
+
+    fun provideAddCustomStationCommandResultReduktor(): AddCustomStationCommandResultReduktor {
+        return AddCustomStationCommandResultReduktor()
+    }
+
+    fun provideAddCustomStationReduktor(): AddCustomStationReduktor {
+        return AddCustomStationReduktor()
+    }
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
+
+        private val searchStationsCommandProcessor: SearchStationsCommandProcessor
+            get() = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase)
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
@@ -125,7 +163,7 @@ internal interface AppModule : AppApi {
             get() = provideStationsListViewModel(
                 reduktor = provideStationsListReduktor(dependencies.context),
                 commandResultReduktor = provideStationsListCommandResultReduktor(dependencies.context),
-                searchStationsCommandProcessor = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase),
+                searchStationsCommandProcessor = searchStationsCommandProcessor,
                 mediaStateListener = provideMediaStateListenerCommandProcessor(mediaController),
                 newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController),
                 listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase),
@@ -144,6 +182,19 @@ internal interface AppModule : AppApi {
 
         override val sleepTimerViewModel: SleepTimerViewModel
             get() = provideSleepTimerViewModel(sleepTimer)
+
+        override val addCustomStationViewModel: AddCustomStationViewModel
+            get() = provideAddCustomStationViewModel(
+                reduktor = provideAddCustomStationReduktor(),
+                commandResultReduktor = provideAddCustomStationCommandResultReduktor(),
+                searchStationsCommandProcessor = searchStationsCommandProcessor,
+                saveCustomStationProcessor = provideSaveCustomStationProcessor(
+                    userStationsInteractor = provideUserStationsInteractor(
+                        userStationUseCase = dependencies.userStationUseCase,
+                        updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase
+                    )
+                )
+            )
 
         override val mediaController: MediaController by lazy {
             MediaController(

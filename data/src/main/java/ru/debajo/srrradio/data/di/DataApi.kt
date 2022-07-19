@@ -6,6 +6,7 @@ import ru.debajo.srrradio.common.di.ModuleApi
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
@@ -16,6 +17,7 @@ interface DataApi : ModuleApi {
     val apiHostDiscovery: ApiHostDiscovery
     val lastStationUseCase: LastStationUseCase
     val loadPlaylistUseCase: LoadPlaylistUseCase
+    val userStationUseCase: UserStationUseCase
 }
 
 internal interface DataApiInternal : DataApi {

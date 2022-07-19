@@ -5,6 +5,7 @@
     <string name="radio_title">Radio</string>
     <string name="settings_title">Settings</string>
     <string name="search">Search</string>
+    <string name="save">Save</string>
     <string name="favorite">Favorite</string>
     <string name="empty_items_placeholder">There no favorite stations\nStart search</string>
     <string name="sleep_timer">Sleep timer</string>
@@ -27,6 +28,10 @@
         <item quantity="other">%d seconds</item>
     </plurals>
 
+    <string name="add_stream_title">Add stream</string>
+    <string name="stream_name">Stream name</string>
+    <string name="stream_url">Stream url</string>
+
     <string name="notification_channel_name">Media controls notification</string>
     <string name="notification_channel_description">Radio controls notification</string>
 
@@ -45,4 +50,7 @@
     <string name="accessibility_station_poster">Station cover</string>
     <string name="accessibility_add_custom_station">Add your radio-stream</string>
     <string name="accessibility_sleep_timer" translatable="false">@string/sleep_timer</string>
+
+    <string name="accessibility_clear_stream">Clear stream url</string>
+    <string name="accessibility_clear_stream_name">Clear stream name</string>
 </resources>

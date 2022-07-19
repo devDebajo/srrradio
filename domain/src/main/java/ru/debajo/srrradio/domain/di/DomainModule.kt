@@ -7,6 +7,7 @@ import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCaseImpl
+import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
@@ -33,6 +34,9 @@ internal interface DomainModule : DomainApi {
 
         override val loadPlaylistUseCase: LoadPlaylistUseCase
             get() = dependencies.loadPlaylistUseCase
+
+        override val userStationUseCase: UserStationUseCase
+            get() = dependencies.userStationUseCase
 
         override val updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase
             get() = provideUpdateFavoriteStationStateUseCase(dependencies.favoriteStationsRepository)
