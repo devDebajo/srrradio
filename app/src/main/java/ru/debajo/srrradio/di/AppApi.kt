@@ -1,12 +1,12 @@
 package ru.debajo.srrradio.di
 
 import kotlinx.coroutines.CoroutineScope
-import ru.debajo.srrradio.MediaController
 import ru.debajo.srrradio.common.di.ModuleApi
-import ru.debajo.srrradio.ui.list.StationsListViewModel
-import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
-import ru.debajo.srrradio.ui.timer.SleepTimer
-import ru.debajo.srrradio.ui.timer.SleepTimerViewModel
+import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
+import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
+import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
+import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 
 interface AppApi : ModuleApi {
     val coroutineScope: CoroutineScope

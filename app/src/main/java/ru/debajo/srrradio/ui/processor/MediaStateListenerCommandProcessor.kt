@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.map
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
-import ru.debajo.srrradio.MediaController
-import ru.debajo.srrradio.model.MediaState
+import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.media.model.MediaState
 
 class MediaStateListenerCommandProcessor(
     private val mediaController: MediaController,

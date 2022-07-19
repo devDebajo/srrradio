@@ -13,6 +13,7 @@ import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.di.AppDependencies
 import ru.debajo.srrradio.domain.di.DomainApiHolder
+import ru.debajo.srrradio.media.MediaController
 import timber.log.Timber
 
 class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJob()) {

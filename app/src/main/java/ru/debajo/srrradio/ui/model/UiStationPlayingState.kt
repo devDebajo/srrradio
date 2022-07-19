@@ -1,6 +1,6 @@
 package ru.debajo.srrradio.ui.model
 
-import ru.debajo.srrradio.RadioPlayer
+import ru.debajo.srrradio.media.RadioPlayer
 
 enum class UiStationPlayingState {
     BUFFERING,

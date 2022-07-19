@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
-import ru.debajo.srrradio.ui.timer.SleepTimer
+import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 
 class SleepTimerListenerProcessor(
     private val sleepTimer: SleepTimer,

@@ -2,26 +2,26 @@ package ru.debajo.srrradio.di
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope
-import ru.debajo.srrradio.MediaController
-import ru.debajo.srrradio.RadioPlayer
-import ru.debajo.srrradio.StationCoverLoader
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
-import ru.debajo.srrradio.ui.list.StationsListViewModel
-import ru.debajo.srrradio.ui.list.reduktor.StationsListCommandResultReduktor
-import ru.debajo.srrradio.ui.list.reduktor.StationsListReduktor
-import ru.debajo.srrradio.ui.player.PlayerBottomSheetViewModel
-import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetCommandResultReduktor
-import ru.debajo.srrradio.ui.player.reduktor.PlayerBottomSheetReduktor
+import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.media.RadioPlayer
+import ru.debajo.srrradio.media.StationCoverLoader
+import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
+import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListCommandResultReduktor
+import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
+import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
+import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandResultReduktor
+import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
+import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
+import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
-import ru.debajo.srrradio.ui.timer.SleepTimer
-import ru.debajo.srrradio.ui.timer.SleepTimerViewModel
 
 internal interface AppModule : AppApi {
     fun provideStationsListViewModel(

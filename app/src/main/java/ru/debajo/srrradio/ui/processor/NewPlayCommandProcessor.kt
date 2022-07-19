@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.mapLatest
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
-import ru.debajo.srrradio.MediaController
+import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.ui.model.UiPlaylist
 
 @OptIn(ExperimentalCoroutinesApi::class)
