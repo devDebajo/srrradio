@@ -4,6 +4,8 @@ import android.os.Build
 import androidx.annotation.ColorInt
 import androidx.compose.ui.graphics.Color
 
+typealias AndroidColor = android.graphics.Color
+
 val Color.colorInt: Int
     @ColorInt
     get() {

@@ -16,7 +16,7 @@
         android:theme="@style/Theme.Srrradio">
 
         <activity
-            android:name=".MainActivity"
+            android:name=".HostActivity"
             android:exported="true"
             android:launchMode="singleInstance"
             android:screenOrientation="portrait"

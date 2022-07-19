@@ -117,7 +117,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
                 .setContentTitle(getString(R.string.app_name))
                 .setStyle(style)
                 .setContentIntent(
-                    MainActivity.createIntent(this)
+                    HostActivity.createIntent(this)
                         .toPending(this, 0, PendingIntentType.ACTIVITY)
                 )
                 .run {
