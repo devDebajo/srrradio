@@ -70,6 +70,8 @@ fun StationsList(onScroll: () -> Unit) {
                     value = state.searchQuery,
                     onValueChange = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(it)) },
                     shape = RoundedCornerShape(12.dp),
+                    maxLines = 1,
+                    singleLine = true,
                     trailingIcon = {
                         if (state.searchQuery.isNotEmpty()) {
                             IconButton(onClick = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged("")) }) {

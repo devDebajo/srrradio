@@ -15,5 +15,8 @@ internal data class RemoteStation(
     val stream: String,
 
     @SerialName("favicon")
-    val image: String?
+    val image: String?,
+
+    @SerialName("lastcheckok")
+    val health: Int,
 )

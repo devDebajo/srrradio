@@ -10,29 +10,33 @@ internal class SearchStationsRepositoryImpl(
 ) : SearchStationsRepository {
 
     override suspend fun search(query: String): List<Station> {
-        return serviceHolder.createService().search(query).convert()
+        return serviceHolder.createService().search(query.trim())
+            .asSequence()
+            .filterAlive()
+            .convert()
+            .toList()
     }
 
     override suspend fun searchByUrl(url: String): List<Station> {
-        return serviceHolder.createService().byUrl(url).convert()
+        return serviceHolder.createService().byUrl(url.trim())
+            .asSequence()
+            .filterAlive()
+            .convert()
+            .toList()
     }
 
-    private fun List<RemoteStation>.convert(): List<Station> {
+    private fun Sequence<RemoteStation>.filterAlive(): Sequence<RemoteStation> {
+        return filter { it.health == 1 }
+    }
+
+    private fun Sequence<RemoteStation>.convert(): Sequence<Station> {
         return map { station ->
             Station(
                 id = station.id,
                 name = station.name.trim(),
-                stream = station.stream.replaceHttp(),
+                stream = station.stream,
                 image = station.image,
             )
-        }
-    }
-
-    private fun String.replaceHttp(): String {
-        return if (startsWith("http://")) {
-            replace("http://", "https://")
-        } else {
-            this
         }
     }
 }
