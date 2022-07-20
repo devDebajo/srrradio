@@ -3,9 +3,15 @@ package ru.debajo.srrradio.ui.host.main.player
 import android.text.TextUtils
 import android.widget.TextView
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -75,6 +81,7 @@ import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.absoluteValue
+import kotlin.math.sin
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
@@ -137,6 +144,13 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             },
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        PlayingIndicator(
+            modifier = Modifier
+                .width(30.dp)
+                .height(10.dp),
+            playing = state.playingState == UiStationPlayingState.PLAYING,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
         Text(
             modifier = Modifier.weight(1f),
             text = state.currentStationNameOrEmpty,
@@ -470,4 +484,67 @@ fun StationCover(
             }
         )
     }
+}
+
+private const val BAR_WIDTH_FACTOR = 0.2f
+private const val BAR_COUNT = 4
+
+@Composable
+private fun PlayingIndicator(
+    modifier: Modifier = Modifier,
+    playing: Boolean
+) {
+    BoxWithConstraints(modifier = modifier) {
+        val maxWidth = this.maxWidth
+        val maxHeight = this.maxHeight
+        val barWidth = maxWidth * BAR_WIDTH_FACTOR
+
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            repeat(BAR_COUNT) {
+                PlayingIndicatorBar(
+                    modifier = Modifier.align(Alignment.Bottom),
+                    maxHeight = maxHeight,
+                    playing = playing,
+                    delay = 20 * it,
+                    width = barWidth,
+                )
+            }
+        }
+    }
+}
+
+private fun cycleEasing(cycles: Int = 1): Easing {
+    return Easing {
+        sin(cycles * Math.PI * it).toFloat()
+    }
+}
+
+@Composable
+private fun PlayingIndicatorBar(
+    modifier: Modifier = Modifier,
+    width: Dp,
+    maxHeight: Dp,
+    playing: Boolean,
+    delay: Int,
+) {
+    val height by rememberInfiniteTransition().animateFloat(
+        initialValue = 0f,
+        targetValue = maxHeight.value,
+        animationSpec = infiniteRepeatable(
+            tween(
+                durationMillis = 400,
+                easing = cycleEasing(),
+                delayMillis = delay,
+            )
+        )
+    )
+    Box(
+        modifier
+            .width(width)
+            .height(if (playing) height.coerceAtLeast(1f).dp else 1.dp)
+            .background(MaterialTheme.colorScheme.primary)
+    )
 }
