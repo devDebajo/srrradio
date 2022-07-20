@@ -11,15 +11,11 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import ru.debajo.srrradio.common.lazySuspend
 
 class ApiHostDiscovery {
 
-    private val mutex = Mutex()
-
-    @Volatile
-    private var host: String? = null
+    private val host = lazySuspend { runCatching { findServers().first() }.getOrNull() ?: DEFAULT_HOST }
 
     suspend fun discover() {
         supervisorScope {
@@ -29,16 +25,7 @@ class ApiHostDiscovery {
         }
     }
 
-    suspend fun getHost(): String {
-        if (host == null) {
-            mutex.withLock {
-                if (host == null) {
-                    host = runCatching { findServers().first() }.getOrNull() ?: DEFAULT_HOST
-                }
-            }
-        }
-        return host!!
-    }
+    suspend fun getHost(): String = host.get()
 
     @Suppress("BlockingMethodInNonBlockingContext")
     private fun findServers(): Flow<String> {

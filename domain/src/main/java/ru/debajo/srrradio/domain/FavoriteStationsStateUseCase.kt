@@ -2,8 +2,7 @@ package ru.debajo.srrradio.domain
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
+import ru.debajo.srrradio.common.mutableLazySuspend
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 
@@ -17,29 +16,19 @@ internal class FavoriteStationsStateUseCaseImpl(
     private val repository: FavoriteStationsRepository
 ) : FavoriteStationsStateUseCase {
 
-    private val mutex = Mutex()
-    private var favoriteStationsIds: Set<String>? = null
+    private val favoriteStationsIds = mutableLazySuspend {
+        repository.getFavoriteStations().map { it.id }.toSet()
+    }
 
     override suspend fun isFavorite(stationId: String): Boolean {
         return stationId in getFavoriteStationsIds()
     }
 
-    private suspend fun getFavoriteStationsIds(): Set<String> {
-        if (favoriteStationsIds == null) {
-            mutex.withLock {
-                if (favoriteStationsIds == null) {
-                    favoriteStationsIds = repository.getFavoriteStations().map { it.id }.toSet()
-                }
-            }
-        }
-        return favoriteStationsIds.orEmpty()
-    }
+    private suspend fun getFavoriteStationsIds(): Set<String> = favoriteStationsIds.get()
 
     override fun observe(): Flow<List<Station>> {
-        return repository.observeFavoriteStations().onEach {
-            mutex.withLock {
-                favoriteStationsIds = it.map { it.id }.toSet()
-            }
+        return repository.observeFavoriteStations().onEach { stations ->
+            favoriteStationsIds.set(stations.map { it.id }.toSet())
         }
     }
 }
