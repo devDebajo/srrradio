@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
@@ -19,6 +20,7 @@ import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
+import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
@@ -28,6 +30,7 @@ import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.SaveCustomStationProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
+import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 internal interface AppModule : AppApi {
     fun provideStationsListViewModel(
@@ -149,6 +152,10 @@ internal interface AppModule : AppApi {
         return AddCustomStationReduktor()
     }
 
+    fun provideSettingsViewModel(themeManager: SrrradioThemeManager): SettingsViewModel = SettingsViewModel(themeManager)
+
+    fun provideSrrradioThemeManager(sharedPreferences: SharedPreferences): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
@@ -195,6 +202,14 @@ internal interface AppModule : AppApi {
                     )
                 )
             )
+        override val settingsViewModel: SettingsViewModel
+            get() = provideSettingsViewModel(themeManager)
+
+
+        override val themeManager: SrrradioThemeManager by lazy {
+            provideSrrradioThemeManager(dependencies.sharedPreferences)
+        }
+
 
         override val mediaController: MediaController by lazy {
             MediaController(

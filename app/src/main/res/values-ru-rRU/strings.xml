@@ -35,6 +35,11 @@
     <string name="settings_app_version">Версия приложения: %s</string>
     <string name="settings_app_theme">Тема приложения</string>
 
+    <string name="theme_synthwave">Synth</string>
+    <string name="theme_mint">Мята</string>
+    <string name="theme_blue">Волна</string>
+    <string name="theme_dynamic">Динамическая</string>
+
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>
     <string name="accessibility_play">Продолжить воспроизведение</string>

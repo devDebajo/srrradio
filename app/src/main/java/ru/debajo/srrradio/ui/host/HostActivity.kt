@@ -30,15 +30,19 @@ import ru.debajo.srrradio.ui.host.main.MainScreen
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
+import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.navigation.SrrradioNavigationHost
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
+import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 class HostActivity : ComponentActivity() {
 
     private val stationsListViewModel: StationsListViewModel by lazyViewModel { AppApiHolder.get().stationsListViewModel }
     private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by lazyViewModel { AppApiHolder.get().playerBottomSheetViewModel }
     private val sleepTimerViewModel: SleepTimerViewModel by lazyViewModel { AppApiHolder.get().sleepTimerViewModel }
+    private val settingsViewModel: SettingsViewModel by lazyViewModel { AppApiHolder.get().settingsViewModel }
+    private val themeManager: SrrradioThemeManager by lazy { AppApiHolder.get().themeManager }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +58,8 @@ class HostActivity : ComponentActivity() {
                 StationsListViewModel.Local provides stationsListViewModel,
                 PlayerBottomSheetViewModel.Local provides playerBottomSheetViewModel,
                 SleepTimerViewModel.Local provides sleepTimerViewModel,
+                SettingsViewModel.Local provides settingsViewModel,
+                SrrradioThemeManager.Local provides themeManager,
                 LocalIndication provides rememberRipple(),
             ) {
                 SrrradioTheme {

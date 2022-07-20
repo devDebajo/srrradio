@@ -1,8 +1,10 @@
 package ru.debajo.srrradio.di
 
 import android.content.Context
+import android.content.SharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.common.di.CommonApiHolder
+import ru.debajo.srrradio.data.di.DataApiHolder
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
@@ -21,6 +23,7 @@ internal interface AppDependencies {
     val userStationUseCase: UserStationUseCase
     val updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase
     val favoriteStationsStateUseCase: FavoriteStationsStateUseCase
+    val sharedPreferences: SharedPreferences
 
     class Impl(override val applicationCoroutineScope: CoroutineScope) : AppDependencies {
 
@@ -44,5 +47,8 @@ internal interface AppDependencies {
 
         override val favoriteStationsStateUseCase: FavoriteStationsStateUseCase
             get() = DomainApiHolder.get().favoriteStationsStateUseCase
+
+        override val sharedPreferences: SharedPreferences
+            get() = DataApiHolder.get().sharedPreferences
     }
 }

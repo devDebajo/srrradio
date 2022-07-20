@@ -23,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -43,7 +45,6 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
-import ru.debajo.srrradio.ui.theme.SynthWaveColors
 
 @Composable
 fun SettingsScreen() {
@@ -61,16 +62,16 @@ fun SettingsScreen() {
             )
             Spacer(Modifier.height(8.dp))
         },
-        body = {
-            SettingsList()
-        },
+        body = { SettingsList() },
         scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed
     )
 }
 
 @Composable
 private fun SettingsList() {
-    val expandedGroup = rememberSaveable { mutableStateOf(0) }
+    val viewModel = SettingsViewModel.Local.current
+    val state by viewModel.state.collectAsState()
+    val expandedGroup = rememberSaveable { mutableStateOf(-1) }
     SettingsBackPress(expandedGroup)
 
     Column(Modifier.fillMaxSize()) {
@@ -81,17 +82,15 @@ private fun SettingsList() {
             state = calculateGroupState(expandedGroup, 0),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(0) }
         ) {
-            SettingsColor(
-                text = "Synthwave",
-                color = SynthWaveColors.primary,
-                selected = false,
-            ) {}
-
-            SettingsColor(
-                text = "Purple",
-                color = Color.Cyan,
-                selected = true,
-            ) {}
+            for (theme in state.themes) {
+                SettingsColor(
+                    text = stringResource(theme.theme.nameRes),
+                    color = theme.theme.colors().primary,
+                    selected = theme.selected,
+                ) {
+                    viewModel.selectTheme(theme.theme.code)
+                }
+            }
         }
 
         Spacer(Modifier.height(12.dp))
