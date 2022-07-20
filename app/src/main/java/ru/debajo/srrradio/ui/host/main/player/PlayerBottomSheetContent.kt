@@ -4,6 +4,7 @@ import android.text.TextUtils
 import android.widget.TextView
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.StartOffset
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -146,7 +147,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     ) {
         PlayingIndicator(
             modifier = Modifier
-                .width(30.dp)
+                .width(20.dp)
                 .height(10.dp),
             playing = state.playingState == UiStationPlayingState.PLAYING,
         )
@@ -488,6 +489,7 @@ fun StationCover(
 
 private const val BAR_WIDTH_FACTOR = 0.2f
 private const val BAR_COUNT = 4
+private const val BAR_DURATION_MS = 400
 
 @Composable
 private fun PlayingIndicator(
@@ -508,7 +510,7 @@ private fun PlayingIndicator(
                     modifier = Modifier.align(Alignment.Bottom),
                     maxHeight = maxHeight,
                     playing = playing,
-                    delay = 20 * it,
+                    delay = 100 * it,
                     width = barWidth,
                 )
             }
@@ -516,10 +518,8 @@ private fun PlayingIndicator(
     }
 }
 
-private fun cycleEasing(cycles: Int = 1): Easing {
-    return Easing {
-        sin(cycles * Math.PI * it).toFloat()
-    }
+private fun cycleEasing(): Easing {
+    return Easing { sin(Math.PI * it).toFloat() }
 }
 
 @Composable
@@ -530,21 +530,21 @@ private fun PlayingIndicatorBar(
     playing: Boolean,
     delay: Int,
 ) {
-    val height by rememberInfiniteTransition().animateFloat(
+    val fraction by rememberInfiniteTransition().animateFloat(
         initialValue = 0f,
-        targetValue = maxHeight.value,
+        targetValue = 1f,
         animationSpec = infiniteRepeatable(
-            tween(
-                durationMillis = 400,
+            animation = tween(
+                durationMillis = BAR_DURATION_MS,
                 easing = cycleEasing(),
-                delayMillis = delay,
-            )
+            ),
+            initialStartOffset = StartOffset(delay)
         )
     )
     Box(
         modifier
             .width(width)
-            .height(if (playing) height.coerceAtLeast(1f).dp else 1.dp)
+            .height(if (playing) (maxHeight * fraction).coerceAtLeast(1.dp) else 1.dp)
             .background(MaterialTheme.colorScheme.primary)
     )
 }
