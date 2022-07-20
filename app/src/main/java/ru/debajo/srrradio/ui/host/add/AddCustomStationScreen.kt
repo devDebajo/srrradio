@@ -23,13 +23,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationEvent
@@ -41,8 +46,12 @@ fun AddCustomStationScreen() {
     val viewModel: AddCustomStationViewModel = viewModel { AppApiHolder.get().addCustomStationViewModel }
     val state by viewModel.state.collectAsState()
     val navTree = NavTree.current
-
+    val focusRequester = remember { FocusRequester() }
     LaunchedEffect(viewModel, navTree) {
+        launch {
+            delay(500)
+            focusRequester.requestFocus()
+        }
         viewModel.news.collect {
             when (it) {
                 AddCustomStationNews.Close -> navTree.host.navController.popBackStack()
@@ -65,7 +74,9 @@ fun AddCustomStationScreen() {
         Spacer(Modifier.height(10.dp))
 
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester),
             shape = RoundedCornerShape(12.dp),
             label = { Text(stringResource(R.string.stream_url)) },
             value = state.stream,
