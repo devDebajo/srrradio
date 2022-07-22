@@ -9,6 +9,7 @@ import androidx.annotation.AnyThread
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
@@ -46,6 +47,17 @@ class RadioPlayer(
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .build()
+            .apply {
+                addListener(object : Player.Listener {
+                    override fun onMediaMetadataChanged(mediaMetadata: MediaMetadata) {
+                        val state = statesMutable.value
+                        if (state is State.HasStation) {
+                            val title = mediaMetadata.extractTitle()
+                            statesMutable.value = state.copy(playingTitle = title)
+                        }
+                    }
+                })
+            }
         MediaSessionConnector(mediaSession)
             .apply { setMediaButtonEventHandler(MediaButtonHandler()) }
             .setPlayer(player)
@@ -211,12 +223,21 @@ class RadioPlayer(
             .build()
     }
 
+    private fun MediaMetadata.extractTitle(): String? {
+        val title = title?.toString() ?: displayTitle?.toString()
+        if (!title.isNullOrEmpty()) {
+            return title
+        }
+        return null
+    }
+
     sealed interface State {
         object None : State
 
         data class HasStation(
             val station: UiStation,
             val playbackState: PlaybackState = PlaybackState.PAUSED,
+            val playingTitle: String? = null,
         ) : State {
             val playing: Boolean
                 get() = playbackState == PlaybackState.PLAYING

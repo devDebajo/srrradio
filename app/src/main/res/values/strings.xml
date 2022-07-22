@@ -8,6 +8,7 @@
     <string name="save">Save</string>
     <string name="favorite">Favorite</string>
     <string name="empty_items_placeholder">There no favorite stations\nStart search</string>
+    <string name="no_track">Unknown track</string>
     <string name="sleep_timer">Sleep timer</string>
     <string name="sleep_timer_save">Start</string>
     <string name="sleep_timer_cancel">Cancel</string>

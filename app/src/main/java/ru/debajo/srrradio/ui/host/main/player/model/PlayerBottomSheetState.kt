@@ -9,6 +9,7 @@ data class PlayerBottomSheetState(
     val showBottomSheet: Boolean = false,
     val currentStationNameOrEmpty: String = "",
     val playingState: UiStationPlayingState = UiStationPlayingState.NONE,
+    val title: String? = null,
     val currentStationIndex: Int = -1,
     val stations: List<UiStation> = emptyList(),
     val favoriteStationsIds: Set<String> = emptySet(),

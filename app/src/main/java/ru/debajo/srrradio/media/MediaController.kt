@@ -100,7 +100,7 @@ class MediaController(
 
         stateMutable.value = MediaState.Loaded(
             playlist = playlist,
-            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE)
+            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE, null)
         )
 
         savePlaylistInfoToPrefs()
@@ -113,7 +113,7 @@ class MediaController(
         val station = state.playlist.stations.firstOrNull { it.id == stationId } ?: return
 
         stateMutable.value = state.copy(
-            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE)
+            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE, null)
         )
 
         savePlaylistInfoToPrefs()
@@ -135,7 +135,7 @@ class MediaController(
         }
         return MediaState.Loaded(
             playlist = playlist.toUi(),
-            mediaStationInfo = lastStation?.let { MediaStationInfo(it.id, UiStationPlayingState.NONE) }
+            mediaStationInfo = lastStation?.let { MediaStationInfo(it.id, UiStationPlayingState.NONE, null) }
         )
     }
 
@@ -153,13 +153,18 @@ class MediaController(
                 if (playerState.station !in currentMediaState.playlist) {
                     MediaState.Loaded(
                         playlist = UiPlaylist(UUID.randomUUID().toString(), "", listOf(playerState.station)),
-                        mediaStationInfo = MediaStationInfo(playerState.station.id, playerState.playbackState.toUi()),
+                        mediaStationInfo = MediaStationInfo(
+                            currentStationId = playerState.station.id,
+                            playingState = playerState.playbackState.toUi(),
+                            title = playerState.playingTitle
+                        ),
                     )
                 } else {
                     currentMediaState.copy(
                         mediaStationInfo = MediaStationInfo(
                             currentStationId = playerState.station.id,
                             playingState = playerState.playbackState.toUi(),
+                            title = playerState.playingTitle
                         )
                     )
                 }

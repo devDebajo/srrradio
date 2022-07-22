@@ -152,13 +152,25 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             playing = state.playingState == UiStationPlayingState.PLAYING,
         )
         Spacer(modifier = Modifier.width(8.dp))
-        Text(
+        Column(
             modifier = Modifier.weight(1f),
-            text = state.currentStationNameOrEmpty,
-            fontSize = 16.sp,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = state.currentStationNameOrEmpty,
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = state.title ?: stringResource(R.string.no_track),
+                fontSize = 10.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
 
         PlayPauseButton(state = state.playingState) {
             if (contentAlpha < 1f) {
@@ -230,7 +242,15 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 )
             }
         }
-
+        Spacer(modifier = Modifier.height(8.dp))
+        TickerTextView(
+            modifier = Modifier
+                .width(itemSize)
+                .align(Alignment.CenterHorizontally),
+            text = state.title ?: stringResource(R.string.no_track),
+            textSize = 13.sp,
+            textColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
         Spacer(modifier = Modifier.height(20.dp))
         Row(
             modifier = Modifier.align(Alignment.CenterHorizontally),

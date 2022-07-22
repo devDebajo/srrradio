@@ -6,6 +6,7 @@
     <string name="save">Сохранить</string>
     <string name="favorite">Избранное</string>
     <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
+    <string name="no_track">Неизвестный трек</string>
     <string name="sleep_timer">Таймер сна</string>
     <string name="sleep_timer_save">Запуск</string>
     <string name="sleep_timer_cancel">Сбросить</string>
