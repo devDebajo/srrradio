@@ -37,6 +37,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.icons.rounded.Save
 import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material.icons.rounded.Timelapse
@@ -90,6 +91,7 @@ import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.ext.toDp
+import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.list.PlayPauseButton
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
@@ -230,7 +232,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 }
             ) {
                 StationCover(
-                    modifier = Modifier.size(itemSize),
+                    modifier = Modifier.size(itemSize).clip(RoundedCornerShape(10.dp)),
                     url = station.image,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -308,7 +310,8 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(35.dp))
+        val snackbarLauncher = LocalSnackbarLauncher.current
         ActionsBar(
             modifier = Modifier
                 .fillMaxWidth()
@@ -322,6 +325,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                     negativeId = R.string.accessibility_add_favorite
                 )
             ) {
+                snackbarLauncher.show("Добавлено в избранные")
                 viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
             }
             Box(
@@ -338,8 +342,24 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             ) {
                 sleepTimerViewModel.show()
             }
+
+            if (!state.title.isNullOrEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .padding(vertical = 5.dp)
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.onSecondaryContainer)
+                )
+                ActionButton(
+                    icon = Icons.Rounded.Save,
+                    contentDescription = "Сохранить трек",
+                ) {
+                    snackbarLauncher.show("Трек добавлен в коллекцию")
+                }
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(70.dp))
     }
 }
 

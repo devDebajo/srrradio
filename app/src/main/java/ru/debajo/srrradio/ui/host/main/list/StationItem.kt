@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -108,7 +109,7 @@ fun PlayPauseButton(
         modifier
             .size(40.dp)
             .clickable(
-                indication = null,
+                indication = rememberRipple(bounded = false),
                 interactionSource = remember { MutableInteractionSource() },
                 enabled = state != UiStationPlayingState.BUFFERING,
                 onClick = { onPlayClick() },

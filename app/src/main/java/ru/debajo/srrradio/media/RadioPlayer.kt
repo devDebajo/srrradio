@@ -129,7 +129,7 @@ class RadioPlayer(
     }
 
     private suspend fun updateMediaSession(playerState: State.HasStation) = runCatching {
-        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, stationCoverLoader.emptyBitmap))
+        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, playerState.playingTitle, stationCoverLoader.emptyBitmap))
         val playbackState = when {
             playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
             playerState.playing -> PlaybackStateCompat.STATE_PLAYING
@@ -144,7 +144,7 @@ class RadioPlayer(
 
         val bitmap = stationCoverLoader.loadImage(playerState.station.image)
         if (bitmap != null) {
-            mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, bitmap))
+            mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, playerState.playingTitle, bitmap))
             mediaSessionUpdatedMutable.emit(Unit)
         }
     }
@@ -215,12 +215,19 @@ class RadioPlayer(
         }
     }
 
-    private fun createMediaMetadataCompat(stationName: String, coverBitmap: Bitmap): MediaMetadataCompat {
-        return MediaMetadataCompat.Builder()
+    private fun createMediaMetadataCompat(stationName: String, title: String?, coverBitmap: Bitmap): MediaMetadataCompat {
+        val builder = MediaMetadataCompat.Builder()
             .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
-            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1)
-            .build()
+
+        if (title.isNullOrEmpty()) {
+            builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
+        } else {
+            builder
+                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, stationName)
+                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+        }
+
+        return builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1).build()
     }
 
     private fun MediaMetadata.extractTitle(): String? {

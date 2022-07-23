@@ -25,7 +25,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -46,6 +50,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
@@ -94,15 +100,51 @@ fun MainScreen() {
         }
     }
 
-    ModalBottomSheetLayout(
-        modifier = Modifier.systemBarsPadding(),
-        sheetState = sheetState,
-        sheetBackgroundColor = bottomSheetBgColor,
-        sheetElevation = 20.dp,
-        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-        sheetContent = { SleepTimerBottomSheet() },
-        content = { RadioScreenContent() },
-    )
+    val snackbarLauncher = rememberSnackbarLauncher()
+    CompositionLocalProvider(
+        LocalSnackbarLauncher provides snackbarLauncher
+    ) {
+        Box {
+            ModalBottomSheetLayout(
+                modifier = Modifier.systemBarsPadding(),
+                sheetState = sheetState,
+                sheetBackgroundColor = bottomSheetBgColor,
+                sheetElevation = 20.dp,
+                sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                sheetContent = { SleepTimerBottomSheet() },
+                content = { RadioScreenContent() },
+            )
+            SnackbarHost(
+                hostState = snackbarLauncher.snackbarHostState,
+                modifier = Modifier
+                    .systemBarsPadding()
+                    .align(Alignment.BottomCenter),
+            )
+        }
+    }
+}
+
+val LocalSnackbarLauncher = staticCompositionLocalOf<SnackbarLauncher> { TODO() }
+
+@Composable
+fun rememberSnackbarLauncher(): SnackbarLauncher {
+    val coroutineScope = rememberCoroutineScope()
+    val state = remember { SnackbarHostState() }
+    return remember(coroutineScope, state) { SnackbarLauncher(coroutineScope, state) }
+}
+
+class SnackbarLauncher(
+    private val coroutineScope: CoroutineScope,
+    val snackbarHostState: SnackbarHostState
+) {
+    private var job: Job? = null
+
+    fun show(message: String) {
+        job?.cancel()
+        job = coroutineScope.launch {
+            snackbarHostState.showSnackbar(message)
+        }
+    }
 }
 
 @Composable
