@@ -5,17 +5,21 @@ import ru.debajo.srrradio.domain.FavoriteStationsStateUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCaseImpl
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
+import ru.debajo.srrradio.domain.repository.TracksCollectionRepository
 
 internal interface DomainModule : DomainApi {
 
     fun provideSearchStationsUseCase(searchStationsRepository: SearchStationsRepository): SearchStationsUseCase {
         return searchStationsRepository
     }
+
+    fun provideTracksCollectionUseCase(repository: TracksCollectionRepository): TracksCollectionUseCase = repository
 
     fun provideUpdateFavoriteStationStateUseCase(repository: FavoriteStationsRepository): UpdateFavoriteStationStateUseCase {
         return UpdateFavoriteStationStateUseCaseImpl(repository)
@@ -44,5 +48,8 @@ internal interface DomainModule : DomainApi {
         override val favoriteStationsStateUseCase: FavoriteStationsStateUseCase by lazy {
             provideFavoriteStationsStateUseCase(dependencies.favoriteStationsRepository)
         }
+
+        override val tracksCollectionUseCase: TracksCollectionUseCase
+            get() = provideTracksCollectionUseCase(dependencies.tracksCollectionRepository)
     }
 }

@@ -9,6 +9,7 @@ import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.di.DomainApiHolder
@@ -23,6 +24,7 @@ internal interface AppDependencies {
     val userStationUseCase: UserStationUseCase
     val updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase
     val favoriteStationsStateUseCase: FavoriteStationsStateUseCase
+    val tracksCollectionUseCase: TracksCollectionUseCase
     val sharedPreferences: SharedPreferences
 
     class Impl(override val applicationCoroutineScope: CoroutineScope) : AppDependencies {
@@ -47,6 +49,9 @@ internal interface AppDependencies {
 
         override val favoriteStationsStateUseCase: FavoriteStationsStateUseCase
             get() = DomainApiHolder.get().favoriteStationsStateUseCase
+
+        override val tracksCollectionUseCase: TracksCollectionUseCase
+            get() = DomainApiHolder.get().tracksCollectionUseCase
 
         override val sharedPreferences: SharedPreferences
             get() = DataApiHolder.get().sharedPreferences

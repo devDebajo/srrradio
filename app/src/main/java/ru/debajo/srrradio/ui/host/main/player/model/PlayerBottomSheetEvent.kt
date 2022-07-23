@@ -7,4 +7,5 @@ sealed interface PlayerBottomSheetEvent {
     object OnPlayPauseClick : PlayerBottomSheetEvent
     class UpdateStationFavorite(val favorite: Boolean) : PlayerBottomSheetEvent
     class OnSelectStation(val page: Int) : PlayerBottomSheetEvent
+    class AddTrackToCollection(val title: String) : PlayerBottomSheetEvent
 }

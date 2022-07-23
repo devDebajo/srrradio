@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.host.main
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -130,14 +132,21 @@ val LocalSnackbarLauncher = staticCompositionLocalOf<SnackbarLauncher> { TODO() 
 fun rememberSnackbarLauncher(): SnackbarLauncher {
     val coroutineScope = rememberCoroutineScope()
     val state = remember { SnackbarHostState() }
-    return remember(coroutineScope, state) { SnackbarLauncher(coroutineScope, state) }
+    val context = LocalContext.current
+    return remember(coroutineScope, state, context) { SnackbarLauncher(coroutineScope, context, state) }
 }
 
 class SnackbarLauncher(
     private val coroutineScope: CoroutineScope,
+    private val context: Context,
     val snackbarHostState: SnackbarHostState
 ) {
     private var job: Job? = null
+
+    fun show(messageRes: Int) {
+        val message = context.getString(messageRes)
+        show(message)
+    }
 
     fun show(message: String) {
         job?.cancel()

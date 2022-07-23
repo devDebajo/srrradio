@@ -7,6 +7,7 @@ import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetNews
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
@@ -23,7 +24,18 @@ class PlayerBottomSheetReduktor(
             PlayerBottomSheetEvent.OnPlayPauseClick -> reduceOnPlayPauseClick()
             is PlayerBottomSheetEvent.OnSelectStation -> reduceOnSelectStation(state, event)
             is PlayerBottomSheetEvent.UpdateStationFavorite -> reduceUpdateStationFavorite(state, event)
+            is PlayerBottomSheetEvent.AddTrackToCollection -> reduceAddTrackToCollection(state, event)
         }
+    }
+
+    private fun reduceAddTrackToCollection(
+        state: PlayerBottomSheetState,
+        event: PlayerBottomSheetEvent.AddTrackToCollection
+    ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
+        val station = state.stations.getOrNull(state.currentStationIndex) ?: return Akt()
+        return Akt(
+            commands = listOf(AddTrackToCollectionProcessor.Save(event.title, station))
+        )
     }
 
     private fun reduceStart(): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {

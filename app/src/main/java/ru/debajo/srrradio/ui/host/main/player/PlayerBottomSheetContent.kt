@@ -232,7 +232,9 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 }
             ) {
                 StationCover(
-                    modifier = Modifier.size(itemSize).clip(RoundedCornerShape(10.dp)),
+                    modifier = Modifier
+                        .size(itemSize)
+                        .clip(RoundedCornerShape(10.dp)),
                     url = station.image,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -325,7 +327,11 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                     negativeId = R.string.accessibility_add_favorite
                 )
             ) {
-                snackbarLauncher.show("Добавлено в избранные")
+                if (state.currentStationInFavorite) {
+                    snackbarLauncher.show(R.string.station_removed_from_favorite)
+                } else {
+                    snackbarLauncher.show(R.string.station_added_to_favorite)
+                }
                 viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
             }
             Box(
@@ -353,9 +359,10 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 )
                 ActionButton(
                     icon = Icons.Rounded.Save,
-                    contentDescription = "Сохранить трек",
+                    contentDescription = stringResource(R.string.accessibility_save_track),
                 ) {
-                    snackbarLauncher.show("Трек добавлен в коллекцию")
+                    snackbarLauncher.show(R.string.track_added_to_collection)
+                    viewModel.onEvent(PlayerBottomSheetEvent.AddTrackToCollection(state.title.orEmpty()))
                 }
             }
         }

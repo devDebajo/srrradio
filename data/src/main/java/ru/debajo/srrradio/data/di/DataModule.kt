@@ -6,13 +6,16 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import ru.debajo.srrradio.data.BuildConfig
+import ru.debajo.srrradio.data.db.MIGRATIONS
 import ru.debajo.srrradio.data.db.SrrradioDatabase
 import ru.debajo.srrradio.data.db.dao.DbFavoriteStationDao
 import ru.debajo.srrradio.data.db.dao.DbPlaylistDao
 import ru.debajo.srrradio.data.db.dao.DbPlaylistMappingDao
 import ru.debajo.srrradio.data.db.dao.DbStationDao
+import ru.debajo.srrradio.data.db.dao.DbTrackCollectionItemDao
 import ru.debajo.srrradio.data.repository.FavoriteStationsRepositoryImpl
 import ru.debajo.srrradio.data.repository.SearchStationsRepositoryImpl
+import ru.debajo.srrradio.data.repository.TracksCollectionRepositoryImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
 import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
@@ -23,6 +26,7 @@ import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
+import ru.debajo.srrradio.domain.repository.TracksCollectionRepository
 
 internal interface DataModule : DataApiInternal {
 
@@ -42,6 +46,10 @@ internal interface DataModule : DataApiInternal {
     fun provideSearchStationsRepository(
         serviceHolder: ServiceHolder
     ): SearchStationsRepository = SearchStationsRepositoryImpl(serviceHolder)
+
+    fun provideTracksCollectionRepository(dao: DbTrackCollectionItemDao): TracksCollectionRepository {
+        return TracksCollectionRepositoryImpl(dao)
+    }
 
     fun provideLastStationUseCase(sharedPreferences: SharedPreferences): LastStationUseCase = LastStationUseCaseImpl(sharedPreferences)
 
@@ -75,7 +83,11 @@ internal interface DataModule : DataApiInternal {
 
         private val serviceHolder: ServiceHolder by lazy { provideServiceHolder(json, okHttpClient, apiHostDiscovery) }
 
-        private val database: SrrradioDatabase by lazy { Room.databaseBuilder(dependencies.context, SrrradioDatabase::class.java, "srrradio.db").build() }
+        private val database: SrrradioDatabase by lazy {
+            Room.databaseBuilder(dependencies.context, SrrradioDatabase::class.java, "srrradio.db")
+                .addMigrations(*MIGRATIONS)
+                .build()
+        }
 
         private val dbPlaylistDao: DbPlaylistDao by lazy { database.dbPlaylistDao() }
 
@@ -84,6 +96,8 @@ internal interface DataModule : DataApiInternal {
         private val dbPlaylistMappingDao: DbPlaylistMappingDao by lazy { database.dbPlaylistMappingDao() }
 
         private val dbFavoriteStationDao: DbFavoriteStationDao by lazy { database.dbFavoriteStationDao() }
+
+        private val dbTrackCollectionItemDao: DbTrackCollectionItemDao by lazy { database.dbTrackCollectionItemDao() }
 
         override val json: Json by lazy { provideJson() }
 
@@ -106,5 +120,8 @@ internal interface DataModule : DataApiInternal {
 
         override val userStationUseCase: UserStationUseCase
             get() = provideUserStationUseCase(dbStationDao)
+
+        override val tracksCollectionRepository: TracksCollectionRepository
+            get() = provideTracksCollectionRepository(dbTrackCollectionItemDao)
     }
 }

@@ -5,6 +5,7 @@ import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
+import ru.debajo.srrradio.domain.repository.TracksCollectionRepository
 
 interface DomainDependencies {
     val searchStationsRepository: SearchStationsRepository
@@ -12,4 +13,5 @@ interface DomainDependencies {
     val lastStationUseCase: LastStationUseCase
     val loadPlaylistUseCase: LoadPlaylistUseCase
     val userStationUseCase: UserStationUseCase
+    val tracksCollectionRepository: TracksCollectionRepository
 }

@@ -7,6 +7,12 @@
     <string name="favorite">Избранное</string>
     <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
     <string name="no_track">Неизвестный трек</string>
+
+    <string name="station_added_to_favorite">Станция добавлена в избранные</string>
+    <string name="station_removed_from_favorite">Станция удалена из избранных</string>
+    <string name="track_added_to_collection">Трек добавлен в коллекцию</string>
+    <string name="track_collection">Коллекция</string>
+
     <string name="sleep_timer">Таймер сна</string>
     <string name="sleep_timer_save">Запуск</string>
     <string name="sleep_timer_cancel">Сбросить</string>
@@ -50,6 +56,7 @@
     <string name="accessibility_remove_favorite">Удалить станцию из избранных</string>
     <string name="accessibility_station_poster">Обложка радиостанции</string>
     <string name="accessibility_add_custom_station">Добавить свой радио-поток</string>
+    <string name="accessibility_save_track">Сохранить трек в коллекцию</string>
 
     <string name="accessibility_clear_stream">Очистить ссылку на радио-поток</string>
     <string name="accessibility_clear_stream_name">Очистить название радио-потока</string>

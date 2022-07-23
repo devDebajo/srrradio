@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.UserStationsInteractor
@@ -25,6 +26,7 @@ import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
@@ -84,13 +86,18 @@ internal interface AppModule : AppApi {
 
     fun provideNewPlayCommandProcessor(mediaController: MediaController): NewPlayCommandProcessor = NewPlayCommandProcessor(mediaController)
 
+    fun provideAddTrackToCollectionProcessor(tracksCollectionUseCase: TracksCollectionUseCase): AddTrackToCollectionProcessor {
+        return AddTrackToCollectionProcessor(tracksCollectionUseCase)
+    }
+
     fun providePlayerBottomSheetViewModel(
         reduktor: PlayerBottomSheetReduktor,
         commandResultReduktor: PlayerBottomSheetCommandResultReduktor,
         mediaStateListenerCommandProcessor: MediaStateListenerCommandProcessor,
         addFavoriteStationProcessor: AddFavoriteStationProcessor,
         listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
-        sleepTimerListenerProcessor: SleepTimerListenerProcessor
+        sleepTimerListenerProcessor: SleepTimerListenerProcessor,
+        addTrackToCollectionProcessor: AddTrackToCollectionProcessor,
     ): PlayerBottomSheetViewModel {
         return PlayerBottomSheetViewModel(
             reduktor = reduktor,
@@ -99,6 +106,7 @@ internal interface AppModule : AppApi {
             addFavoriteStationProcessor = addFavoriteStationProcessor,
             listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
             sleepTimerListenerProcessor = sleepTimerListenerProcessor,
+            addTrackToCollectionProcessor = addTrackToCollectionProcessor,
         )
     }
 
@@ -192,6 +200,7 @@ internal interface AppModule : AppApi {
                 addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
                 listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase),
                 sleepTimerListenerProcessor = provideSleepTimerListenerProcessor(sleepTimer),
+                addTrackToCollectionProcessor = provideAddTrackToCollectionProcessor(dependencies.tracksCollectionUseCase)
             )
 
         override val sleepTimerViewModel: SleepTimerViewModel

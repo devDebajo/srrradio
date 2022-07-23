@@ -6,6 +6,7 @@ import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.di.DomainDependencies
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
+import ru.debajo.srrradio.domain.repository.TracksCollectionRepository
 
 object DomainDependenciesImpl : DomainDependencies {
     override val searchStationsRepository: SearchStationsRepository
@@ -22,4 +23,7 @@ object DomainDependenciesImpl : DomainDependencies {
 
     override val userStationUseCase: UserStationUseCase
         get() = DataApiHolder.get().userStationUseCase
+
+    override val tracksCollectionRepository: TracksCollectionRepository
+        get() = DataApiHolder.get().tracksCollectionRepository
 }

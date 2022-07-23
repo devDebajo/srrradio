@@ -11,6 +11,7 @@ import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
@@ -24,6 +25,7 @@ class PlayerBottomSheetViewModel(
     addFavoriteStationProcessor: AddFavoriteStationProcessor,
     listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
     sleepTimerListenerProcessor: SleepTimerListenerProcessor,
+    addTrackToCollectionProcessor: AddTrackToCollectionProcessor,
 ) : ReduktorViewModel<PlayerBottomSheetState, PlayerBottomSheetEvent, PlayerBottomSheetNews>(
     store = reduktorStore(
         initialState = PlayerBottomSheetState(),
@@ -33,6 +35,7 @@ class PlayerBottomSheetViewModel(
             addFavoriteStationProcessor,
             listenFavoriteStationsProcessor,
             sleepTimerListenerProcessor,
+            addTrackToCollectionProcessor,
         ),
         commandResultReduktor = commandResultReduktor,
         initialEvents = listOf(PlayerBottomSheetEvent.Start),
