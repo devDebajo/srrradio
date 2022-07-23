@@ -49,7 +49,7 @@
     <string name="settings_app_version">App version: %s</string>
     <string name="settings_app_theme">App theme</string>
 
-    <string name="theme_synthwave">Synth</string>
+    <string name="theme_synthwave">Neon</string>
     <string name="theme_mint">Mint</string>
     <string name="theme_blue">Wave</string>
     <string name="theme_dynamic">Dynamic</string>
