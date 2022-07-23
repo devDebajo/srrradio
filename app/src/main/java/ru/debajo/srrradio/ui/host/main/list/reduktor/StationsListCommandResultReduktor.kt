@@ -11,6 +11,7 @@ import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 
 class StationsListCommandResultReduktor(
     private val context: Context,
@@ -21,6 +22,7 @@ class StationsListCommandResultReduktor(
             is SearchStationsCommandProcessor.SearchResult -> reduceSearchResult(state, event)
             is MediaStateListenerCommandProcessor.OnNewMediaState -> reduceOnNewMediaState(state, event)
             is ListenFavoriteStationsProcessor.Result -> reduceNewFavoriteStations(state, event)
+            is TrackCollectionListener.TrackCollectionChanged -> reduceTrackCollectionChanged(state, event)
             else -> Akt()
         }
     }
@@ -69,6 +71,17 @@ class StationsListCommandResultReduktor(
                 playlist = playlist,
                 uiElements = playlist.buildUiElements(context, event.stations.map { it.id }.toSet(), state.mediaState),
                 favoriteStations = event.stations
+            )
+        )
+    }
+
+    private fun reduceTrackCollectionChanged(
+        state: StationsListState,
+        event: TrackCollectionListener.TrackCollectionChanged
+    ): Akt<StationsListState, StationsListNews> {
+        return Akt(
+            state.copy(
+                collectionNotEmpty = event.collection.isNotEmpty()
             )
         )
     }

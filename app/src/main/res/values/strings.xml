@@ -4,6 +4,7 @@
 
     <string name="radio_title">Radio</string>
     <string name="settings_title">Settings</string>
+    <string name="collection_title">Collection</string>
     <string name="search">Search</string>
     <string name="save">Save</string>
     <string name="favorite">Favorite</string>
@@ -13,7 +14,7 @@
     <string name="station_added_to_favorite">Station added to favorites</string>
     <string name="station_removed_from_favorite">Station removed from favorites</string>
     <string name="track_added_to_collection">Track added to collection</string>
-    <string name="track_collection">Collection</string>
+    <string name="track_collection" translatable="false">@string/collection_title</string>
 
     <string name="sleep_timer">Sleep timer</string>
     <string name="sleep_timer_save">Start</string>
@@ -64,6 +65,7 @@
     <string name="accessibility_add_custom_station">Add your radio-stream</string>
     <string name="accessibility_sleep_timer" translatable="false">@string/sleep_timer</string>
     <string name="accessibility_save_track">Save track to collection</string>
+    <string name="accessibility_remove_track">Remove track from collection</string>
 
     <string name="accessibility_clear_stream">Clear stream url</string>
     <string name="accessibility_clear_stream_name">Clear stream name</string>

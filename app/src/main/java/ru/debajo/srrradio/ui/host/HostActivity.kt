@@ -26,6 +26,7 @@ import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.ext.AndroidColor
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.host.add.AddCustomStationScreen
+import ru.debajo.srrradio.ui.host.collection.CollectionScreen
 import ru.debajo.srrradio.ui.host.main.MainScreen
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
@@ -95,6 +96,10 @@ class HostActivity : ComponentActivity() {
 
                 composable(navTree.host.addCustomStation.route) {
                     AddCustomStationScreen()
+                }
+
+                composable(navTree.host.collection.route) {
+                    CollectionScreen()
                 }
             }
         }

@@ -13,6 +13,7 @@ import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
+import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 
 class StationsListReduktor(
     private val context: Context,
@@ -32,6 +33,7 @@ class StationsListReduktor(
             commands = listOf(
                 MediaStateListenerCommandProcessor.ListenerCommand.Start,
                 ListenFavoriteStationsProcessor.Listen,
+                TrackCollectionListener.Listen,
             )
         )
     }

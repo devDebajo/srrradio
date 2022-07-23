@@ -44,6 +44,7 @@ import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.model.UiTextElement
+import ru.debajo.srrradio.ui.navigation.NavTree
 
 @Composable
 fun StationsList(onScroll: () -> Unit) {
@@ -69,13 +70,16 @@ fun StationsList(onScroll: () -> Unit) {
                         fontSize = 36.sp,
                     )
 
-                    Spacer(modifier = Modifier.weight(1f))
+                    if (state.collectionNotEmpty) {
+                        Spacer(modifier = Modifier.weight(1f))
 
-                    OutlinedButton(onClick = { }) {
-                        Text(
-                            text = stringResource(R.string.track_collection),
-                            fontSize = 12.sp
-                        )
+                        val navTree = NavTree.current
+                        OutlinedButton(onClick = { navTree.host.collection.navigate() }) {
+                            Text(
+                                text = stringResource(R.string.track_collection),
+                                fontSize = 12.sp
+                            )
+                        }
                     }
                 }
                 Spacer(Modifier.height(10.dp))

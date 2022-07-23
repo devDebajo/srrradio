@@ -16,6 +16,7 @@ import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
+import ru.debajo.srrradio.ui.host.collection.CollectionViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
@@ -33,6 +34,7 @@ import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.SaveCustomStationProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
+import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 internal interface AppModule : AppApi {
@@ -44,6 +46,7 @@ internal interface AppModule : AppApi {
         newPlayCommandProcessor: NewPlayCommandProcessor,
         listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
         addFavoriteStationProcessor: AddFavoriteStationProcessor,
+        trackCollectionListener: TrackCollectionListener,
     ): StationsListViewModel {
         return StationsListViewModel(
             reduktor = reduktor,
@@ -53,6 +56,7 @@ internal interface AppModule : AppApi {
             newPlayCommandProcessor = newPlayCommandProcessor,
             listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
             addFavoriteStationProcessor = addFavoriteStationProcessor,
+            trackCollectionListener = trackCollectionListener,
         )
     }
 
@@ -169,6 +173,14 @@ internal interface AppModule : AppApi {
 
     fun provideSrrradioThemeManager(sharedPreferences: SharedPreferences): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
 
+    fun provideCollectionViewModel(tracksCollectionUseCase: TracksCollectionUseCase): CollectionViewModel {
+        return CollectionViewModel(tracksCollectionUseCase)
+    }
+
+    fun provideTrackCollectionListener(tracksCollectionUseCase: TracksCollectionUseCase): TrackCollectionListener {
+        return TrackCollectionListener(tracksCollectionUseCase)
+    }
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
@@ -190,6 +202,7 @@ internal interface AppModule : AppApi {
                 newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController),
                 listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase),
                 addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
+                trackCollectionListener = provideTrackCollectionListener(dependencies.tracksCollectionUseCase),
             )
 
         override val playerBottomSheetViewModel: PlayerBottomSheetViewModel
@@ -221,6 +234,8 @@ internal interface AppModule : AppApi {
         override val settingsViewModel: SettingsViewModel
             get() = provideSettingsViewModel(themeManager)
 
+        override val collectionViewModel: CollectionViewModel
+            get() = provideCollectionViewModel(dependencies.tracksCollectionUseCase)
 
         override val themeManager: SrrradioThemeManager by lazy {
             provideSrrradioThemeManager(dependencies.sharedPreferences)

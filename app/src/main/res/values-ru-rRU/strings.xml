@@ -2,6 +2,7 @@
 <resources>
     <string name="radio_title">Радио</string>
     <string name="settings_title">Настройки</string>
+    <string name="collection_title">Коллекция</string>
     <string name="search">Поиск</string>
     <string name="save">Сохранить</string>
     <string name="favorite">Избранное</string>
@@ -11,7 +12,6 @@
     <string name="station_added_to_favorite">Станция добавлена в избранные</string>
     <string name="station_removed_from_favorite">Станция удалена из избранных</string>
     <string name="track_added_to_collection">Трек добавлен в коллекцию</string>
-    <string name="track_collection">Коллекция</string>
 
     <string name="sleep_timer">Таймер сна</string>
     <string name="sleep_timer_save">Запуск</string>
@@ -57,6 +57,7 @@
     <string name="accessibility_station_poster">Обложка радиостанции</string>
     <string name="accessibility_add_custom_station">Добавить свой радио-поток</string>
     <string name="accessibility_save_track">Сохранить трек в коллекцию</string>
+    <string name="accessibility_remove_track">Удалить трек из коллекцию</string>
 
     <string name="accessibility_clear_stream">Очистить ссылку на радио-поток</string>
     <string name="accessibility_clear_stream_name">Очистить название радио-потока</string>

@@ -24,3 +24,4 @@ class AddTrackToCollectionProcessor(
 
     class Save(val title: String, val station: UiStation) : Command
 }
+
