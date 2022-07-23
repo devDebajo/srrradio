@@ -26,7 +26,9 @@ class MediaButtonHandler : MediaSessionConnector.MediaButtonEventHandler {
                 true
             }
             KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
-                mediaController.toggle()
+                if (event.action == KeyEvent.ACTION_UP) {
+                    mediaController.toggle()
+                }
                 true
             }
             KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {

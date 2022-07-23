@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.ui.host.HostActivity
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
@@ -35,6 +36,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
+    private val mediaSessionController: MediaSessionController by lazy { AppApiHolder.get().mediaSessionController }
     private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
     private val coroutineScope: CoroutineScope by lazy { AppApiHolder.get().coroutineScope }
     private val sleepTimer: SleepTimer by lazy { AppApiHolder.get().sleepTimer }
@@ -111,7 +113,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
     }
 
     private fun buildNotification(mediaState: MediaState.Loaded): Flow<Notification> {
-        return mediaController.mediaSession.map { mediaSession ->
+        return mediaSessionController.observe().map { mediaSession ->
             val style = androidx.media.app.NotificationCompat.MediaStyle()
             style.setMediaSession(mediaSession.sessionToken)
             style.setShowActionsInCompactView(mediaState)

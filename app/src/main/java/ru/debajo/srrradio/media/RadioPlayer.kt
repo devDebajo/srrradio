@@ -3,8 +3,6 @@ package ru.debajo.srrradio.media
 import android.content.Context
 import android.graphics.Bitmap
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.MediaSessionCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.annotation.AnyThread
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -18,11 +16,8 @@ import com.google.android.exoplayer2.upstream.DefaultDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
@@ -32,6 +27,7 @@ import ru.debajo.srrradio.ui.model.UiStation
 class RadioPlayer(
     private val context: Context,
     private val stationCoverLoader: StationCoverLoader,
+    private val mediaSessionController: MediaSessionController,
     coroutineScope: CoroutineScope,
 ) : CoroutineScope by coroutineScope {
 
@@ -58,7 +54,7 @@ class RadioPlayer(
                     }
                 })
             }
-        MediaSessionConnector(mediaSession)
+        MediaSessionConnector(mediaSessionController.mediaSession)
             .apply { setMediaButtonEventHandler(MediaButtonHandler()) }
             .setPlayer(player)
         player
@@ -83,13 +79,6 @@ class RadioPlayer(
     val isPlaying: Boolean
         get() = (states.value as? State.HasStation)?.playing == true
 
-    val mediaSession: MediaSessionCompat by lazy {
-        MediaSessionCompat(context, "Srrradio media session")
-    }
-
-    private val mediaSessionUpdatedMutable: MutableSharedFlow<Unit> = MutableSharedFlow()
-    val mediaSessionUpdated: Flow<Unit> = mediaSessionUpdatedMutable.asSharedFlow()
-
     init {
         exoPlayer.addListener(object : Player.Listener {
             private val playWhenReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -113,6 +102,10 @@ class RadioPlayer(
                         statesMutable.value = newState
                         if (newState is State.HasStation) {
                             updateMediaSession(newState)
+                        } else {
+                            mediaSessionController.update {
+                                isActive = false
+                            }
                         }
                     }
                 }
@@ -129,23 +122,19 @@ class RadioPlayer(
     }
 
     private suspend fun updateMediaSession(playerState: State.HasStation) = runCatching {
-        mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, playerState.playingTitle, stationCoverLoader.emptyBitmap))
-        val playbackState = when {
-            playerState.buffering -> PlaybackStateCompat.STATE_BUFFERING
-            playerState.playing -> PlaybackStateCompat.STATE_PLAYING
-            else -> PlaybackStateCompat.STATE_PAUSED
+        mediaSessionController.update {
+            isActive = true
+            station = playerState.station.name
+            playingTitle = playerState.playingTitle
+            cover = stationCoverLoader.emptyBitmap
+            playbackState = playerState.playbackState
         }
-        mediaSession.setPlaybackState(
-            PlaybackStateCompat.Builder()
-                .setState(playbackState, 0L, 1f)
-                .build()
-        )
-        mediaSessionUpdatedMutable.emit(Unit)
 
         val bitmap = stationCoverLoader.loadImage(playerState.station.image)
         if (bitmap != null) {
-            mediaSession.setMetadata(createMediaMetadataCompat(playerState.station.name, playerState.playingTitle, bitmap))
-            mediaSessionUpdatedMutable.emit(Unit)
+            mediaSessionController.update {
+                cover = bitmap
+            }
         }
     }
 

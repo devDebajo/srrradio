@@ -9,6 +9,7 @@ import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.UserStationsInteractor
 import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
@@ -65,14 +66,18 @@ internal interface AppModule : AppApi {
         return MediaStateListenerCommandProcessor(mediaController)
     }
 
+    fun provideMediaSessionController(context: Context): MediaSessionController = MediaSessionController(context)
+
     fun provideRadioPlayer(
         context: Context,
         stationCoverLoader: StationCoverLoader,
+        mediaSessionController: MediaSessionController,
         coroutineScope: CoroutineScope
     ): RadioPlayer {
         return RadioPlayer(
             context = context,
             stationCoverLoader = stationCoverLoader,
+            mediaSessionController = mediaSessionController,
             coroutineScope = coroutineScope
         )
     }
@@ -161,6 +166,8 @@ internal interface AppModule : AppApi {
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
             get() = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase)
 
+        override val mediaSessionController: MediaSessionController by lazy { provideMediaSessionController(dependencies.context) }
+
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
         override val coroutineScope: CoroutineScope
@@ -216,10 +223,12 @@ internal interface AppModule : AppApi {
                 player = provideRadioPlayer(
                     context = dependencies.context,
                     stationCoverLoader = provideStationCoverLoader(dependencies.context),
-                    coroutineScope = dependencies.applicationCoroutineScope
+                    coroutineScope = dependencies.applicationCoroutineScope,
+                    mediaSessionController = mediaSessionController,
                 ),
                 lastStationUseCase = dependencies.lastStationUseCase,
                 loadPlaylistUseCase = dependencies.loadPlaylistUseCase,
+                mediaSessionController = mediaSessionController,
                 coroutineScope = dependencies.applicationCoroutineScope,
             )
         }

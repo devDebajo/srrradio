@@ -1,15 +1,10 @@
 package ru.debajo.srrradio.media
 
-import android.support.v4.media.session.MediaSessionCompat
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onStart
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.media.model.MediaState
@@ -24,16 +19,12 @@ class MediaController(
     private val player: RadioPlayer,
     private val lastStationUseCase: LastStationUseCase,
     private val loadPlaylistUseCase: LoadPlaylistUseCase,
+    private val mediaSessionController: MediaSessionController,
     coroutineScope: CoroutineScope,
 ) : MediaActions, CoroutineScope by coroutineScope {
 
     private val stateMutable: MutableStateFlow<MediaState> = MutableStateFlow(MediaState.None)
     val state: StateFlow<MediaState> = stateMutable.asStateFlow()
-
-    val mediaSession: Flow<MediaSessionCompat> = combine(
-        flowOf(player.mediaSession),
-        player.mediaSessionUpdated.onStart { emit(Unit) }
-    ) { session, _ -> session }
 
     suspend fun prepare() {
         if (stateMutable.value !is MediaState.None) {
@@ -139,7 +130,7 @@ class MediaController(
         )
     }
 
-    private fun onNewPlayerState(playerState: RadioPlayer.State) {
+    private suspend fun onNewPlayerState(playerState: RadioPlayer.State) {
         val currentMediaState = stateMutable.value as? MediaState.Loaded ?: return
         stateMutable.value = when (playerState) {
             is RadioPlayer.State.None -> {
@@ -169,7 +160,15 @@ class MediaController(
                     )
                 }
             }
+        }.updateMediaSession()
+    }
+
+    private suspend fun MediaState.Loaded.updateMediaSession(): MediaState.Loaded {
+        mediaSessionController.update {
+            hasNext = hasNextStation
+            hasPrevious = hasPreviousStation
         }
+        return this
     }
 }
 

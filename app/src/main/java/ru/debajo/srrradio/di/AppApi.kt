@@ -3,6 +3,7 @@ package ru.debajo.srrradio.di
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.common.di.ModuleApi
 import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
@@ -23,5 +24,6 @@ internal interface AppApi : ModuleApi {
     val themeManager: SrrradioThemeManager
 
     val mediaController: MediaController
+    val mediaSessionController: MediaSessionController
     val sleepTimer: SleepTimer
 }
