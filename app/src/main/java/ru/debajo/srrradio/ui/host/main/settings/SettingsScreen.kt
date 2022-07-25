@@ -81,7 +81,7 @@ private fun SettingsList() {
         Spacer(Modifier.height(8.dp))
 
         SettingsGroup(
-            title = stringResource(R.string.settings_app_theme),
+            title = stringResource(R.string.settings_group_app_theme),
             state = calculateGroupState(expandedGroup, 0),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(0) }
         ) {
@@ -98,10 +98,28 @@ private fun SettingsList() {
 
         Spacer(Modifier.height(12.dp))
 
+        val openDocumentLauncher = LocalOpenDocumentLauncher.current
         SettingsGroup(
-            title = stringResource(R.string.settings_group_app),
+            title = stringResource(R.string.settings_group_data),
             state = calculateGroupState(expandedGroup, 1),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(1) }
+        ) {
+            SettingsText(
+                text = stringResource(R.string.settings_import_m3u),
+                loadingIndicator = state.loadingM3u
+            ) {
+                if (!state.loadingM3u) {
+                    openDocumentLauncher.launch(arrayOf("audio/x-mpegurl"))
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        SettingsGroup(
+            title = stringResource(R.string.settings_group_app),
+            state = calculateGroupState(expandedGroup, 2),
+            onHeaderClick = { expandedGroup.onGroupHeaderClick(2) }
         ) {
             val context = LocalContext.current
             SettingsText(
@@ -119,24 +137,6 @@ private fun SettingsList() {
             SettingsText(
                 text = stringResource(R.string.settings_app_version, BuildConfig.VERSION_NAME)
             )
-        }
-
-        Spacer(Modifier.height(12.dp))
-
-        val openDocumentLauncher = LocalOpenDocumentLauncher.current
-        SettingsGroup(
-            title = "Данные",
-            state = calculateGroupState(expandedGroup, 2),
-            onHeaderClick = { expandedGroup.onGroupHeaderClick(2) }
-        ) {
-            SettingsText(
-                text = "Импорт m3u",
-                loadingIndicator = state.loadingM3u
-            ) {
-                if (!state.loadingM3u) {
-                    openDocumentLauncher.launch(arrayOf("audio/x-mpegurl"))
-                }
-            }
         }
     }
 }

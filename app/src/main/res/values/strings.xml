@@ -44,11 +44,15 @@
     <string name="notification_channel_name">Media controls notification</string>
     <string name="notification_channel_description">Radio controls notification</string>
 
+    <string name="settings_group_app_theme">App theme</string>
+
+    <string name="settings_group_data">Data</string>
+    <string name="settings_import_m3u">Import m3u</string>
+
     <string name="settings_group_app">Application</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_data_source">Stations source (API)</string>
     <string name="settings_app_version">App version: %s</string>
-    <string name="settings_app_theme">App theme</string>
 
     <string name="theme_synthwave">Neon</string>
     <string name="theme_mint">Mint</string>

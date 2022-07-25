@@ -37,11 +37,15 @@
     <string name="notification_channel_name">Управление воспроизведением</string>
     <string name="notification_channel_description">Уведомление для управления воспроизведением</string>
 
+    <string name="settings_group_app_theme">Тема приложения</string>
+
+    <string name="settings_group_data">Данные</string>
+    <string name="settings_import_m3u">Импорт m3u</string>
+
     <string name="settings_group_app">Приложение</string>
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
     <string name="settings_data_source">Источник радиостанций (API)</string>
     <string name="settings_app_version">Версия приложения: %s</string>
-    <string name="settings_app_theme">Тема приложения</string>
 
     <string name="theme_synthwave">Неон</string>
     <string name="theme_mint">Мята</string>
