@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.mapLatest
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
-import ru.debajo.srrradio.domain.UserStationsInteractor
+import ru.debajo.srrradio.ui.processor.interactor.UserStationsInteractor
 
 class SaveCustomStationProcessor(
     private val userStationsInteractor: UserStationsInteractor,

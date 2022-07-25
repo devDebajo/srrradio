@@ -7,6 +7,8 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +22,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
@@ -51,6 +54,12 @@ class HostActivity : ComponentActivity() {
     private val settingsViewModel: SettingsViewModel by lazyViewModel { AppApiHolder.get().settingsViewModel }
     private val themeManager: SrrradioThemeManager by lazy { AppApiHolder.get().themeManager }
 
+    private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
+        if (it != null) {
+            settingsViewModel.onFileSelected(it.toString())
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -68,6 +77,7 @@ class HostActivity : ComponentActivity() {
                 SettingsViewModel.Local provides settingsViewModel,
                 SrrradioThemeManager.Local provides themeManager,
                 LocalIndication provides rememberRipple(),
+                LocalOpenDocumentLauncher provides openDocumentLauncher
             ) {
                 SrrradioTheme {
                     ConfigureNavigationColor()
@@ -131,3 +141,5 @@ class HostActivity : ComponentActivity() {
         }
     }
 }
+
+val LocalOpenDocumentLauncher = staticCompositionLocalOf<ActivityResultLauncher<Array<String>>> { TODO() }

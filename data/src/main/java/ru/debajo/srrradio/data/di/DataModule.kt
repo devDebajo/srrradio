@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.data.di
 
+import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import kotlinx.serialization.json.Json
@@ -20,9 +21,11 @@ import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
 import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
 import ru.debajo.srrradio.data.usecase.LoadPlaylistUseCaseImpl
+import ru.debajo.srrradio.data.usecase.ParseM3uUseCaseImpl
 import ru.debajo.srrradio.data.usecase.UserStationUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
@@ -64,6 +67,8 @@ internal interface DataModule : DataApiInternal {
     }
 
     fun provideUserStationUseCase(stationDao: DbStationDao): UserStationUseCase = UserStationUseCaseImpl(stationDao)
+
+    fun provideParseM3uUseCase(context: Context): ParseM3uUseCase = ParseM3uUseCaseImpl(context)
 
     class Impl(private val dependencies: DataDependencies) : DataModule {
 
@@ -120,6 +125,9 @@ internal interface DataModule : DataApiInternal {
 
         override val userStationUseCase: UserStationUseCase
             get() = provideUserStationUseCase(dbStationDao)
+
+        override val parseM3uUseCase: ParseM3uUseCase
+            get() = provideParseM3uUseCase(dependencies.context)
 
         override val tracksCollectionRepository: TracksCollectionRepository
             get() = provideTracksCollectionRepository(dbTrackCollectionItemDao)

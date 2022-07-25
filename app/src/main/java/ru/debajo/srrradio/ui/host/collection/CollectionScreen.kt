@@ -44,9 +44,7 @@ import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 @OptIn(ExperimentalFoundationApi::class)
 fun CollectionScreen() {
     val viewModel = viewModel { AppApiHolder.get().collectionViewModel }
-    LaunchedEffect(viewModel) {
-        viewModel.load()
-    }
+    LaunchedEffect(viewModel) { viewModel.load() }
 
     val state by viewModel.state.collectAsState()
     val haptic = LocalHapticFeedback.current

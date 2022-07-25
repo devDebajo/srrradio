@@ -4,6 +4,7 @@ import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
+import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
@@ -51,5 +52,8 @@ internal interface DomainModule : DomainApi {
 
         override val tracksCollectionUseCase: TracksCollectionUseCase
             get() = provideTracksCollectionUseCase(dependencies.tracksCollectionRepository)
+
+        override val parseM3uUseCase: ParseM3uUseCase
+            get() = dependencies.parseM3uUseCase
     }
 }

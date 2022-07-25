@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.SharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
+import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
-import ru.debajo.srrradio.domain.UserStationsInteractor
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
@@ -35,6 +35,8 @@ import ru.debajo.srrradio.ui.processor.SaveCustomStationProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
+import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
+import ru.debajo.srrradio.ui.processor.interactor.UserStationsInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 internal interface AppModule : AppApi {
@@ -157,6 +159,20 @@ internal interface AppModule : AppApi {
         updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase
     ): UserStationsInteractor = UserStationsInteractor(userStationUseCase, updateFavoriteStationStateUseCase)
 
+    fun provideLoadM3uInteractor(
+        parseM3uUseCase: ParseM3uUseCase,
+        searchStationsUseCase: SearchStationsUseCase,
+        updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase,
+        userStationUseCase: UserStationUseCase,
+    ): LoadM3uInteractor {
+        return LoadM3uInteractor(
+            parseM3uUseCase = parseM3uUseCase,
+            searchStationsUseCase = searchStationsUseCase,
+            updateFavoriteStationStateUseCase = updateFavoriteStationStateUseCase,
+            userStationUseCase = userStationUseCase,
+        )
+    }
+
     fun provideSaveCustomStationProcessor(userStationsInteractor: UserStationsInteractor): SaveCustomStationProcessor {
         return SaveCustomStationProcessor(userStationsInteractor)
     }
@@ -169,7 +185,8 @@ internal interface AppModule : AppApi {
         return AddCustomStationReduktor()
     }
 
-    fun provideSettingsViewModel(themeManager: SrrradioThemeManager): SettingsViewModel = SettingsViewModel(themeManager)
+    fun provideSettingsViewModel(themeManager: SrrradioThemeManager, loadM3uInteractor: LoadM3uInteractor): SettingsViewModel =
+        SettingsViewModel(themeManager, loadM3uInteractor)
 
     fun provideSrrradioThemeManager(sharedPreferences: SharedPreferences): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
 
@@ -232,7 +249,15 @@ internal interface AppModule : AppApi {
                 )
             )
         override val settingsViewModel: SettingsViewModel
-            get() = provideSettingsViewModel(themeManager)
+            get() = provideSettingsViewModel(
+                themeManager = themeManager,
+                loadM3uInteractor = provideLoadM3uInteractor(
+                    parseM3uUseCase = dependencies.parseM3uUseCase,
+                    searchStationsUseCase = dependencies.searchStationsUseCase,
+                    updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase,
+                    userStationUseCase = dependencies.userStationUseCase,
+                )
+            )
 
         override val collectionViewModel: CollectionViewModel
             get() = provideCollectionViewModel(dependencies.tracksCollectionUseCase)

@@ -1,5 +1,7 @@
-package ru.debajo.srrradio.domain
+package ru.debajo.srrradio.ui.processor.interactor
 
+import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
+import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.model.Station
 
 class UserStationsInteractor(

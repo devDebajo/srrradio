@@ -17,7 +17,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,6 +47,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
+import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
 
 @Composable
 fun SettingsScreen() {
@@ -117,6 +120,24 @@ private fun SettingsList() {
                 text = stringResource(R.string.settings_app_version, BuildConfig.VERSION_NAME)
             )
         }
+
+        Spacer(Modifier.height(12.dp))
+
+        val openDocumentLauncher = LocalOpenDocumentLauncher.current
+        SettingsGroup(
+            title = "Данные",
+            state = calculateGroupState(expandedGroup, 2),
+            onHeaderClick = { expandedGroup.onGroupHeaderClick(2) }
+        ) {
+            SettingsText(
+                text = "Импорт m3u",
+                loadingIndicator = state.loadingM3u
+            ) {
+                if (!state.loadingM3u) {
+                    openDocumentLauncher.launch(arrayOf("audio/x-mpegurl"))
+                }
+            }
+        }
     }
 }
 
@@ -130,6 +151,7 @@ fun SettingsText(
     alpha: Float = 1f,
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight? = null,
+    loadingIndicator: Boolean = false,
     onClick: (() -> Unit)? = null,
 ) {
     val alphaAnimatable = remember(text) { Animatable(1f) }
@@ -138,16 +160,30 @@ fun SettingsText(
             alphaAnimatable.animateTo(alpha)
         }
     })
-    Text(
-        modifier = Modifier
-            .fillMaxWidth()
-            .optionalClickable(onClick)
-            .padding(vertical = 18.dp, horizontal = 16.dp)
-            .alpha(alphaAnimatable.value),
-        text = text,
-        fontSize = fontSize,
-        fontWeight = fontWeight,
-    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .optionalClickable(onClick)
+                .padding(vertical = 18.dp, horizontal = 16.dp)
+                .weight(1f)
+                .alpha(alphaAnimatable.value),
+            text = text,
+            fontSize = fontSize,
+            fontWeight = fontWeight,
+        )
+
+        if (loadingIndicator) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(24.dp),
+                strokeWidth = 2.dp,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+        }
+    }
 }
 
 @Composable

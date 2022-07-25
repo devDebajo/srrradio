@@ -16,4 +16,7 @@ internal interface DbStationDao {
 
     @Query("SELECT * FROM dbstation WHERE id in (SELECT stationId FROM DbPlaylistMapping WHERE playlistId=:playlistId)")
     suspend fun getStationsByPlaylist(playlistId: String): List<DbStation>
+
+    @Query("SELECT * FROM dbstation WHERE stream=:url")
+    suspend fun getByUrl(url: String): DbStation?
 }

@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
+import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 internal class SettingsViewModel(
-    private val themeManager: SrrradioThemeManager
+    private val themeManager: SrrradioThemeManager,
+    private val loadM3uInteractor: LoadM3uInteractor,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -37,6 +39,17 @@ internal class SettingsViewModel(
 
     fun selectTheme(code: String) {
         themeManager.select(code)
+    }
+
+    fun onFileSelected(filePath: String) {
+        if (stateMutable.value.loadingM3u) {
+            return
+        }
+        stateMutable.value = stateMutable.value.copy(loadingM3u = true)
+        viewModelScope.launch {
+            loadM3uInteractor.load(filePath)
+            stateMutable.value = stateMutable.value.copy(loadingM3u = false)
+        }
     }
 
     companion object {
