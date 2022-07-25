@@ -12,6 +12,7 @@
     <string name="station_added_to_favorite">Станция добавлена в избранные</string>
     <string name="station_removed_from_favorite">Станция удалена из избранных</string>
     <string name="track_added_to_collection">Трек добавлен в коллекцию</string>
+    <string name="copied_to_clipboard">Скопировано в буфер обмена</string>
 
     <string name="sleep_timer">Таймер сна</string>
     <string name="sleep_timer_save">Запуск</string>

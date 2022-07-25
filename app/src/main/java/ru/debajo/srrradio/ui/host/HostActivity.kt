@@ -8,15 +8,19 @@ import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.LocalIndication
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
@@ -27,10 +31,12 @@ import ru.debajo.srrradio.ui.ext.AndroidColor
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.host.add.AddCustomStationScreen
 import ru.debajo.srrradio.ui.host.collection.CollectionScreen
+import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.MainScreen
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
+import ru.debajo.srrradio.ui.host.main.rememberSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.navigation.SrrradioNavigationHost
@@ -69,7 +75,21 @@ class HostActivity : ComponentActivity() {
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
                     ) {
-                        HostScreen()
+                        val snackbarLauncher = rememberSnackbarLauncher()
+
+                        CompositionLocalProvider(
+                            LocalSnackbarLauncher provides snackbarLauncher
+                        ) {
+                            Box {
+                                HostScreen()
+                                SnackbarHost(
+                                    hostState = snackbarLauncher.snackbarHostState,
+                                    modifier = Modifier
+                                        .systemBarsPadding()
+                                        .align(Alignment.BottomCenter),
+                                )
+                            }
+                        }
                     }
                 }
             }

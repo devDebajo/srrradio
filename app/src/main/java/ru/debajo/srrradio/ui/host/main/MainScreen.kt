@@ -26,10 +26,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -102,28 +100,15 @@ fun MainScreen() {
         }
     }
 
-    val snackbarLauncher = rememberSnackbarLauncher()
-    CompositionLocalProvider(
-        LocalSnackbarLauncher provides snackbarLauncher
-    ) {
-        Box {
-            ModalBottomSheetLayout(
-                modifier = Modifier.systemBarsPadding(),
-                sheetState = sheetState,
-                sheetBackgroundColor = bottomSheetBgColor,
-                sheetElevation = 20.dp,
-                sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-                sheetContent = { SleepTimerBottomSheet() },
-                content = { RadioScreenContent() },
-            )
-            SnackbarHost(
-                hostState = snackbarLauncher.snackbarHostState,
-                modifier = Modifier
-                    .systemBarsPadding()
-                    .align(Alignment.BottomCenter),
-            )
-        }
-    }
+    ModalBottomSheetLayout(
+        modifier = Modifier.systemBarsPadding(),
+        sheetState = sheetState,
+        sheetBackgroundColor = bottomSheetBgColor,
+        sheetElevation = 20.dp,
+        sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        sheetContent = { SleepTimerBottomSheet() },
+        content = { RadioScreenContent() },
+    )
 }
 
 val LocalSnackbarLauncher = staticCompositionLocalOf<SnackbarLauncher> { TODO() }

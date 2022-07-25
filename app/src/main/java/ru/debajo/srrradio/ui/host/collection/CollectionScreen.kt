@@ -27,16 +27,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
+@OptIn(ExperimentalFoundationApi::class)
 fun CollectionScreen() {
     val viewModel = viewModel { AppApiHolder.get().collectionViewModel }
     LaunchedEffect(viewModel) {
@@ -44,6 +49,9 @@ fun CollectionScreen() {
     }
 
     val state by viewModel.state.collectAsState()
+    val haptic = LocalHapticFeedback.current
+    val clipboardManager = LocalClipboardManager.current
+    val snackbarLauncher = LocalSnackbarLauncher.current
 
     Surface(
         modifier = Modifier
@@ -73,8 +81,17 @@ fun CollectionScreen() {
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .animateItemPlacement(),
-                            item = state[it]
-                        ) { viewModel.remove(it) }
+                            item = state[it],
+                            onDelete = { item ->
+                                viewModel.remove(item)
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            },
+                            onClick = { item ->
+                                snackbarLauncher.show(R.string.copied_to_clipboard)
+                                clipboardManager.setText(AnnotatedString(item.track))
+                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            }
+                        )
                     }
                 )
             }
@@ -87,34 +104,39 @@ fun CollectionScreen() {
 private fun CollectionItem(
     modifier: Modifier = Modifier,
     item: UiCollectionItem,
+    onClick: (UiCollectionItem) -> Unit,
     onDelete: (UiCollectionItem) -> Unit
 ) {
-    OutlinedCard(modifier) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.weight(1f)) {
-                Text(
-                    text = item.track,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = item.stationName,
-                    fontSize = 12.sp
-                )
-            }
-            Spacer(modifier = Modifier.width(8.dp))
-            IconButton(onClick = { onDelete(item) }) {
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = stringResource(R.string.accessibility_remove_track)
-                )
+    OutlinedCard(
+        modifier = modifier,
+        onClick = { onClick(item) },
+        content = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(
+                        text = item.track,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = item.stationName,
+                        fontSize = 12.sp
+                    )
+                }
+                Spacer(modifier = Modifier.width(8.dp))
+                IconButton(onClick = { onDelete(item) }) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = stringResource(R.string.accessibility_remove_track)
+                    )
+                }
             }
         }
-    }
+    )
 }
