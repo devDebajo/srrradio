@@ -87,6 +87,7 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.18.0'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.18.0'
     implementation 'com.github.devDebajo:reduktor:1.0.0-alpha04'
+    implementation 'com.github.bastienpaulfr:Treessence:1.0.0'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }

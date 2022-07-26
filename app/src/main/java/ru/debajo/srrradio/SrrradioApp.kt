@@ -1,6 +1,9 @@
 package ru.debajo.srrradio
 
 import android.app.Application
+import android.util.Log
+import fr.bipi.tressence.file.FileLoggerTree
+import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.SupervisorJob
@@ -25,9 +28,12 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
         super.onCreate()
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(logToFileTree())
         }
 
         initDi()
+        initFatalErrors()
 
         launch {
             apiHostDiscovery.discover()
@@ -36,6 +42,25 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
         launch(Main) {
             mediaController.prepare()
         }
+    }
+
+    private fun initFatalErrors() {
+        val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+            Timber.e(e)
+            defaultHandler?.uncaughtException(t, e)
+        }
+    }
+
+    private fun logToFileTree(): Timber.Tree {
+        return FileLoggerTree.Builder()
+            .withFileName("srrradio%g.log")
+            .withDir(File(cacheDir, "logs"))
+            .withSizeLimit(20000)
+            .withFileLimit(20)
+            .withMinPriority(Log.ERROR)
+            .appendToFile(true)
+            .build()
     }
 
     private fun initDi() {
