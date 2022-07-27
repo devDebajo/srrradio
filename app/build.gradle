@@ -15,6 +15,7 @@ android {
 
         buildConfigField "String", "PRIVACY_POLICY", '"http://188.120.246.136/srrradio_privacy_policy.html"'
         buildConfigField "String", "DATABASE_HOMEPAGE", '"https://www.radio-browser.info/"'
+        buildConfigField "String", "DEVELOPER_EMAIL", '"debajo.dev@gmail.com"'
         vectorDrawables {
             useSupportLibrary true
         }
@@ -87,7 +88,6 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.18.0'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.18.0'
     implementation 'com.github.devDebajo:reduktor:1.0.0-alpha04'
-    implementation 'com.github.bastienpaulfr:Treessence:1.0.0'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }

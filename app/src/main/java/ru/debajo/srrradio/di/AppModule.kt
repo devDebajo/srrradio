@@ -9,6 +9,7 @@ import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
+import ru.debajo.srrradio.error.SendErrorsHelper
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
@@ -185,8 +186,11 @@ internal interface AppModule : AppApi {
         return AddCustomStationReduktor()
     }
 
-    fun provideSettingsViewModel(themeManager: SrrradioThemeManager, loadM3uInteractor: LoadM3uInteractor): SettingsViewModel =
-        SettingsViewModel(themeManager, loadM3uInteractor)
+    fun provideSettingsViewModel(
+        themeManager: SrrradioThemeManager,
+        loadM3uInteractor: LoadM3uInteractor,
+        sendErrorsHelper: SendErrorsHelper
+    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendErrorsHelper)
 
     fun provideSrrradioThemeManager(sharedPreferences: SharedPreferences): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
 
@@ -198,6 +202,8 @@ internal interface AppModule : AppApi {
         return TrackCollectionListener(tracksCollectionUseCase)
     }
 
+    fun provideSendErrorsHelper(context: Context): SendErrorsHelper = SendErrorsHelper(context)
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
@@ -206,6 +212,9 @@ internal interface AppModule : AppApi {
         override val mediaSessionController: MediaSessionController by lazy { provideMediaSessionController(dependencies.context) }
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
+
+        override val sendErrorsHelper: SendErrorsHelper
+            get() = provideSendErrorsHelper(dependencies.context)
 
         override val coroutineScope: CoroutineScope
             get() = dependencies.applicationCoroutineScope
@@ -256,7 +265,8 @@ internal interface AppModule : AppApi {
                     searchStationsUseCase = dependencies.searchStationsUseCase,
                     updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase,
                     userStationUseCase = dependencies.userStationUseCase,
-                )
+                ),
+                sendErrorsHelper = provideSendErrorsHelper(dependencies.context)
             )
 
         override val collectionViewModel: CollectionViewModel

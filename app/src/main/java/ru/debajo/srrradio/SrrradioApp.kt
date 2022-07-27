@@ -1,9 +1,6 @@
 package ru.debajo.srrradio
 
 import android.app.Application
-import android.util.Log
-import fr.bipi.tressence.file.FileLoggerTree
-import java.io.File
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.SupervisorJob
@@ -16,6 +13,8 @@ import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.di.AppDependencies
 import ru.debajo.srrradio.domain.di.DomainApiHolder
+import ru.debajo.srrradio.error.FileLogTimberTree
+import ru.debajo.srrradio.error.SendErrorsHelper
 import ru.debajo.srrradio.media.MediaController
 import timber.log.Timber
 
@@ -23,16 +22,13 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
 
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
     private val apiHostDiscovery: ApiHostDiscovery by lazy { DataApiHolder.get().apiHostDiscovery }
+    private val sendErrorsHelper: SendErrorsHelper by lazy { AppApiHolder.get().sendErrorsHelper }
 
     override fun onCreate() {
         super.onCreate()
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        } else {
-            Timber.plant(logToFileTree())
-        }
 
         initDi()
+        initLogs()
         initFatalErrors()
 
         launch {
@@ -44,23 +40,20 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
         }
     }
 
+    private fun initLogs() {
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree(), FileLogTimberTree(sendErrorsHelper))
+        } else {
+            Timber.plant(FileLogTimberTree(sendErrorsHelper))
+        }
+    }
+
     private fun initFatalErrors() {
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             Timber.e(e)
             defaultHandler?.uncaughtException(t, e)
         }
-    }
-
-    private fun logToFileTree(): Timber.Tree {
-        return FileLoggerTree.Builder()
-            .withFileName("srrradio%g.log")
-            .withDir(File(cacheDir, "logs"))
-            .withSizeLimit(20000)
-            .withFileLimit(20)
-            .withMinPriority(Log.ERROR)
-            .appendToFile(true)
-            .build()
     }
 
     private fun initDi() {

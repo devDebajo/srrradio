@@ -73,6 +73,7 @@ fun SettingsScreen() {
 @Composable
 private fun SettingsList() {
     val viewModel = SettingsViewModel.Local.current
+    LaunchedEffect(viewModel) { viewModel.update() }
     val state by viewModel.state.collectAsState()
     val expandedGroup = rememberSaveable { mutableStateOf(-1) }
     SettingsBackPress(expandedGroup)
@@ -110,6 +111,13 @@ private fun SettingsList() {
             ) {
                 if (!state.loadingM3u) {
                     openDocumentLauncher.launch(arrayOf("audio/x-mpegurl"))
+                }
+            }
+
+            if (state.canSendLogs) {
+                val context = LocalContext.current
+                SettingsText(text = stringResource(R.string.settings_send_logs)) {
+                    viewModel.sendLogs(context)
                 }
             }
         }

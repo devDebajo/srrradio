@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.host.main.settings
 
+import android.content.Context
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.debajo.srrradio.error.SendErrorsHelper
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
@@ -16,6 +18,7 @@ import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 internal class SettingsViewModel(
     private val themeManager: SrrradioThemeManager,
     private val loadM3uInteractor: LoadM3uInteractor,
+    private val sendErrorsHelper: SendErrorsHelper,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -37,6 +40,14 @@ internal class SettingsViewModel(
         }
     }
 
+    fun update() {
+        viewModelScope.launch {
+            stateMutable.value = stateMutable.value.copy(
+                canSendLogs = sendErrorsHelper.canSend()
+            )
+        }
+    }
+
     fun selectTheme(code: String) {
         themeManager.select(code)
     }
@@ -49,6 +60,13 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             loadM3uInteractor.load(filePath)
             stateMutable.value = stateMutable.value.copy(loadingM3u = false)
+        }
+    }
+
+    fun sendLogs(uiContext: Context) {
+        viewModelScope.launch {
+//            val intent = sendErrorsHelper.buildIntent()
+//            uiContext.startActivity(intent)
         }
     }
 

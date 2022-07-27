@@ -41,6 +41,7 @@
 
     <string name="settings_group_data">Данные</string>
     <string name="settings_import_m3u">Импорт m3u</string>
+    <string name="settings_send_logs">Отправить логи Разработчику</string>
 
     <string name="settings_group_app">Приложение</string>
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
