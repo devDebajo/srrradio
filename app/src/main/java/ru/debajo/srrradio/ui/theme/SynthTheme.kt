@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.theme
 
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import ru.debajo.srrradio.R
 
@@ -10,7 +11,7 @@ internal val SynthTheme: AppTheme = AppTheme(
     colors = { SynthColors }
 )
 
-private val SynthColors: ColorScheme = ColorScheme(
+private val SynthColors: ColorScheme = darkColorScheme(
     primary = Color(0xFFf8acfb),
     onPrimary = Color(0xFF51145a),
     primaryContainer = Color(0xFF6b2e72),

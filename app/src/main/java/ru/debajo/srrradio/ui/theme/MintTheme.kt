@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.theme
 
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import ru.debajo.srrradio.R
 
@@ -10,7 +11,7 @@ internal val MintTheme: AppTheme = AppTheme(
     colors = { MintColors },
 )
 
-private val MintColors: ColorScheme = ColorScheme(
+private val MintColors: ColorScheme = darkColorScheme(
     primary = Color(0xFF5CDBBE),
     onPrimary = Color(0xFF00382D),
     primaryContainer = Color(0xFF005142),

@@ -2,7 +2,6 @@ package ru.debajo.srrradio.ui.host.main.settings.logs
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,7 +20,6 @@ import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.host.collection.ListScreen
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 fun LogsListScreen() {
     val viewModel = viewModel { AppApiHolder.get().logsListViewModel }
     val helper = remember { AppApiHolder.get().sendErrorsHelper }

@@ -38,6 +38,7 @@ android {
         kotlin {
             kotlinOptions {
                 freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+                freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
                 freeCompilerArgs += "-Xjvm-default=all"
                 freeCompilerArgs += "-Xcontext-receivers"
             }
@@ -85,8 +86,8 @@ dependencies {
     implementation "me.onebone:toolbar-compose:2.3.3"
 
     implementation 'androidx.palette:palette:1.0.0'
-    implementation 'com.google.android.exoplayer:exoplayer:2.18.0'
-    implementation 'com.google.android.exoplayer:extension-mediasession:2.18.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
+    implementation 'com.google.android.exoplayer:extension-mediasession:2.18.1'
     implementation 'com.github.devDebajo:reduktor:1.0.0-alpha04'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
