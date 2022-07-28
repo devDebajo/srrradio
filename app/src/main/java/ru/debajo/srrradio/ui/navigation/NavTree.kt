@@ -2,6 +2,7 @@ package ru.debajo.srrradio.ui.navigation
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.Collections
 import androidx.compose.material.icons.rounded.Navigation
 import androidx.compose.material.icons.rounded.Radio
@@ -55,6 +56,13 @@ class NavTree(rootController: NavHostController, mainController: NavHostControll
             route = "collection",
             icon = Icons.Rounded.Collections,
             titleRes = R.string.collection_title,
+            navController = navController
+        )
+
+        val sendLogs: Screen = Screen(
+            route = "sendLogs",
+            icon = Icons.Rounded.BugReport,
+            titleRes = R.string.settings_send_logs,
             navController = navController
         )
     }

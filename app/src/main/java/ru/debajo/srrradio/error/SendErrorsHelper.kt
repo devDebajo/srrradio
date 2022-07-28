@@ -2,10 +2,11 @@ package ru.debajo.srrradio.error
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.os.Build
 import androidx.annotation.WorkerThread
+import androidx.core.content.FileProvider
 import java.io.File
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import org.joda.time.LocalDate
 import org.joda.time.format.DateTimeFormat
@@ -25,7 +26,7 @@ class SendErrorsHelper(private val context: Context) {
         return file
     }
 
-    private fun getDate(file: File): LocalDate? {
+    fun getDate(file: File): LocalDate? {
         val date = file.name
             .replace("srrradio_", "")
             .replace(".log", "")
@@ -36,13 +37,37 @@ class SendErrorsHelper(private val context: Context) {
     }
 
     suspend fun getFiles(): List<File> {
-        return withContext(Dispatchers.IO) { getFilesBlocking() }
+        return withContext(IO) { getFilesBlocking() }
     }
 
-    suspend fun canSend(): Boolean {
-        val canSendEmail = canSendEmail()
-        val hasFiles = getFiles().isNotEmpty()
-        return canSendEmail && hasFiles
+    suspend fun canSend(): Boolean = getFiles().isNotEmpty()
+
+    suspend fun clearAll() {
+        withContext(IO) {
+            getFiles().forEach { it.delete() }
+        }
+    }
+
+    fun openMailApp(context: Context, path: String) {
+        val uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", File(path))
+
+        val intent = Intent(Intent.ACTION_SEND)
+            .setType("message/rfc822")
+            .putExtra(Intent.EXTRA_EMAIL, arrayOf(BuildConfig.DEVELOPER_EMAIL))
+            .putExtra(Intent.EXTRA_SUBJECT, "Srrradio crash logs")
+            .putExtra(Intent.EXTRA_TEXT, dumpDeviceInfo())
+            .putExtra(Intent.EXTRA_STREAM, uri)
+            .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        context.startActivity(Intent.createChooser(intent, "Send logs"))
+    }
+
+    private fun dumpDeviceInfo(): String {
+        return StringBuilder()
+            .appendLine("App version: ${BuildConfig.VERSION_NAME}")
+            .appendLine("OS version: ${Build.VERSION.RELEASE}")
+            .appendLine("API level: ${Build.VERSION.SDK_INT}")
+            .toString()
     }
 
     @WorkerThread
@@ -74,17 +99,6 @@ class SendErrorsHelper(private val context: Context) {
             directory.mkdirs()
         }
         return directory
-    }
-
-    private fun canSendEmail(): Boolean = canLaunchIntent(buildIntentRaw())
-
-    private fun buildIntentRaw(): Intent {
-        return Intent(Intent.ACTION_SENDTO)
-            .setData(Uri.parse("mailto:${BuildConfig.DEVELOPER_EMAIL}"))
-    }
-
-    private fun canLaunchIntent(intent: Intent): Boolean {
-        return runCatching { intent.resolveActivity(context.packageManager) != null }.getOrElse { false }
     }
 
     private companion object {

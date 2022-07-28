@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +43,45 @@ import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 
 @Composable
+fun <T> ListScreen(
+    title: String,
+    items: List<T>,
+    key: ((item: T) -> Any)? = null,
+    contentType: (item: T) -> Any? = { null },
+    itemContent: @Composable LazyItemScope.(item: T) -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .systemBarsPadding()
+    ) {
+        Column(
+            Modifier.padding(horizontal = 16.dp)
+        ) {
+            Text(
+                text = title,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 36.sp,
+                lineHeight = 44.sp,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(
+                    items = items,
+                    key = key,
+                    contentType = contentType,
+                    itemContent = itemContent
+                )
+            }
+        }
+    }
+}
+
+@Composable
 @OptIn(ExperimentalFoundationApi::class)
 fun CollectionScreen() {
     val viewModel = viewModel { AppApiHolder.get().collectionViewModel }
@@ -51,50 +92,29 @@ fun CollectionScreen() {
     val clipboardManager = LocalClipboardManager.current
     val snackbarLauncher = LocalSnackbarLauncher.current
 
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .systemBarsPadding()
-    ) {
-        Column(
-            Modifier.padding(horizontal = 16.dp)
-        ) {
-            Text(
-                text = stringResource(R.string.collection_title),
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 36.sp,
+    ListScreen(
+        title = stringResource(R.string.collection_title),
+        items = state,
+        key = { it.track },
+        contentType = { "UiCollectionItem" },
+        itemContent = { collectionItem ->
+            CollectionItem(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .animateItemPlacement(),
+                item = collectionItem,
+                onDelete = { item ->
+                    viewModel.remove(item)
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                },
+                onClick = { item ->
+                    snackbarLauncher.show(R.string.copied_to_clipboard)
+                    clipboardManager.setText(AnnotatedString(item.track))
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    count = state.size,
-                    key = { state[it].track },
-                    contentType = { "UiCollectionItem" },
-                    itemContent = {
-                        CollectionItem(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateItemPlacement(),
-                            item = state[it],
-                            onDelete = { item ->
-                                viewModel.remove(item)
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            },
-                            onClick = { item ->
-                                snackbarLauncher.show(R.string.copied_to_clipboard)
-                                clipboardManager.setText(AnnotatedString(item.track))
-                                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                            }
-                        )
-                    }
-                )
-            }
         }
-    }
+    )
 }
 
 @Composable

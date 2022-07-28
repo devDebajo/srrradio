@@ -48,6 +48,8 @@ import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
+import ru.debajo.srrradio.ui.navigation.NavTree
+import timber.log.Timber
 
 @Composable
 fun SettingsScreen() {
@@ -115,9 +117,18 @@ private fun SettingsList() {
             }
 
             if (state.canSendLogs) {
-                val context = LocalContext.current
+                val navTree = NavTree.current
                 SettingsText(text = stringResource(R.string.settings_send_logs)) {
-                    viewModel.sendLogs(context)
+                    navTree.host.sendLogs.navigate()
+                }
+                SettingsText(text = stringResource(R.string.settings_clear_logs)) {
+                   viewModel.clearLogs()
+                }
+            }
+            if (BuildConfig.DEBUG) {
+                SettingsText(text = "Add error logs") {
+                    Timber.e(IllegalStateException("Test log"))
+                    viewModel.update()
                 }
             }
         }

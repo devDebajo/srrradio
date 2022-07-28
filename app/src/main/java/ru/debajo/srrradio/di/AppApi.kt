@@ -10,6 +10,7 @@ import ru.debajo.srrradio.ui.host.collection.CollectionViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
+import ru.debajo.srrradio.ui.host.main.settings.logs.LogsListViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
@@ -23,6 +24,7 @@ internal interface AppApi : ModuleApi {
     val addCustomStationViewModel: AddCustomStationViewModel
     val settingsViewModel: SettingsViewModel
     val collectionViewModel: CollectionViewModel
+    val logsListViewModel: LogsListViewModel
 
     val themeManager: SrrradioThemeManager
 

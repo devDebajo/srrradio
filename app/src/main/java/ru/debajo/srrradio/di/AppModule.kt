@@ -25,6 +25,7 @@ import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
+import ru.debajo.srrradio.ui.host.main.settings.logs.LogsListViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
@@ -204,6 +205,8 @@ internal interface AppModule : AppApi {
 
     fun provideSendErrorsHelper(context: Context): SendErrorsHelper = SendErrorsHelper(context)
 
+    fun provideLogsListViewModel(sendErrorsHelper: SendErrorsHelper): LogsListViewModel = LogsListViewModel(sendErrorsHelper)
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
@@ -272,10 +275,12 @@ internal interface AppModule : AppApi {
         override val collectionViewModel: CollectionViewModel
             get() = provideCollectionViewModel(dependencies.tracksCollectionUseCase)
 
+        override val logsListViewModel: LogsListViewModel
+            get() = provideLogsListViewModel(sendErrorsHelper)
+
         override val themeManager: SrrradioThemeManager by lazy {
             provideSrrradioThemeManager(dependencies.sharedPreferences)
         }
-
 
         override val mediaController: MediaController by lazy {
             MediaController(

@@ -172,7 +172,7 @@ private fun RadioScreenContent() {
                 Box(Modifier.fillMaxSize()) {
                     NavHost(navTree.main.navController, startDestination = navTree.main.radio.route) {
                         composable(navTree.main.radio.route) {
-                            StationsList {
+                            StationsList(navigationHeight.toDp()) {
                                 if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isAnimationRunning) {
                                     coroutineScope.launch {
                                         bottomSheetScaffoldState.animateTo(BottomSheetValue.Collapsed)

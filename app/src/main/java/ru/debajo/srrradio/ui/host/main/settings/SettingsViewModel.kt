@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.host.main.settings
 
-import android.content.Context
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
@@ -33,18 +32,18 @@ internal class SettingsViewModel(
                         selected = it.code == selected.code
                     )
                 }
-                stateMutable.value = stateMutable.value.copy(
-                    themes = themes
-                )
+                updateState {
+                    copy(themes = themes)
+                }
             }
         }
     }
 
     fun update() {
         viewModelScope.launch {
-            stateMutable.value = stateMutable.value.copy(
-                canSendLogs = sendErrorsHelper.canSend()
-            )
+            updateState {
+                copy(canSendLogs = sendErrorsHelper.canSend())
+            }
         }
     }
 
@@ -56,18 +55,24 @@ internal class SettingsViewModel(
         if (stateMutable.value.loadingM3u) {
             return
         }
-        stateMutable.value = stateMutable.value.copy(loadingM3u = true)
+        updateState { copy(loadingM3u = true) }
         viewModelScope.launch {
             loadM3uInteractor.load(filePath)
-            stateMutable.value = stateMutable.value.copy(loadingM3u = false)
+            updateState { copy(loadingM3u = false) }
         }
     }
 
-    fun sendLogs(uiContext: Context) {
+    fun clearLogs() {
         viewModelScope.launch {
-//            val intent = sendErrorsHelper.buildIntent()
-//            uiContext.startActivity(intent)
+            sendErrorsHelper.clearAll()
+            updateState {
+                copy(canSendLogs = false)
+            }
         }
+    }
+
+    private inline fun updateState(block: SettingsState.() -> SettingsState) {
+        stateMutable.value = stateMutable.value.block()
     }
 
     companion object {

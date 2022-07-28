@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.filter
@@ -47,7 +48,7 @@ import ru.debajo.srrradio.ui.model.UiTextElement
 import ru.debajo.srrradio.ui.navigation.NavTree
 
 @Composable
-fun StationsList(onScroll: () -> Unit) {
+fun StationsList(navigationHeight: Dp, onScroll: () -> Unit) {
     val viewModel = StationsListViewModel.Local.current
     val state by viewModel.state.collectAsState()
 
@@ -119,7 +120,7 @@ fun StationsList(onScroll: () -> Unit) {
                 ListContent(
                     state = state,
                     onScroll = onScroll,
-                    contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + 12.dp)
+                    contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + navigationHeight + 12.dp)
                 )
             }
         },
