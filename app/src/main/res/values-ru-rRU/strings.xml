@@ -9,6 +9,11 @@
     <string name="empty_items_placeholder">Нет избранных станций\nНачните поиск</string>
     <string name="no_track">Неизвестный трек</string>
 
+    <string name="playlist_new">Новые</string>
+    <string name="playlist_popular">Популярные</string>
+    <string name="playlist_favorite">Избранные</string>
+    <string name="playlist_near">Неподалеку</string>
+
     <string name="station_added_to_favorite">Станция добавлена в избранные</string>
     <string name="station_removed_from_favorite">Станция удалена из избранных</string>
     <string name="track_added_to_collection">Трек добавлен в коллекцию</string>

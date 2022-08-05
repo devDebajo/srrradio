@@ -30,7 +30,7 @@ class StationsListViewModel(
     trackCollectionListener: TrackCollectionListener,
 ) : ReduktorViewModel<StationsListState, StationsListEvent, StationsListNews>(
     store = reduktorStore(
-        initialState = StationsListState(),
+        initialState = StationsListState.Idle(),
         eventReduktor = reduktor,
         commandResultReduktor = commandResultReduktor,
         initialEvents = listOf(StationsListEvent.Start),

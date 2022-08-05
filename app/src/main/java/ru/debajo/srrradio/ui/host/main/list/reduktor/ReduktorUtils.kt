@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.host.main.list.reduktor
 
-import android.content.Context
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.ui.model.UiElement
@@ -15,7 +14,6 @@ private const val FAVORITE_PLAYLIST_ID = "Favorite_id"
 private const val FAVORITE_PLAYLIST_NAME = "Favorite"
 
 fun UiPlaylist?.buildUiElements(
-    context: Context,
     favoriteStationsIds: Set<String>,
     mediaState: MediaState?
 ): List<UiElement> {
@@ -25,7 +23,7 @@ fun UiPlaylist?.buildUiElements(
     }
 
     return if (id == FAVORITE_PLAYLIST_ID) {
-        listOf(buildFavoriteElement(context)) + result
+        listOf(buildFavoriteElement()) + result
     } else {
         result
     }
@@ -41,8 +39,8 @@ fun List<UiStation>.toFavoritePlaylist(): UiPlaylist? {
     return toPlaylist(id = FAVORITE_PLAYLIST_ID, name = FAVORITE_PLAYLIST_NAME)
 }
 
-private fun buildFavoriteElement(context: Context): UiElement {
-    return UiTextElement(context.getString(R.string.favorite))
+private fun buildFavoriteElement(): UiElement {
+    return UiTextElement(R.string.favorite)
 }
 
 private fun stationPlayingState(mediaState: MediaState?, station: UiStation): UiStationPlayingState {

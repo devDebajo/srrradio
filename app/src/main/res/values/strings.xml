@@ -11,6 +11,11 @@
     <string name="empty_items_placeholder">There no favorite stations\nStart search</string>
     <string name="no_track">Unknown track</string>
 
+    <string name="playlist_new">New</string>
+    <string name="playlist_popular">Popular</string>
+    <string name="playlist_favorite">Favorite</string>
+    <string name="playlist_near">Near</string>
+
     <string name="station_added_to_favorite">Station added to favorites</string>
     <string name="station_removed_from_favorite">Station removed from favorites</string>
     <string name="track_added_to_collection">Track added to collection</string>

@@ -64,9 +64,9 @@ internal interface AppModule : AppApi {
         )
     }
 
-    fun provideStationsListReduktor(context: Context): StationsListReduktor = StationsListReduktor(context)
+    fun provideStationsListReduktor(): StationsListReduktor = StationsListReduktor()
 
-    fun provideStationsListCommandResultReduktor(context: Context): StationsListCommandResultReduktor = StationsListCommandResultReduktor(context)
+    fun provideStationsListCommandResultReduktor(): StationsListCommandResultReduktor = StationsListCommandResultReduktor()
 
     fun provideSearchStationsCommandProcessor(searchStationsUseCase: SearchStationsUseCase): SearchStationsCommandProcessor {
         return SearchStationsCommandProcessor(searchStationsUseCase)
@@ -224,8 +224,8 @@ internal interface AppModule : AppApi {
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
-                reduktor = provideStationsListReduktor(dependencies.context),
-                commandResultReduktor = provideStationsListCommandResultReduktor(dependencies.context),
+                reduktor = provideStationsListReduktor(),
+                commandResultReduktor = provideStationsListCommandResultReduktor(),
                 searchStationsCommandProcessor = searchStationsCommandProcessor,
                 mediaStateListener = provideMediaStateListenerCommandProcessor(mediaController),
                 newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController),

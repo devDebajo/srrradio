@@ -19,4 +19,10 @@ internal data class RemoteStation(
 
     @SerialName("lastcheckok")
     val health: Int,
+
+    @SerialName("geo_lat")
+    val latitude: Double? = null,
+
+    @SerialName("geo_long")
+    val longitude: Double? = null,
 )

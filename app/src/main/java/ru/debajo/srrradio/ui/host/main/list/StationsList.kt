@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.host.main.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
@@ -39,10 +41,13 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.ui.ext.addPadding
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
+import ru.debajo.srrradio.ui.host.main.list.model.collectionEmpty
+import ru.debajo.srrradio.ui.host.main.list.model.searchQuery
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
+import ru.debajo.srrradio.ui.model.UiPlaylistIcon
+import ru.debajo.srrradio.ui.model.UiPlaylistsElement
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.model.UiTextElement
 import ru.debajo.srrradio.ui.navigation.NavTree
@@ -71,7 +76,7 @@ fun StationsList(navigationHeight: Dp, onScroll: () -> Unit) {
                         fontSize = 36.sp,
                     )
 
-                    if (state.collectionNotEmpty) {
+                    if (!state.collectionEmpty) {
                         Spacer(modifier = Modifier.weight(1f))
 
                         val navTree = NavTree.current
@@ -146,7 +151,7 @@ private fun ListContent(
         modifier = Modifier.fillMaxSize(),
         state = listState,
         verticalArrangement = Arrangement.spacedBy(8.dp),
-        contentPadding = contentPadding.addPadding(horizontal = 16.dp),
+        contentPadding = contentPadding,
     ) {
         items(
             count = state.uiElements.size,
@@ -171,6 +176,15 @@ private fun ListContent(
                         modifier = Modifier.animateItemPlacement(),
                         element = element
                     )
+
+                    is UiPlaylistsElement -> {
+                        Playlists(
+                            modifier = Modifier.animateItemPlacement(),
+                            items = element.list,
+                        ) {
+
+                        }
+                    }
                 }
             }
         )
@@ -178,10 +192,27 @@ private fun ListContent(
 }
 
 @Composable
+private fun Playlists(
+    modifier: Modifier = Modifier,
+    items: List<UiPlaylistIcon>,
+    onClick: (UiPlaylistIcon) -> Unit
+) {
+    val state = rememberScrollState()
+    Row(
+        modifier = modifier.horizontalScroll(state).padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        for (item in items) {
+            PlaylistCard(item = item, onClick = onClick)
+        }
+    }
+}
+
+@Composable
 private fun TextElement(modifier: Modifier = Modifier, element: UiTextElement) {
     Text(
         modifier = modifier.padding(vertical = 8.dp),
-        text = element.text,
+        text = stringResource(element.text),
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.primary,

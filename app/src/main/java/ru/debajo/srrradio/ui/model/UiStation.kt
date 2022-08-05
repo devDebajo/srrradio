@@ -1,7 +1,6 @@
 package ru.debajo.srrradio.ui.model
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import ru.debajo.srrradio.domain.model.Station
 
 @Immutable
@@ -28,26 +27,4 @@ internal fun UiStation.toDomain(): Station {
         stream = stream,
         image = image
     )
-}
-
-@Stable
-interface UiElement {
-    val id: String
-    val contentType: String
-}
-
-@Immutable
-data class UiStationElement(
-    val station: UiStation,
-    val playingState: UiStationPlayingState,
-    val favorite: Boolean,
-) : UiElement {
-    override val id: String = station.id
-    override val contentType: String = "UiStationElement"
-}
-
-@Immutable
-data class UiTextElement(val text: String) : UiElement {
-    override val id: String = "UiTextElement_$text"
-    override val contentType: String = "UiTextElement"
 }

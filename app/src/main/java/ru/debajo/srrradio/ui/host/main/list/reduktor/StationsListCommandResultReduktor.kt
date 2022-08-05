@@ -1,21 +1,19 @@
 package ru.debajo.srrradio.ui.host.main.list.reduktor
 
-import android.content.Context
 import java.util.UUID
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
+import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 
-class StationsListCommandResultReduktor(
-    private val context: Context,
-) : Reduktor<StationsListState, CommandResult, StationsListNews> {
+class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandResult, StationsListNews> {
 
     override fun invoke(state: StationsListState, event: CommandResult): Akt<StationsListState, StationsListNews> {
         return when (event) {
@@ -31,16 +29,17 @@ class StationsListCommandResultReduktor(
         state: StationsListState,
         event: SearchStationsCommandProcessor.SearchResult
     ): Akt<StationsListState, StationsListNews> {
+        if (state !is StationsListState.InSearchMode) {
+            return Akt()
+        }
+
         val playlist = UiPlaylist(
             id = UUID.randomUUID().toString(),
             name = "No named playlist",
             stations = event.stations,
         )
         return Akt(
-            state = state.copy(
-                playlist = playlist,
-                uiElements = playlist.buildUiElements(context, state.favoriteStationsIds, state.mediaState)
-            )
+            state = state.copy(searchPlaylist = playlist)
         )
     }
 
@@ -49,10 +48,9 @@ class StationsListCommandResultReduktor(
         event: MediaStateListenerCommandProcessor.OnNewMediaState,
     ): Akt<StationsListState, StationsListNews> {
         return Akt(
-            state = state.copy(
-                mediaState = event.state,
-                uiElements = state.playlist.buildUiElements(context, state.favoriteStationsIds, event.state)
-            )
+            state = state.updateIdle {
+                copy(mediaState = event.state)
+            }
         )
     }
 
@@ -60,18 +58,10 @@ class StationsListCommandResultReduktor(
         state: StationsListState,
         event: ListenFavoriteStationsProcessor.Result
     ): Akt<StationsListState, StationsListNews> {
-        val playlist = if (state.playlist == null || state.playlist.isFavorite) {
-            event.stations.toFavoritePlaylist()
-        } else {
-            state.playlist
-        }
-
         return Akt(
-            state.copy(
-                playlist = playlist,
-                uiElements = playlist.buildUiElements(context, event.stations.map { it.id }.toSet(), state.mediaState),
-                favoriteStations = event.stations
-            )
+            state.updateIdle {
+                copy(favoriteStations = event.stations)
+            }
         )
     }
 
@@ -80,9 +70,11 @@ class StationsListCommandResultReduktor(
         event: TrackCollectionListener.TrackCollectionChanged
     ): Akt<StationsListState, StationsListNews> {
         return Akt(
-            state.copy(
-                collectionNotEmpty = event.collection.isNotEmpty()
-            )
+            state.updateIdle {
+                copy(
+                    collectionEmpty = event.collection.isEmpty()
+                )
+            }
         )
     }
 }
