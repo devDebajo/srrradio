@@ -41,6 +41,7 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.host.main.list.model.DefaultPlaylists
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.list.model.collectionEmpty
@@ -80,7 +81,7 @@ fun StationsList(navigationHeight: Dp, onScroll: () -> Unit) {
                         Spacer(modifier = Modifier.weight(1f))
 
                         val navTree = NavTree.current
-                        OutlinedButton(onClick = { navTree.host.collection.navigate() }) {
+                        OutlinedButton(onClick = { navTree.collection.navigate() }) {
                             Text(
                                 text = stringResource(R.string.track_collection),
                                 fontSize = 12.sp
@@ -142,6 +143,7 @@ private fun ListContent(
 ) {
     val viewModel = StationsListViewModel.Local.current
     val listState = rememberLazyListState()
+    val navTree = NavTree.current
     LaunchedEffect(listState, onScroll) {
         snapshotFlow { listState.isScrollInProgress }
             .filter { it }
@@ -182,12 +184,20 @@ private fun ListContent(
                             modifier = Modifier.animateItemPlacement(),
                             items = element.list,
                         ) {
-
+                            navigateToPlaylist(navTree, it)
                         }
                     }
                 }
             }
         )
+    }
+}
+
+private fun navigateToPlaylist(navTree: NavTree, playlist: UiPlaylistIcon) {
+    when (playlist) {
+        DefaultPlaylists.NewStations -> {
+            navTree.main.radio.newStations.navigate()
+        }
     }
 }
 
@@ -199,7 +209,9 @@ private fun Playlists(
 ) {
     val state = rememberScrollState()
     Row(
-        modifier = modifier.horizontalScroll(state).padding(horizontal = 16.dp),
+        modifier = modifier
+            .horizontalScroll(state)
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         for (item in items) {

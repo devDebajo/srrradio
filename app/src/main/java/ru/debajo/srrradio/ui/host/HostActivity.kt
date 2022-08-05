@@ -120,20 +120,20 @@ class HostActivity : ComponentActivity() {
     @Composable
     private fun HostScreen() {
         SrrradioNavigationHost { navTree ->
-            NavHost(navTree.host.navController, startDestination = navTree.host.main.route) {
-                composable(navTree.host.main.route) {
+            NavHost(navTree.rootController, startDestination = navTree.main.route) {
+                composable(navTree.main.route) {
                     MainScreen()
                 }
 
-                composable(navTree.host.addCustomStation.route) {
+                composable(navTree.addCustomStation.route) {
                     AddCustomStationScreen()
                 }
 
-                composable(navTree.host.collection.route) {
+                composable(navTree.collection.route) {
                     CollectionScreen()
                 }
 
-                composable(navTree.host.sendLogs.route) {
+                composable(navTree.sendLogs.route) {
                     LogsListScreen()
                 }
             }

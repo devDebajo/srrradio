@@ -119,7 +119,7 @@ private fun SettingsList() {
             if (state.canSendLogs) {
                 val navTree = NavTree.current
                 SettingsText(text = stringResource(R.string.settings_send_logs)) {
-                    navTree.host.sendLogs.navigate()
+                    navTree.sendLogs.navigate()
                 }
                 SettingsText(text = stringResource(R.string.settings_clear_logs)) {
                    viewModel.clearLogs()

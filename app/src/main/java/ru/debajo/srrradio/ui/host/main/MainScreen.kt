@@ -45,11 +45,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navigation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
@@ -62,6 +62,7 @@ import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetContent
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.player.normalizedFraction
+import ru.debajo.srrradio.ui.host.main.playlist.PlaylistScreen
 import ru.debajo.srrradio.ui.host.main.settings.SettingsScreen
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerBottomSheet
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
@@ -171,13 +172,19 @@ private fun RadioScreenContent() {
             content = {
                 Box(Modifier.fillMaxSize()) {
                     NavHost(navTree.main.navController, startDestination = navTree.main.radio.route) {
-                        composable(navTree.main.radio.route) {
-                            StationsList(navigationHeight.toDp()) {
-                                if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isAnimationRunning) {
-                                    coroutineScope.launch {
-                                        bottomSheetScaffoldState.animateTo(BottomSheetValue.Collapsed)
+                        navigation(startDestination = navTree.main.radio.root.route, route = navTree.main.radio.route) {
+                            composable(navTree.main.radio.root.route) {
+                                StationsList(navigationHeight.toDp()) {
+                                    if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isAnimationRunning) {
+                                        coroutineScope.launch {
+                                            bottomSheetScaffoldState.animateTo(BottomSheetValue.Collapsed)
+                                        }
                                     }
                                 }
+                            }
+
+                            composable(navTree.main.radio.newStations.route) {
+                                PlaylistScreen()
                             }
                         }
 
@@ -186,7 +193,6 @@ private fun RadioScreenContent() {
                         }
                     }
                 }
-
             },
             sheetPeekHeight = if (showBottomSheet) PlayerBottomSheetPeekHeight + navigationHeight.toDp() else 0.dp,
             sheetContent = {
@@ -223,7 +229,7 @@ private fun Navigation(
             floatingActionButton = {
                 val navTree = NavTree.current
                 FloatingActionButton(
-                    onClick = { navTree.host.addCustomStation.navigate() }
+                    onClick = { navTree.addCustomStation.navigate() }
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,
@@ -238,15 +244,7 @@ private fun Navigation(
                 val screens = NavTree.current.main.screens
                 for (screen in screens) {
                     val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                    IconButton(onClick = {
-                        navigationController.navigate(screen.route) {
-                            popUpTo(navigationController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }) {
+                    IconButton(onClick = { screen.navigate() }) {
                         Icon(
                             imageVector = screen.icon,
                             contentDescription = stringResource(screen.titleRes),

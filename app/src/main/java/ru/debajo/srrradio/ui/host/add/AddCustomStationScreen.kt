@@ -54,7 +54,7 @@ fun AddCustomStationScreen() {
         }
         viewModel.news.collect {
             when (it) {
-                AddCustomStationNews.Close -> navTree.host.navController.popBackStack()
+                AddCustomStationNews.Close -> navTree.rootController.popBackStack()
             }
         }
     }

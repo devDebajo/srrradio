@@ -5,7 +5,7 @@ buildscript {
         compose_meterial3_version = '1.0.0-alpha15'
         compose_activity_version = '1.6.0-alpha05'
         compose_view_model_version = '2.6.0-alpha01'
-        compose_navigation_version = '2.5.0'
+        compose_navigation_version = '2.5.1'
         accompanist_version = '0.24.13-rc'
         glide_landscapist = '1.5.2'
 
