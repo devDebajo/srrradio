@@ -63,20 +63,7 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
             navController = navController
         )
 
-        private val nestedScreens = listOf(newStations).map { it.route }
-
-        override fun navigate() {
-            val currentRoute = navController.currentDestination?.route
-            navController.navigate(route) {
-                popUpTo(navController.graph.findStartDestination().id) {
-                    if (currentRoute !in nestedScreens) {
-                        saveState = true
-                    }
-                }
-                launchSingleTop = true
-                restoreState = true
-            }
-        }
+        override val nestedScreens: List<Screen> = listOf(newStations)
     }
 
     interface AbstractScreen {
@@ -102,10 +89,15 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         route = route,
         navController = navController
     ) {
+        open val nestedScreens: List<Screen> = emptyList()
+
         override fun navigate() {
+            val currentRoute = navController.currentDestination?.route
             navController.navigate(route) {
                 popUpTo(navController.graph.findStartDestination().id) {
-                    saveState = true
+                    if (currentRoute !in nestedScreens.map { it.route }) {
+                        saveState = true
+                    }
                 }
                 launchSingleTop = true
                 restoreState = true
