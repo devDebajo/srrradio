@@ -1,5 +1,7 @@
 package ru.debajo.srrradio.domain.di
 
+import android.content.Context
+import android.location.LocationManager
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
@@ -9,6 +11,8 @@ import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCaseImpl
+import ru.debajo.srrradio.domain.UserLocationUseCase
+import ru.debajo.srrradio.domain.UserLocationUseCaseImpl
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
@@ -29,6 +33,11 @@ internal interface DomainModule : DomainApi {
     fun provideFavoriteStationsStateUseCase(repository: FavoriteStationsRepository): FavoriteStationsStateUseCase {
         return FavoriteStationsStateUseCaseImpl(repository)
     }
+
+    fun provideUserLocationUseCase(
+        context: Context,
+        locationManager: LocationManager,
+    ): UserLocationUseCase = UserLocationUseCaseImpl(context, locationManager)
 
     class Impl(private val dependencies: DomainDependencies) : DomainModule {
         override val searchStationsUseCase: SearchStationsUseCase
@@ -55,5 +64,8 @@ internal interface DomainModule : DomainApi {
 
         override val parseM3uUseCase: ParseM3uUseCase
             get() = dependencies.parseM3uUseCase
+
+        override val userLocationUseCase: UserLocationUseCase
+            get() = provideUserLocationUseCase(dependencies.context, dependencies.locationManager)
     }
 }

@@ -8,6 +8,7 @@ import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
+import ru.debajo.srrradio.domain.UserLocationUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 
 interface DomainApi : ModuleApi {
@@ -19,4 +20,5 @@ interface DomainApi : ModuleApi {
     val favoriteStationsStateUseCase: FavoriteStationsStateUseCase
     val tracksCollectionUseCase: TracksCollectionUseCase
     val parseM3uUseCase: ParseM3uUseCase
+    val userLocationUseCase: UserLocationUseCase
 }

@@ -83,6 +83,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:$compose_navigation_version"
     implementation "com.github.skydoves:landscapist-glide:$glide_landscapist"
     implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-permissions:$accompanist_version"
     implementation "me.onebone:toolbar-compose:2.3.3"
 
     implementation 'androidx.palette:palette:1.0.0'

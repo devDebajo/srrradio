@@ -24,6 +24,7 @@ import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
+import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistViewModel
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
 import ru.debajo.srrradio.ui.host.main.settings.logs.LogsListViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
@@ -66,7 +67,7 @@ internal interface AppModule : AppApi {
 
     fun provideStationsListReduktor(): StationsListReduktor = StationsListReduktor()
 
-    fun provideStationsListCommandResultReduktor(): StationsListCommandResultReduktor = StationsListCommandResultReduktor()
+    fun provideStationsListCommandResultReduktor(context: Context): StationsListCommandResultReduktor = StationsListCommandResultReduktor(context)
 
     fun provideSearchStationsCommandProcessor(searchStationsUseCase: SearchStationsUseCase): SearchStationsCommandProcessor {
         return SearchStationsCommandProcessor(searchStationsUseCase)
@@ -225,7 +226,7 @@ internal interface AppModule : AppApi {
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
                 reduktor = provideStationsListReduktor(),
-                commandResultReduktor = provideStationsListCommandResultReduktor(),
+                commandResultReduktor = provideStationsListCommandResultReduktor(dependencies.context),
                 searchStationsCommandProcessor = searchStationsCommandProcessor,
                 mediaStateListener = provideMediaStateListenerCommandProcessor(mediaController),
                 newPlayCommandProcessor = provideNewPlayCommandProcessor(mediaController),
@@ -277,6 +278,16 @@ internal interface AppModule : AppApi {
 
         override val logsListViewModel: LogsListViewModel
             get() = provideLogsListViewModel(sendErrorsHelper)
+
+        override val defaultPlaylistViewModel: DefaultPlaylistViewModel
+            get() = DefaultPlaylistViewModel(
+                context = dependencies.context,
+                searchStationsUseCase = dependencies.searchStationsUseCase,
+                userLocationUseCase = dependencies.userLocationUseCase,
+                favoriteStationsStateUseCase = dependencies.favoriteStationsStateUseCase,
+                updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase,
+                mediaController = mediaController,
+            )
 
         override val themeManager: SrrradioThemeManager by lazy {
             provideSrrradioThemeManager(dependencies.sharedPreferences)

@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -62,7 +64,8 @@ import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetContent
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.player.normalizedFraction
-import ru.debajo.srrradio.ui.host.main.playlist.PlaylistScreen
+import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistScreen
+import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistScreenStrategy
 import ru.debajo.srrradio.ui.host.main.settings.SettingsScreen
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerBottomSheet
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
@@ -162,6 +165,13 @@ private fun RadioScreenContent() {
         }
     }
 
+    val density = LocalDensity.current
+    val listBottomPadding by remember {
+        derivedStateOf {
+            navigationHeight.toDp(density) + PlayerBottomSheetPeekHeight + 12.dp
+        }
+    }
+
     val navTree = NavTree.current
     Box(Modifier.fillMaxSize()) {
         BottomSheetScaffold(
@@ -174,7 +184,7 @@ private fun RadioScreenContent() {
                     NavHost(navTree.main.navController, startDestination = navTree.main.radio.route) {
                         navigation(startDestination = navTree.main.radio.root.route, route = navTree.main.radio.route) {
                             composable(navTree.main.radio.root.route) {
-                                StationsList(navigationHeight.toDp()) {
+                                StationsList(listBottomPadding) {
                                     if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isAnimationRunning) {
                                         coroutineScope.launch {
                                             bottomSheetScaffoldState.animateTo(BottomSheetValue.Collapsed)
@@ -184,7 +194,31 @@ private fun RadioScreenContent() {
                             }
 
                             composable(navTree.main.radio.newStations.route) {
-                                PlaylistScreen()
+                                DefaultPlaylistScreen(
+                                    listBottomPadding = listBottomPadding,
+                                    strategy = DefaultPlaylistScreenStrategy.NEW
+                                )
+                            }
+
+                            composable(navTree.main.radio.popularStations.route) {
+                                DefaultPlaylistScreen(
+                                    listBottomPadding = listBottomPadding,
+                                    strategy = DefaultPlaylistScreenStrategy.POPULAR
+                                )
+                            }
+
+                            composable(navTree.main.radio.favoriteStations.route) {
+                                DefaultPlaylistScreen(
+                                    listBottomPadding = listBottomPadding,
+                                    strategy = DefaultPlaylistScreenStrategy.FAVORITE
+                                )
+                            }
+
+                            composable(navTree.main.radio.nearStations.route) {
+                                DefaultPlaylistScreen(
+                                    listBottomPadding = listBottomPadding,
+                                    strategy = DefaultPlaylistScreenStrategy.NEAR
+                                )
                             }
                         }
 

@@ -1,9 +1,11 @@
 package ru.debajo.srrradio.ui.host.main.list.reduktor
 
+import android.content.Context
 import java.util.UUID
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
+import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
@@ -13,7 +15,9 @@ import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 
-class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandResult, StationsListNews> {
+class StationsListCommandResultReduktor(
+    private val context: Context,
+) : Reduktor<StationsListState, CommandResult, StationsListNews> {
 
     override fun invoke(state: StationsListState, event: CommandResult): Akt<StationsListState, StationsListNews> {
         return when (event) {
@@ -35,7 +39,7 @@ class StationsListCommandResultReduktor : Reduktor<StationsListState, CommandRes
 
         val playlist = UiPlaylist(
             id = UUID.randomUUID().toString(),
-            name = "No named playlist",
+            name = context.getString(R.string.search),
             stations = event.stations,
         )
         return Akt(

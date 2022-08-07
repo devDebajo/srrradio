@@ -1,13 +1,11 @@
 package ru.debajo.srrradio.ui.host.main.list.reduktor
 
-import ru.debajo.srrradio.R
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.ui.model.UiElement
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
-import ru.debajo.srrradio.ui.model.UiTextElement
 import ru.debajo.srrradio.ui.model.toPlaylist
 
 private const val FAVORITE_PLAYLIST_ID = "Favorite_id"
@@ -18,14 +16,8 @@ fun UiPlaylist?.buildUiElements(
     mediaState: MediaState?
 ): List<UiElement> {
     this ?: return emptyList()
-    val result = stations.map { station ->
+    return stations.map { station ->
         UiStationElement(station, stationPlayingState(mediaState, station), station.id in favoriteStationsIds)
-    }
-
-    return if (id == FAVORITE_PLAYLIST_ID) {
-        listOf(buildFavoriteElement()) + result
-    } else {
-        result
     }
 }
 
@@ -39,11 +31,7 @@ fun List<UiStation>.toFavoritePlaylist(): UiPlaylist? {
     return toPlaylist(id = FAVORITE_PLAYLIST_ID, name = FAVORITE_PLAYLIST_NAME)
 }
 
-private fun buildFavoriteElement(): UiElement {
-    return UiTextElement(R.string.favorite)
-}
-
-private fun stationPlayingState(mediaState: MediaState?, station: UiStation): UiStationPlayingState {
+fun stationPlayingState(mediaState: MediaState?, station: UiStation): UiStationPlayingState {
     val mediaStationInfo = (mediaState as? MediaState.Loaded)?.mediaStationInfo
     if (station.id != mediaStationInfo?.currentStationId) {
         return UiStationPlayingState.NONE

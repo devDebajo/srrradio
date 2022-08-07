@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,7 +45,6 @@ import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.list.model.collectionEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.searchQuery
-import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.model.UiPlaylistIcon
 import ru.debajo.srrradio.ui.model.UiPlaylistsElement
 import ru.debajo.srrradio.ui.model.UiStationElement
@@ -54,9 +52,9 @@ import ru.debajo.srrradio.ui.model.UiTextElement
 import ru.debajo.srrradio.ui.navigation.NavTree
 
 @Composable
-fun StationsList(navigationHeight: Dp, onScroll: () -> Unit) {
+fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
     val viewModel = StationsListViewModel.Local.current
-    val state by viewModel.state.collectAsState()
+    val state: StationsListState by viewModel.state.collectAsState()
 
     CollapsingToolbarScaffold(
         modifier = Modifier.fillMaxSize(),
@@ -114,21 +112,11 @@ fun StationsList(navigationHeight: Dp, onScroll: () -> Unit) {
             }
         },
         body = {
-            if (state.uiElements.isEmpty()) {
-                Text(
-                    modifier = Modifier.align(Alignment.Center),
-                    text = stringResource(R.string.empty_items_placeholder),
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            } else {
-                ListContent(
-                    state = state,
-                    onScroll = onScroll,
-                    contentPadding = PaddingValues(bottom = PlayerBottomSheetPeekHeight + navigationHeight + 12.dp)
-                )
-            }
+            ListContent(
+                state = state,
+                onScroll = onScroll,
+                contentPadding = PaddingValues(bottom = bottomPadding)
+            )
         },
         scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed
     )
@@ -165,7 +153,8 @@ private fun ListContent(
                         StationItem(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .animateItemPlacement(),
+                                .animateItemPlacement()
+                                .padding(horizontal = 16.dp),
                             station = element.station,
                             favorite = element.favorite,
                             playingState = element.playingState,
@@ -175,7 +164,7 @@ private fun ListContent(
                     }
 
                     is UiTextElement -> TextElement(
-                        modifier = Modifier.animateItemPlacement(),
+                        modifier = Modifier.animateItemPlacement().padding(horizontal = 16.dp),
                         element = element
                     )
 
@@ -198,6 +187,18 @@ private fun navigateToPlaylist(navTree: NavTree, playlist: UiPlaylistIcon) {
         DefaultPlaylists.NewStations -> {
             navTree.main.radio.newStations.navigate()
         }
+
+        DefaultPlaylists.PopularStations -> {
+            navTree.main.radio.popularStations.navigate()
+        }
+
+        DefaultPlaylists.FavoriteStations -> {
+            navTree.main.radio.favoriteStations.navigate()
+        }
+
+        DefaultPlaylists.NearStations -> {
+            navTree.main.radio.nearStations.navigate()
+        }
     }
 }
 
@@ -215,7 +216,11 @@ private fun Playlists(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         for (item in items) {
-            PlaylistCard(item = item, onClick = onClick)
+            if (item === DefaultPlaylists.NearStations) {
+                NearPlaylistCard(item = item, onClick = onClick)
+            } else {
+                PlaylistCard(item = item, onClick = onClick)
+            }
         }
     }
 }
@@ -224,7 +229,7 @@ private fun Playlists(
 private fun TextElement(modifier: Modifier = Modifier, element: UiTextElement) {
     Text(
         modifier = modifier.padding(vertical = 8.dp),
-        text = stringResource(element.text),
+        text = element.text,
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.primary,

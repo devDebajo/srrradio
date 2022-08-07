@@ -12,14 +12,16 @@ import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
+import ru.debajo.srrradio.domain.UserLocationUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.di.DomainApiHolder
 
 internal interface AppDependencies {
 
-    val searchStationsUseCase: SearchStationsUseCase
     val context: Context
     val applicationCoroutineScope: CoroutineScope
+    val searchStationsUseCase: SearchStationsUseCase
+    val userLocationUseCase: UserLocationUseCase
     val lastStationUseCase: LastStationUseCase
     val loadPlaylistUseCase: LoadPlaylistUseCase
     val userStationUseCase: UserStationUseCase
@@ -33,6 +35,9 @@ internal interface AppDependencies {
 
         override val searchStationsUseCase: SearchStationsUseCase
             get() = DomainApiHolder.get().searchStationsUseCase
+
+        override val userLocationUseCase: UserLocationUseCase
+            get() = DomainApiHolder.get().userLocationUseCase
 
         override val context: Context
             get() = CommonApiHolder.get().context

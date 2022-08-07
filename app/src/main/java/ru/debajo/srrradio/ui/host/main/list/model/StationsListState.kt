@@ -2,11 +2,13 @@ package ru.debajo.srrradio.ui.host.main.list.model
 
 import androidx.compose.runtime.Immutable
 import ru.debajo.srrradio.media.model.MediaState
+import ru.debajo.srrradio.media.model.asLoaded
 import ru.debajo.srrradio.ui.host.main.list.reduktor.buildUiElements
 import ru.debajo.srrradio.ui.model.UiElement
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiPlaylistsElement
 import ru.debajo.srrradio.ui.model.UiStation
+import ru.debajo.srrradio.ui.model.UiTextElement
 
 @Immutable
 sealed interface StationsListState {
@@ -16,18 +18,21 @@ sealed interface StationsListState {
     @Immutable
     data class Idle(
         val mediaState: MediaState = MediaState.None,
-        val recentPlaylist: UiPlaylist? = null,
         val favoriteStations: List<UiStation> = emptyList(),
         val collectionEmpty: Boolean = true
     ) : StationsListState {
         override val uiElements: List<UiElement> = buildList {
             add(UiPlaylistsElement(DefaultPlaylists.all))
-            addAll(
-                recentPlaylist.buildUiElements(
-                    favoriteStationsIds = favoriteStationsIds,
-                    mediaState = mediaState
+            if (mediaState is MediaState.Loaded) {
+                val playlist = mediaState.playlist
+                add(UiTextElement(playlist.name))
+                addAll(
+                    mediaState.asLoaded?.playlist.buildUiElements(
+                        favoriteStationsIds = favoriteStationsIds,
+                        mediaState = mediaState
+                    )
                 )
-            )
+            }
         }
     }
 
@@ -53,7 +58,7 @@ val StationsListState.mediaState: MediaState
 
 val StationsListState.playlist: UiPlaylist?
     get() = when (this) {
-        is StationsListState.Idle -> recentPlaylist
+        is StationsListState.Idle -> mediaState.asLoaded?.playlist
         is StationsListState.InSearchMode -> searchPlaylist
     }
 

@@ -53,17 +53,18 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         titleRes = R.string.radio_title,
         navController = navController,
     ) {
-        val root: Screen = Screen(
-            route = "radioRoot",
-            navController = navController
-        )
+        val root: Screen = childScreen(route = "radioRoot")
+        val newStations: Screen = childScreen(route = "newStations")
+        val popularStations: Screen = childScreen(route = "popularStations")
+        val favoriteStations: Screen = childScreen(route = "favoriteStations")
+        val nearStations: Screen = childScreen(route = "nearStations")
 
-        val newStations: Screen = Screen(
-            route = "newStations",
-            navController = navController
+        override val nestedScreens: List<Screen> = listOf(
+            newStations,
+            popularStations,
+            favoriteStations,
+            nearStations,
         )
-
-        override val nestedScreens: List<Screen> = listOf(newStations)
     }
 
     interface AbstractScreen {
@@ -78,7 +79,11 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
     open class Screen(
         override val route: String,
         override val navController: NavController,
-    ) : AbstractScreen
+    ) : AbstractScreen {
+        protected fun childScreen(route: String): Screen {
+            return Screen(route, navController)
+        }
+    }
 
     open class NavigationScreen(
         val icon: ImageVector,

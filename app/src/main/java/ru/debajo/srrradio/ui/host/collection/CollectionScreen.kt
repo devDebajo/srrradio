@@ -2,7 +2,10 @@ package ru.debajo.srrradio.ui.host.collection
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +37,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,9 +48,11 @@ import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 @Composable
 fun <T> ListScreen(
     title: String,
+    listBottomPadding: Dp = 0.dp,
     items: List<T>,
     key: ((item: T) -> Any)? = null,
     contentType: (item: T) -> Any? = { null },
+    emptyItemsContent: @Composable BoxScope.() -> Unit = {},
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     Surface(
@@ -65,16 +71,23 @@ fun <T> ListScreen(
                 lineHeight = 44.sp,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    items = items,
-                    key = key,
-                    contentType = contentType,
-                    itemContent = itemContent
-                )
+            Box(modifier = Modifier.fillMaxSize()) {
+                if (items.isEmpty()) {
+                    emptyItemsContent()
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(bottom = listBottomPadding)
+                    ) {
+                        items(
+                            items = items,
+                            key = key,
+                            contentType = contentType,
+                            itemContent = itemContent
+                        )
+                    }
+                }
             }
         }
     }
