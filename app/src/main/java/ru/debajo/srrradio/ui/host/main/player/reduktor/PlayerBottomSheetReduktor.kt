@@ -68,6 +68,10 @@ class PlayerBottomSheetReduktor(
         event: PlayerBottomSheetEvent.OnSelectStation
     ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
         val station = state.stations.getOrNull(event.page) ?: return Akt()
+        val currentStation = state.stations.getOrNull(state.currentStationIndex)
+        if (currentStation?.id == station.id) {
+            return Akt()
+        }
         mediaController.changeStation(station.id, state.playing)
         return Akt()
     }

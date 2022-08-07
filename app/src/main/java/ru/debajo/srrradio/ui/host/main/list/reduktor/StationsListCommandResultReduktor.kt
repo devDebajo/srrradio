@@ -62,7 +62,7 @@ class StationsListCommandResultReduktor(
 
         val playlist = UiPlaylist(
             id = UUID.randomUUID().toString(),
-            name = context.getString(R.string.search),
+            name = "${context.getString(R.string.search)}: ${event.query}",
             stations = event.stations,
         )
         return Akt(

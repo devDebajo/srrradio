@@ -26,16 +26,16 @@ class SearchStationsCommandProcessor(
             .mapLatest { action ->
                 when (action) {
                     is Action.Cancel -> CommandResult.EMPTY
-                    is Action.Search -> searchSafe { searchStationsUseCase.search(action.query) }
-                    is Action.SearchByUrl -> searchSafe { searchStationsUseCase.searchByUrl(action.url) }
+                    is Action.Search -> searchSafe(action.query) { searchStationsUseCase.search(action.query) }
+                    is Action.SearchByUrl -> searchSafe("") { searchStationsUseCase.searchByUrl(action.url) }
                 }
             }
     }
 
-    private suspend fun searchSafe(searchBlock: suspend () -> List<Station>): CommandResult {
+    private suspend fun searchSafe(query: String, searchBlock: suspend () -> List<Station>): CommandResult {
         return runCatching {
             delay(500)
-            SearchResult(searchBlock().convert())
+            SearchResult(query, searchBlock().convert())
         }.getOrElse { CommandResult.EMPTY }
     }
 
@@ -47,5 +47,8 @@ class SearchStationsCommandProcessor(
         object Cancel : Action
     }
 
-    data class SearchResult(val stations: List<UiStation>) : CommandResult
+    data class SearchResult(
+        val query: String,
+        val stations: List<UiStation>
+    ) : CommandResult
 }

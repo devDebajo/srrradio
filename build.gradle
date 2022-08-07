@@ -6,7 +6,7 @@ buildscript {
         compose_activity_version = '1.6.0-alpha05'
         compose_view_model_version = '2.6.0-alpha01'
         compose_navigation_version = '2.5.1'
-        accompanist_version = '0.24.13-rc'
+        accompanist_version = '0.26.0-alpha'
         glide_landscapist = '1.5.2'
 
         coroutines_version = '1.6.3'

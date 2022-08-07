@@ -193,7 +193,6 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
         LaunchedEffect(pagerState) {
             launch {
                 snapshotFlow { pagerState.currentPage }
-                    .filter { state.currentStationIndex != it }
                     .collect {
                         viewModel.onEvent(PlayerBottomSheetEvent.OnSelectStation(it))
                     }

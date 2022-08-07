@@ -148,7 +148,6 @@ class RadioPlayer(
                 if (playWhenReady) play() else pause()
             } else {
                 statesMutable.value = State.HasStation(station)
-                //exoPlayer.pause()
                 exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
                 exoPlayer.prepare()
                 PlayerNotificationService.show(context)
