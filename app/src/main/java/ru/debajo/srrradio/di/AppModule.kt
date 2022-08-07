@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
+import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
@@ -34,6 +35,7 @@ import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
+import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
 import ru.debajo.srrradio.ui.processor.SaveCustomStationProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
@@ -52,6 +54,7 @@ internal interface AppModule : AppApi {
         listenFavoriteStationsProcessor: ListenFavoriteStationsProcessor,
         addFavoriteStationProcessor: AddFavoriteStationProcessor,
         trackCollectionListener: TrackCollectionListener,
+        popularStationsProcessor: PopularStationsProcessor,
     ): StationsListViewModel {
         return StationsListViewModel(
             reduktor = reduktor,
@@ -62,10 +65,11 @@ internal interface AppModule : AppApi {
             listenFavoriteStationsProcessor = listenFavoriteStationsProcessor,
             addFavoriteStationProcessor = addFavoriteStationProcessor,
             trackCollectionListener = trackCollectionListener,
+            popularStationsProcessor = popularStationsProcessor
         )
     }
 
-    fun provideStationsListReduktor(): StationsListReduktor = StationsListReduktor()
+    fun provideStationsListReduktor(lastStationUseCase: LastStationUseCase): StationsListReduktor = StationsListReduktor(lastStationUseCase)
 
     fun provideStationsListCommandResultReduktor(context: Context): StationsListCommandResultReduktor = StationsListCommandResultReduktor(context)
 
@@ -208,6 +212,9 @@ internal interface AppModule : AppApi {
 
     fun provideLogsListViewModel(sendErrorsHelper: SendErrorsHelper): LogsListViewModel = LogsListViewModel(sendErrorsHelper)
 
+    fun providePopularStationsProcessor(searchStationsUseCase: SearchStationsUseCase): PopularStationsProcessor =
+        PopularStationsProcessor(searchStationsUseCase)
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
@@ -225,7 +232,7 @@ internal interface AppModule : AppApi {
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
-                reduktor = provideStationsListReduktor(),
+                reduktor = provideStationsListReduktor(dependencies.lastStationUseCase),
                 commandResultReduktor = provideStationsListCommandResultReduktor(dependencies.context),
                 searchStationsCommandProcessor = searchStationsCommandProcessor,
                 mediaStateListener = provideMediaStateListenerCommandProcessor(mediaController),
@@ -233,6 +240,7 @@ internal interface AppModule : AppApi {
                 listenFavoriteStationsProcessor = provideListenFavoriteStationsProcessor(dependencies.favoriteStationsStateUseCase),
                 addFavoriteStationProcessor = provideAddFavoriteStationProcessor(dependencies.updateFavoriteStationStateUseCase),
                 trackCollectionListener = provideTrackCollectionListener(dependencies.tracksCollectionUseCase),
+                popularStationsProcessor = providePopularStationsProcessor(dependencies.searchStationsUseCase)
             )
 
         override val playerBottomSheetViewModel: PlayerBottomSheetViewModel

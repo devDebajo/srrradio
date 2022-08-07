@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.model
 
 import androidx.compose.runtime.Immutable
+import java.util.UUID
 import ru.debajo.srrradio.domain.model.Playlist
 
 @Immutable
@@ -28,7 +29,7 @@ fun UiPlaylist.toDomain(): Playlist {
     )
 }
 
-fun List<UiStation>.toPlaylist(id: String, name: String): UiPlaylist {
+fun List<UiStation>.toPlaylist(id: String = UUID.randomUUID().toString(), name: String): UiPlaylist {
     return UiPlaylist(
         id = id,
         name = name,

@@ -25,9 +25,9 @@ enum class DefaultPlaylistScreenStrategy(
     val titleRes: Int,
     val emptyPlaceholderTextRes: Int
 ) {
-    NEW(R.string.playlist_new, R.string.playlist_new_empty),
     POPULAR(R.string.playlist_popular, R.string.playlist_popular_empty),
     FAVORITE(R.string.playlist_favorite, R.string.playlist_favorite_empty),
+    NEW(R.string.playlist_new, R.string.playlist_new_empty),
     NEAR(R.string.playlist_near, R.string.playlist_near_empty),
 }
 

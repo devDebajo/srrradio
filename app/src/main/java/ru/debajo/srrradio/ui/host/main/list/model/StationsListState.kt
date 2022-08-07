@@ -19,15 +19,17 @@ sealed interface StationsListState {
     data class Idle(
         val mediaState: MediaState = MediaState.None,
         val favoriteStations: List<UiStation> = emptyList(),
-        val collectionEmpty: Boolean = true
+        val collectionEmpty: Boolean = true,
+        val fallBackPlaylist: UiPlaylist? = null,
     ) : StationsListState {
         override val uiElements: List<UiElement> = buildList {
             add(UiPlaylistsElement(DefaultPlaylists.all))
-            if (mediaState is MediaState.Loaded) {
-                val playlist = mediaState.playlist
+
+            val playlist = (mediaState as? MediaState.Loaded)?.playlist ?: fallBackPlaylist
+            if (playlist != null) {
                 add(UiTextElement(playlist.name))
                 addAll(
-                    mediaState.asLoaded?.playlist.buildUiElements(
+                    playlist.buildUiElements(
                         favoriteStationsIds = favoriteStationsIds,
                         mediaState = mediaState
                     )
@@ -58,7 +60,7 @@ val StationsListState.mediaState: MediaState
 
 val StationsListState.playlist: UiPlaylist?
     get() = when (this) {
-        is StationsListState.Idle -> mediaState.asLoaded?.playlist
+        is StationsListState.Idle -> mediaState.asLoaded?.playlist ?: fallBackPlaylist
         is StationsListState.InSearchMode -> searchPlaylist
     }
 

@@ -63,7 +63,7 @@ fun PlaylistCard(
 
             Text(
                 modifier = Modifier
-                    .align(Alignment.BottomStart)
+                    .align(Alignment.BottomCenter)
                     .padding(8.dp),
                 text = stringResource(item.title),
                 fontSize = 9.sp,

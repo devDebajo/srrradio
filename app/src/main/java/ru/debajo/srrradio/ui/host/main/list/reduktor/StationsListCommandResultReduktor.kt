@@ -8,10 +8,13 @@ import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
+import ru.debajo.srrradio.ui.host.main.list.model.playlist
 import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
 import ru.debajo.srrradio.ui.model.UiPlaylist
+import ru.debajo.srrradio.ui.model.toPlaylist
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
+import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 
@@ -25,8 +28,28 @@ class StationsListCommandResultReduktor(
             is MediaStateListenerCommandProcessor.OnNewMediaState -> reduceOnNewMediaState(state, event)
             is ListenFavoriteStationsProcessor.Result -> reduceNewFavoriteStations(state, event)
             is TrackCollectionListener.TrackCollectionChanged -> reduceTrackCollectionChanged(state, event)
+            is PopularStationsProcessor.Loaded -> reducePopularStationsLoaded(state, event)
             else -> Akt()
         }
+    }
+
+    private fun reducePopularStationsLoaded(
+        state: StationsListState,
+        event: PopularStationsProcessor.Loaded,
+    ): Akt<StationsListState, StationsListNews> {
+        if (state.playlist != null) {
+            return Akt()
+        }
+
+        return Akt(
+            state.updateIdle {
+                copy(
+                    fallBackPlaylist = event.stations.toPlaylist(
+                        name = context.getString(R.string.playlist_popular),
+                    )
+                )
+            }
+        )
     }
 
     private fun reduceSearchResult(

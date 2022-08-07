@@ -3,6 +3,7 @@ package ru.debajo.srrradio.ui.host.main.list.reduktor
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.Reduktor
+import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
@@ -14,10 +15,13 @@ import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
+import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 
-class StationsListReduktor : Reduktor<StationsListState, StationsListEvent, StationsListNews> {
+class StationsListReduktor(
+    private val lastStationUseCase: LastStationUseCase,
+) : Reduktor<StationsListState, StationsListEvent, StationsListNews> {
 
     override fun invoke(state: StationsListState, event: StationsListEvent): Akt<StationsListState, StationsListNews> {
         return when (event) {
@@ -30,10 +34,11 @@ class StationsListReduktor : Reduktor<StationsListState, StationsListEvent, Stat
 
     private fun reduceStart(): Akt<StationsListState, StationsListNews> {
         return Akt(
-            commands = listOf(
+            commands = listOfNotNull(
                 MediaStateListenerCommandProcessor.ListenerCommand.Start,
                 ListenFavoriteStationsProcessor.Listen,
                 TrackCollectionListener.Listen,
+                PopularStationsProcessor.Load.takeIf { lastStationUseCase.lastPlaylistId == null },
             )
         )
     }
