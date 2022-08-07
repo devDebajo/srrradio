@@ -62,8 +62,8 @@ internal interface DataModule : DataApiInternal {
         dbPlaylistMappingDao: DbPlaylistMappingDao,
     ): LoadPlaylistUseCase = LoadPlaylistUseCaseImpl(playlistDao, stationDao, dbPlaylistMappingDao)
 
-    fun provideFavoriteStationsRepository(dbFavoriteStationDao: DbFavoriteStationDao): FavoriteStationsRepository {
-        return FavoriteStationsRepositoryImpl(dbFavoriteStationDao)
+    fun provideFavoriteStationsRepository(dbStationDao: DbStationDao, dbFavoriteStationDao: DbFavoriteStationDao): FavoriteStationsRepository {
+        return FavoriteStationsRepositoryImpl(dbStationDao, dbFavoriteStationDao)
     }
 
     fun provideUserStationUseCase(stationDao: DbStationDao): UserStationUseCase = UserStationUseCaseImpl(stationDao)
@@ -109,7 +109,7 @@ internal interface DataModule : DataApiInternal {
         override val searchStationsRepository: SearchStationsRepository by lazy { provideSearchStationsRepository(serviceHolder) }
 
         override val favoriteStationsRepository: FavoriteStationsRepository by lazy {
-            provideFavoriteStationsRepository(dbFavoriteStationDao)
+            provideFavoriteStationsRepository(dbStationDao, dbFavoriteStationDao)
         }
 
         override val sharedPreferences: SharedPreferences

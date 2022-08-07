@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import ru.debajo.srrradio.domain.model.Station
 
 interface FavoriteStationsRepository {
-    suspend fun updateFavoriteState(stationId: String, inFavorite: Boolean)
+    suspend fun updateFavoriteState(station: Station, inFavorite: Boolean)
 
     fun observeFavoriteStations(): Flow<List<Station>>
 

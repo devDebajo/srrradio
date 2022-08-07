@@ -8,6 +8,7 @@ import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
+import ru.debajo.srrradio.domain.model.Station
 
 class AddFavoriteStationProcessor(
     private val useCase: UpdateFavoriteStationStateUseCase,
@@ -18,10 +19,10 @@ class AddFavoriteStationProcessor(
         return commands
             .filterIsInstance<Update>()
             .mapLatest {
-                useCase.update(it.stationId, it.favorite)
+                useCase.update(it.station, it.favorite)
                 CommandResult.EMPTY
             }
     }
 
-    class Update(val stationId: String, val favorite: Boolean) : Command
+    class Update(val station: Station, val favorite: Boolean) : Command
 }

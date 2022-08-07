@@ -11,6 +11,7 @@ import ru.debajo.srrradio.ui.host.main.list.model.playlist
 import ru.debajo.srrradio.ui.host.main.list.model.toIdle
 import ru.debajo.srrradio.ui.host.main.list.model.toSearch
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
@@ -80,7 +81,7 @@ class StationsListReduktor(
 
     private fun reduceChangeFavorite(event: StationsListEvent.ChangeFavorite): Akt<StationsListState, StationsListNews> {
         return Akt(
-            commands = listOf(AddFavoriteStationProcessor.Update(event.station.id, event.favorite))
+            commands = listOf(AddFavoriteStationProcessor.Update(event.station.toDomain(), event.favorite))
         )
     }
 }

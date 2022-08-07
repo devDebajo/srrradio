@@ -159,9 +159,7 @@ private fun ListContent(
                             favorite = element.favorite,
                             playingState = element.playingState,
                             onFavoriteClick = { station, favorite -> viewModel.onEvent(StationsListEvent.ChangeFavorite(station, favorite)) },
-                            onPlayClick = { station, playingState ->
-                                viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState))
-                            }
+                            onPlayClick = { station, playingState -> viewModel.onEvent(StationsListEvent.OnPlayPauseStation(station, playingState)) }
                         )
                     }
 

@@ -6,6 +6,7 @@ import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetNews
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
+import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
@@ -82,7 +83,7 @@ class PlayerBottomSheetReduktor(
     ): Akt<PlayerBottomSheetState, PlayerBottomSheetNews> {
         val station = state.stations.getOrNull(state.currentStationIndex) ?: return Akt()
         return Akt(
-            commands = listOf(AddFavoriteStationProcessor.Update(station.id, event.favorite))
+            commands = listOf(AddFavoriteStationProcessor.Update(station.toDomain(), event.favorite))
         )
     }
 }

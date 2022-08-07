@@ -27,7 +27,7 @@ class LoadM3uInteractor(
             .map { resolve(it) }
             .onEach {
                 userStationUseCase.persist(it)
-                updateFavoriteStationStateUseCase.update(it.id, inFavorite = true)
+                updateFavoriteStationStateUseCase.update(it, inFavorite = true)
             }
     }
 

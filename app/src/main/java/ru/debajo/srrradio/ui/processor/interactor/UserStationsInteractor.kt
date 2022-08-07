@@ -10,7 +10,7 @@ class UserStationsInteractor(
 ) {
     suspend fun add(stream: String, name: String): Station {
         val station = userStationUseCase.create(stream, name)
-        updateFavoriteStationStateUseCase.update(station.id, inFavorite = true)
+        updateFavoriteStationStateUseCase.update(station, inFavorite = true)
         return station
     }
 }

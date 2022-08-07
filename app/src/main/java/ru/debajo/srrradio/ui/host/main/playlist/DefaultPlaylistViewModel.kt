@@ -26,6 +26,7 @@ import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStation
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.model.toUi
 
 @SuppressLint("StaticFieldLeak")
@@ -69,7 +70,7 @@ class DefaultPlaylistViewModel(
 
     fun onFavoriteClick(station: UiStation, favorite: Boolean) {
         viewModelScope.launch {
-            updateFavoriteStationStateUseCase.update(station.id, favorite)
+            updateFavoriteStationStateUseCase.update(station.toDomain(), favorite)
         }
     }
 
