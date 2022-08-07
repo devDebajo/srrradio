@@ -14,13 +14,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.stringResource
+import ru.debajo.srrradio.ui.ext.textHandleMove
 
 @Composable
 fun SleepTimerBottomSheet() {
@@ -42,7 +42,7 @@ fun SleepTimerBottomSheet() {
             modifier = Modifier.fillMaxWidth(),
             value = state.leftMinutes.toFloat(),
             onValueChange = {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                haptic.textHandleMove()
                 viewModel.onValueChange(it)
             },
             onValueChangeFinished = { viewModel.onValueChangeFinished() },

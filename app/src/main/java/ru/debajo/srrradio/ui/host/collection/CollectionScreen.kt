@@ -31,7 +31,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 
 @Composable
@@ -117,12 +117,12 @@ fun CollectionScreen() {
                 item = collectionItem,
                 onDelete = { item ->
                     viewModel.remove(item)
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.longPress()
                 },
                 onClick = { item ->
                     snackbarLauncher.show(R.string.copied_to_clipboard)
                     clipboardManager.setText(AnnotatedString(item.track))
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.longPress()
                 }
             )
         }

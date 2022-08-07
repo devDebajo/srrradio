@@ -30,12 +30,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.host.main.player.StationCover
@@ -81,7 +81,7 @@ fun StationItem(
             Spacer(Modifier.width(8.dp))
             val haptic = LocalHapticFeedback.current
             IconButton(onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                haptic.longPress()
                 onFavoriteClick(station, !favorite)
             }) {
                 Icon(
