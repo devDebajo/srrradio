@@ -25,6 +25,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -32,6 +33,7 @@ import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.ext.AndroidColor
 import ru.debajo.srrradio.ui.ext.colorInt
+import ru.debajo.srrradio.ui.ext.rememberFixedHapticFeedback
 import ru.debajo.srrradio.ui.host.add.AddCustomStationScreen
 import ru.debajo.srrradio.ui.host.collection.CollectionScreen
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
@@ -78,7 +80,8 @@ class HostActivity : ComponentActivity() {
                 SettingsViewModel.Local provides settingsViewModel,
                 SrrradioThemeManager.Local provides themeManager,
                 LocalIndication provides rememberRipple(),
-                LocalOpenDocumentLauncher provides openDocumentLauncher
+                LocalOpenDocumentLauncher provides openDocumentLauncher,
+                LocalHapticFeedback provides rememberFixedHapticFeedback()
             ) {
                 SrrradioTheme {
                     ConfigureNavigationColor()
