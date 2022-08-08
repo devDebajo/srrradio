@@ -1,8 +1,6 @@
 package ru.debajo.srrradio.media
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.support.v4.media.MediaMetadataCompat
 import androidx.annotation.AnyThread
 import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.ExoPlayer
@@ -145,14 +143,14 @@ class RadioPlayer(
         playPauseJob?.cancel()
         playPauseJob = launch(Main) {
             if (station.id == currentStation?.id) {
-                if (playWhenReady) play() else pause()
+                if (playWhenReady) playAndSeekToEnd() else pause()
             } else {
                 statesMutable.value = State.HasStation(station)
                 exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
                 exoPlayer.prepare()
                 PlayerNotificationService.show(context)
                 if (playWhenReady) {
-                    exoPlayer.play()
+                    playAndSeekToEnd()
                 }
             }
         }
@@ -164,7 +162,7 @@ class RadioPlayer(
         playPauseJob = launch(Main) {
             when (states.value) {
                 is State.None -> Unit
-                is State.HasStation -> exoPlayer.play()
+                is State.HasStation -> playAndSeekToEnd()
             }
         }
     }
@@ -177,13 +175,13 @@ class RadioPlayer(
                 is State.None -> Unit
                 is State.HasStation -> {
                     when (state.playbackState) {
-                        PlaybackState.PAUSED -> exoPlayer.play()
+                        PlaybackState.PAUSED -> playAndSeekToEnd()
                         PlaybackState.PLAYING -> exoPlayer.pause()
                         PlaybackState.BUFFERING -> {
                             if (exoPlayer.playWhenReady) {
                                 exoPlayer.pause()
                             } else {
-                                exoPlayer.play()
+                                playAndSeekToEnd()
                             }
                         }
                     }
@@ -203,27 +201,17 @@ class RadioPlayer(
         }
     }
 
-    private fun createMediaMetadataCompat(stationName: String, title: String?, coverBitmap: Bitmap): MediaMetadataCompat {
-        val builder = MediaMetadataCompat.Builder()
-            .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, coverBitmap)
-
-        if (title.isNullOrEmpty()) {
-            builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, stationName)
-        } else {
-            builder
-                .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, stationName)
-                .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
-        }
-
-        return builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1).build()
-    }
-
     private fun MediaMetadata.extractTitle(): String? {
         val title = title?.toString() ?: displayTitle?.toString()
         if (!title.isNullOrEmpty()) {
             return title
         }
         return null
+    }
+
+    private fun playAndSeekToEnd() {
+        exoPlayer.seekTo(exoPlayer.bufferedPosition)
+        exoPlayer.play()
     }
 
     sealed interface State {

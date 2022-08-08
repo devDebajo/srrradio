@@ -34,7 +34,6 @@ fun HapticFeedback.longPress() {
     performHapticFeedback(HapticFeedbackType.LongPress)
 }
 
-
 fun HapticFeedback.textHandleMove() {
     performHapticFeedback(HapticFeedbackType.TextHandleMove)
 }

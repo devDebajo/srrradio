@@ -84,6 +84,8 @@ import com.google.accompanist.pager.rememberPagerState
 import com.skydoves.landscapist.glide.GlideImage
 import kotlin.math.absoluteValue
 import kotlin.math.sin
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
@@ -112,7 +114,7 @@ val SwipeProgress<BottomSheetValue>.normalizedFraction: Float
     }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class, FlowPreview::class)
 fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val sleepTimerViewModel = SleepTimerViewModel.Local.current
@@ -193,6 +195,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
         LaunchedEffect(pagerState) {
             launch {
                 snapshotFlow { pagerState.currentPage }
+                    .debounce(100)
                     .collect {
                         viewModel.onEvent(PlayerBottomSheetEvent.OnSelectStation(it))
                     }
@@ -504,7 +507,6 @@ private fun PlayBackButton(
         }
     }
 }
-
 
 @Composable
 fun StationCover(
