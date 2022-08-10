@@ -60,6 +60,7 @@
     <string name="theme_synthwave">Неон</string>
     <string name="theme_mint">Мята</string>
     <string name="theme_blue">Волна</string>
+    <string name="theme_light">Светлая</string>
     <string name="theme_dynamic">Динамическая</string>
 
     <string name="accessibility_next_station">Следующая радиостанция</string>

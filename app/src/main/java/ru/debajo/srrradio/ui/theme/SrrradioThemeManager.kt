@@ -44,6 +44,7 @@ internal class SrrradioThemeManager(
             SynthTheme,
             BlueTheme,
             MintTheme,
+            // LightTheme,
         )
     }
 }
