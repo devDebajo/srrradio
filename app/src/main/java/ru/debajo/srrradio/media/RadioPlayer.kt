@@ -11,9 +11,11 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -98,11 +100,10 @@ class RadioPlayer(
                             is State.None -> currentState
                         }
                         statesMutable.value = newState
-                        if (newState is State.HasStation) {
-                            updateMediaSession(newState)
-                        } else {
-                            mediaSessionController.update {
-                                isActive = false
+                        when (newState) {
+                            is State.HasStation -> updateMediaSession(newState)
+                            is State.None -> {
+                                mediaSessionController.update { isActive = false }
                             }
                         }
                     }
@@ -128,11 +129,27 @@ class RadioPlayer(
             playbackState = playerState.playbackState
         }
 
+        scheduleMediaSessionDeactivation(playerState)
+
         val bitmap = stationCoverLoader.loadImage(playerState.station.image)
         if (bitmap != null) {
             mediaSessionController.update {
                 cover = bitmap
             }
+        }
+    }
+
+    private var deactivateJob: Job? = null
+
+    private fun scheduleMediaSessionDeactivation(playerState: State.HasStation) {
+        deactivateJob?.cancel()
+        deactivateJob = if (playerState.playbackState == PlaybackState.PAUSED) {
+            launch {
+                delay(DEACTIVATE_DELAY_MS)
+                mediaSessionController.update { isActive = false }
+            }
+        } else {
+            null
         }
     }
 
@@ -148,8 +165,8 @@ class RadioPlayer(
                 statesMutable.value = State.HasStation(station)
                 exoPlayer.setMediaSource(mediaSourceFactory.createMediaSource(MediaItem.fromUri(station.stream)))
                 exoPlayer.prepare()
-                PlayerNotificationService.show(context)
                 if (playWhenReady) {
+                    PlayerNotificationService.show(context)
                     playAndSeekToEnd()
                 }
             }
@@ -224,15 +241,12 @@ class RadioPlayer(
         ) : State {
             val playing: Boolean
                 get() = playbackState == PlaybackState.PLAYING
-
-            val buffering: Boolean
-                get() = playbackState == PlaybackState.BUFFERING
         }
     }
 
-    enum class PlaybackState {
-        PAUSED,
-        BUFFERING,
-        PLAYING,
+    enum class PlaybackState { PAUSED, BUFFERING, PLAYING, }
+
+    private companion object {
+        val DEACTIVATE_DELAY_MS = TimeUnit.MINUTES.toMillis(3)
     }
 }

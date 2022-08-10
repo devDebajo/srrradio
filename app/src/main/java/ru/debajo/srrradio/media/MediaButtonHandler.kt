@@ -9,9 +9,14 @@ import ru.debajo.srrradio.di.AppApiHolder
 class MediaButtonHandler : MediaSessionConnector.MediaButtonEventHandler {
 
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
+    private val mediaSessionController: MediaSessionController by lazy { AppApiHolder.get().mediaSessionController }
 
     override fun onMediaButtonEvent(player: Player, mediaButtonEvent: Intent): Boolean {
         if (mediaButtonEvent.action != Intent.ACTION_MEDIA_BUTTON) {
+            return false
+        }
+
+        if (!mediaSessionController.mediaSession.isActive) {
             return false
         }
 

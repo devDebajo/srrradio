@@ -32,6 +32,8 @@ import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.ui.host.HostActivity
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 
+
+// Наверное надо сделать серсвис foreground и вырубать тогда, когда сессия перестает быть активной?
 class PlayerNotificationService : Service(), CoroutineScope {
 
     private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
