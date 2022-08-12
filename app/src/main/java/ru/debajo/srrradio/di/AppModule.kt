@@ -202,7 +202,7 @@ internal interface AppModule : AppApi {
     fun provideSrrradioThemeManager(
         sharedPreferences: SharedPreferences,
         appIconManager: AppIconManager,
-    ): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences, appIconManager)
+    ): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
 
     fun provideCollectionViewModel(tracksCollectionUseCase: TracksCollectionUseCase): CollectionViewModel {
         return CollectionViewModel(tracksCollectionUseCase)

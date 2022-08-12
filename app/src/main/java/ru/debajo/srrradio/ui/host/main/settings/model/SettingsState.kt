@@ -4,4 +4,5 @@ internal data class SettingsState(
     val themes: List<SettingsTheme> = emptyList(),
     val loadingM3u: Boolean = false,
     val canSendLogs: Boolean = false,
+    val dynamicIcon: Boolean = false,
 )

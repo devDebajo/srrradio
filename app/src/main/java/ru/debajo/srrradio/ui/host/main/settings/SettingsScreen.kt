@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +36,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
@@ -97,6 +100,13 @@ private fun SettingsList() {
                     viewModel.selectTheme(theme.theme.code)
                 }
             }
+
+            SettingsSwitch(
+                text = "Динамическая иконка приложения",
+                checked = state.dynamicIcon,
+            ) {
+                viewModel.onDynamicIconClick()
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -122,7 +132,7 @@ private fun SettingsList() {
                     navTree.sendLogs.navigate()
                 }
                 SettingsText(text = stringResource(R.string.settings_clear_logs)) {
-                   viewModel.clearLogs()
+                    viewModel.clearLogs()
                 }
             }
             if (BuildConfig.DEBUG) {
@@ -202,6 +212,32 @@ fun SettingsText(
             )
             Spacer(modifier = Modifier.width(16.dp))
         }
+    }
+}
+
+@Composable
+fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp, horizontal = 16.dp)
+    ) {
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f)
+        )
+
+        val haptic = LocalHapticFeedback.current
+        Switch(
+            checked = checked,
+            onCheckedChange = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            }
+        )
     }
 }
 

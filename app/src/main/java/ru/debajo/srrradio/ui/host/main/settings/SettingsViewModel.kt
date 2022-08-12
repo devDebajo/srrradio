@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.error.SendErrorsHelper
+import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
@@ -18,12 +19,17 @@ internal class SettingsViewModel(
     private val themeManager: SrrradioThemeManager,
     private val loadM3uInteractor: LoadM3uInteractor,
     private val sendErrorsHelper: SendErrorsHelper,
+    private val appIconManager: AppIconManager,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
     val state: StateFlow<SettingsState> = stateMutable.asStateFlow()
 
     init {
+        updateState {
+            copy(dynamicIcon = appIconManager.dynamicIcon)
+        }
+
         viewModelScope.launch {
             themeManager.currentTheme.collect { selected ->
                 val themes = themeManager.supportedThemes.map {
@@ -68,6 +74,13 @@ internal class SettingsViewModel(
             updateState {
                 copy(canSendLogs = false)
             }
+        }
+    }
+
+    fun onDynamicIconClick() {
+        updateState {
+            appIconManager.dynamicIcon = !dynamicIcon
+            copy(dynamicIcon = !dynamicIcon)
         }
     }
 

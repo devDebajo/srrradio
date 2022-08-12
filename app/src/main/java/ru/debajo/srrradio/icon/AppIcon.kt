@@ -4,5 +4,9 @@ enum class AppIcon(val componentSegment: String) {
     DYNAMIC("dynamic"),
     NEON("neon"),
     WAVE("wave"),
-    MINT("mint"),
+    MINT("mint");
+
+    companion object {
+        val DEFAULT: AppIcon = NEON
+    }
 }

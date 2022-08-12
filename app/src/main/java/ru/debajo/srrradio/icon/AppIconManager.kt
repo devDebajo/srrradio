@@ -2,19 +2,38 @@ package ru.debajo.srrradio.icon
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 
 class AppIconManager(
     private val context: Context,
+    private val sharedPreferences: SharedPreferences,
 ) {
+
+    var dynamicIcon: Boolean
+        get() = sharedPreferences.getBoolean(DYNAMIC_ICON, false)
+        set(value) {
+            sharedPreferences.edit()
+                .putBoolean(DYNAMIC_ICON, value)
+                .apply()
+        }
+
     fun isEnabled(icon: AppIcon): Boolean {
+        if (!dynamicIcon) {
+            return icon == AppIcon.DEFAULT
+        }
+
         val componentEnabledSetting = context.packageManager.getComponentEnabledSetting(icon.componentName)
         return componentEnabledSetting == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
-                componentEnabledSetting == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == AppIcon.NEON
+                componentEnabledSetting == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == AppIcon.DEFAULT
     }
 
     fun enable(icon: AppIcon) {
-        AppIcon.values().forEach { updateIconState(icon = it, enabled = it == icon) }
+        if (dynamicIcon) {
+            AppIcon.values().forEach { updateIconState(icon = it, enabled = it == icon) }
+        } else {
+            AppIcon.values().forEach { updateIconState(icon = it, enabled = it == AppIcon.DEFAULT) }
+        }
     }
 
     private fun updateIconState(icon: AppIcon, enabled: Boolean) {
@@ -32,4 +51,10 @@ class AppIconManager(
 
     private val AppIcon.componentName: ComponentName
         get() = ComponentName(context.packageName, "ru.debajo.srrradio.ui.host.HostActivity.$componentSegment")
+
+    private companion object {
+        const val DYNAMIC_ICON = "DYNAMIC_ICON"
+    }
 }
+
+
