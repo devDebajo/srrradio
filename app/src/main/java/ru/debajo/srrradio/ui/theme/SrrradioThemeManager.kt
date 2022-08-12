@@ -6,9 +6,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.debajo.srrradio.icon.AppIconManager
 
 internal class SrrradioThemeManager(
     private val sharedPreferences: SharedPreferences,
+    private val appIconManager: AppIconManager,
 ) {
 
     private val currentThemeMutable: MutableStateFlow<AppTheme> = MutableStateFlow(loadCurrent())
@@ -18,6 +20,7 @@ internal class SrrradioThemeManager(
     fun select(code: String) {
         val selected = themes.firstOrNull { it.code == code } ?: currentThemeMutable.value
         saveSelected(selected.code)
+        appIconManager.enable(selected.icon)
         currentThemeMutable.value = selected
     }
 
@@ -29,7 +32,9 @@ internal class SrrradioThemeManager(
 
     private fun loadCurrent(): AppTheme {
         val key = sharedPreferences.getString(KEY, null) ?: return defaultTheme
-        return themes.firstOrNull { it.code == key } ?: defaultTheme
+        val currentTheme = themes.firstOrNull { it.code == key } ?: defaultTheme
+        appIconManager.enable(currentTheme.icon)
+        return currentTheme
     }
 
     companion object {
@@ -44,7 +49,6 @@ internal class SrrradioThemeManager(
             SynthTheme,
             BlueTheme,
             MintTheme,
-            // LightTheme,
         )
     }
 }

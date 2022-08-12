@@ -4,11 +4,13 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.icon.AppIcon
 
 internal val BlueTheme: AppTheme = AppTheme(
     code = "BlueTheme",
     nameRes = R.string.theme_blue,
     colors = { BlueColors },
+    icon = AppIcon.WAVE,
 )
 
 private val BlueColors: ColorScheme = darkColorScheme(

@@ -11,6 +11,7 @@ import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.error.SendErrorsHelper
+import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
@@ -198,7 +199,10 @@ internal interface AppModule : AppApi {
         sendErrorsHelper: SendErrorsHelper
     ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendErrorsHelper)
 
-    fun provideSrrradioThemeManager(sharedPreferences: SharedPreferences): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
+    fun provideSrrradioThemeManager(
+        sharedPreferences: SharedPreferences,
+        appIconManager: AppIconManager,
+    ): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences, appIconManager)
 
     fun provideCollectionViewModel(tracksCollectionUseCase: TracksCollectionUseCase): CollectionViewModel {
         return CollectionViewModel(tracksCollectionUseCase)
@@ -214,6 +218,8 @@ internal interface AppModule : AppApi {
 
     fun providePopularStationsProcessor(searchStationsUseCase: SearchStationsUseCase): PopularStationsProcessor =
         PopularStationsProcessor(searchStationsUseCase)
+
+    fun provideAppIconManager(context: Context): AppIconManager = AppIconManager(context)
 
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
@@ -298,7 +304,10 @@ internal interface AppModule : AppApi {
             )
 
         override val themeManager: SrrradioThemeManager by lazy {
-            provideSrrradioThemeManager(dependencies.sharedPreferences)
+            provideSrrradioThemeManager(
+                sharedPreferences = dependencies.sharedPreferences,
+                appIconManager = provideAppIconManager(dependencies.context),
+            )
         }
 
         override val mediaController: MediaController by lazy {
