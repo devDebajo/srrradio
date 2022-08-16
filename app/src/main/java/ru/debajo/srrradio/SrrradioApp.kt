@@ -14,6 +14,7 @@ import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.di.AppDependencies
 import ru.debajo.srrradio.domain.di.DomainApiHolder
 import ru.debajo.srrradio.error.FileLogTimberTree
+import ru.debajo.srrradio.error.OnlyErrorsTree
 import ru.debajo.srrradio.error.SendErrorsHelper
 import ru.debajo.srrradio.media.MediaController
 import timber.log.Timber
@@ -42,9 +43,15 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
 
     private fun initLogs() {
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree(), FileLogTimberTree(sendErrorsHelper))
+            Timber.plant(
+                Timber.DebugTree(),
+                FileLogTimberTree(sendErrorsHelper)
+            )
         } else {
-            Timber.plant(FileLogTimberTree(sendErrorsHelper))
+            Timber.plant(
+                FileLogTimberTree(sendErrorsHelper),
+                OnlyErrorsTree()
+            )
         }
     }
 

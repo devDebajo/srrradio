@@ -2,6 +2,7 @@ package ru.debajo.srrradio.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.LastStationUseCase
@@ -235,6 +236,10 @@ internal interface AppModule : AppApi {
 
         override val coroutineScope: CoroutineScope
             get() = dependencies.applicationCoroutineScope
+
+        override val firebaseCrashlytics: FirebaseCrashlytics by lazy {
+            FirebaseCrashlytics.getInstance()
+        }
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(

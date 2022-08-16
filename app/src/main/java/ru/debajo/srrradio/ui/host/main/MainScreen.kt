@@ -271,7 +271,7 @@ private fun Navigation(
                     )
                 }
             },
-            icons = {
+            actions = {
                 val navBackStackEntry by navigationController.currentBackStackEntryAsState()
                 val currentDestination = navBackStackEntry?.destination
 
