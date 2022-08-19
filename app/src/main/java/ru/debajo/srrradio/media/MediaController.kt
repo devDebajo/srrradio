@@ -5,6 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.debajo.srrradio.ProcessScopeImmediate
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.media.model.MediaState
@@ -20,8 +21,7 @@ class MediaController(
     private val lastStationUseCase: LastStationUseCase,
     private val loadPlaylistUseCase: LoadPlaylistUseCase,
     private val mediaSessionController: MediaSessionController,
-    coroutineScope: CoroutineScope,
-) : MediaActions, CoroutineScope by coroutineScope {
+) : MediaActions, CoroutineScope by ProcessScopeImmediate {
 
     private val stateMutable: MutableStateFlow<MediaState> = MutableStateFlow(MediaState.None)
     val state: StateFlow<MediaState> = stateMutable.asStateFlow()

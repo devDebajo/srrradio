@@ -1,7 +1,6 @@
 package ru.debajo.srrradio.di
 
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.common.di.ModuleApi
 import ru.debajo.srrradio.error.SendErrorsHelper
 import ru.debajo.srrradio.media.MediaController
@@ -18,7 +17,6 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 internal interface AppApi : ModuleApi {
-    val coroutineScope: CoroutineScope
     val firebaseCrashlytics: FirebaseCrashlytics
 
     val stationsListViewModel: StationsListViewModel

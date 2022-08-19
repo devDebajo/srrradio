@@ -3,7 +3,6 @@ package ru.debajo.srrradio.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import kotlinx.coroutines.CoroutineScope
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
@@ -89,13 +88,11 @@ internal interface AppModule : AppApi {
         context: Context,
         stationCoverLoader: StationCoverLoader,
         mediaSessionController: MediaSessionController,
-        coroutineScope: CoroutineScope
     ): RadioPlayer {
         return RadioPlayer(
             context = context,
             stationCoverLoader = stationCoverLoader,
             mediaSessionController = mediaSessionController,
-            coroutineScope = coroutineScope
         )
     }
 
@@ -234,9 +231,6 @@ internal interface AppModule : AppApi {
         override val sendErrorsHelper: SendErrorsHelper
             get() = provideSendErrorsHelper(dependencies.context)
 
-        override val coroutineScope: CoroutineScope
-            get() = dependencies.applicationCoroutineScope
-
         override val firebaseCrashlytics: FirebaseCrashlytics by lazy {
             FirebaseCrashlytics.getInstance()
         }
@@ -320,13 +314,11 @@ internal interface AppModule : AppApi {
                 player = provideRadioPlayer(
                     context = dependencies.context,
                     stationCoverLoader = provideStationCoverLoader(dependencies.context),
-                    coroutineScope = dependencies.applicationCoroutineScope,
                     mediaSessionController = mediaSessionController,
                 ),
                 lastStationUseCase = dependencies.lastStationUseCase,
                 loadPlaylistUseCase = dependencies.loadPlaylistUseCase,
                 mediaSessionController = mediaSessionController,
-                coroutineScope = dependencies.applicationCoroutineScope,
             )
         }
     }
