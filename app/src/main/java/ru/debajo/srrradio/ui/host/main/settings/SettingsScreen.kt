@@ -272,32 +272,6 @@ fun SettingsColor(
 }
 
 @Composable
-private fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 16.dp)
-    ) {
-        Text(
-            text = text,
-            fontSize = 14.sp,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .weight(1f)
-        )
-        Spacer(Modifier.width(8.dp))
-        val haptic = LocalHapticFeedback.current
-        Switch(
-            checked = checked,
-            onCheckedChange = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onClick()
-            }
-        )
-    }
-}
-
-@Composable
 private fun SettingsBackPress(expandedGroup: MutableState<Int>) {
     BackHandler(enabled = expandedGroup.value != -1) {
         expandedGroup.value = -1
