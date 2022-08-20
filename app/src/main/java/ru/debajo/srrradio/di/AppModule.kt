@@ -286,7 +286,7 @@ internal interface AppModule : AppApi {
                     userStationUseCase = dependencies.userStationUseCase,
                 ),
                 sendingErrorsManager = sendingErrorsManager,
-                appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences),
+                appIconManager = appIconManager,
             )
 
         override val collectionViewModel: CollectionViewModel
@@ -308,6 +308,9 @@ internal interface AppModule : AppApi {
                 appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences),
             )
         }
+
+        override val appIconManager: AppIconManager
+            get() = provideAppIconManager(dependencies.context, dependencies.sharedPreferences)
 
         override val mediaController: MediaController by lazy {
             MediaController(

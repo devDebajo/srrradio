@@ -19,10 +19,6 @@ class AppIconManager(
         }
 
     fun isEnabled(icon: AppIcon): Boolean {
-        if (!dynamicIcon) {
-            return icon == AppIcon.DEFAULT
-        }
-
         val componentEnabledSetting = context.packageManager.getComponentEnabledSetting(icon.componentName)
         return componentEnabledSetting == PackageManager.COMPONENT_ENABLED_STATE_ENABLED ||
                 componentEnabledSetting == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT && icon == AppIcon.DEFAULT

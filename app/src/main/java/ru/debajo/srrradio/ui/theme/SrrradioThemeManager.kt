@@ -29,8 +29,7 @@ internal class SrrradioThemeManager(
 
     private fun loadCurrent(): AppTheme {
         val key = sharedPreferences.getString(KEY, null) ?: return defaultTheme
-        val currentTheme = themes.firstOrNull { it.code == key } ?: defaultTheme
-        return currentTheme
+        return themes.firstOrNull { it.code == key } ?: defaultTheme
     }
 
     companion object {

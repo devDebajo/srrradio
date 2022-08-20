@@ -13,7 +13,7 @@ buildscript {
         core_ktx_version = '1.9.0-beta01'
 
         lifecycle_version = '2.6.0-alpha01'
-        activity_ktx_version = "1.6.0-alpha05"
+        activity_ktx_version = "1.6.0-beta01"
 
         retrofit_version = '2.9.0'
         retrofit_coroutines_adapter = '0.9.2'

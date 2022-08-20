@@ -1,7 +1,9 @@
 package ru.debajo.srrradio
 
 import android.app.Application
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -15,7 +17,9 @@ import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.domain.di.DomainApiHolder
 import ru.debajo.srrradio.error.OnlyErrorsTree
 import ru.debajo.srrradio.error.SendingErrorsManager
+import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 import timber.log.Timber
 
 class SrrradioApp : Application() {
@@ -23,6 +27,8 @@ class SrrradioApp : Application() {
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
     private val apiHostDiscovery: ApiHostDiscovery by lazy { DataApiHolder.get().apiHostDiscovery }
     private val sendingErrorsManager: SendingErrorsManager by lazy { AppApiHolder.get().sendingErrorsManager }
+    private val appIconManager: AppIconManager by lazy { AppApiHolder.get().appIconManager }
+    private val themeManager: SrrradioThemeManager by lazy { AppApiHolder.get().themeManager }
 
     override fun onCreate() {
         super.onCreate()
@@ -31,7 +37,17 @@ class SrrradioApp : Application() {
         initLogs()
         initFatalErrors()
 
-        with(ProcessScopeImmediate) {
+        val processLifecycle = ProcessLifecycleOwner.get().lifecycle
+        val processScope = processLifecycle.coroutineScope
+
+        processLifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
+                Timber.d("yopta onStop")
+                appIconManager.enable(themeManager.currentTheme.value.icon)
+            }
+        })
+
+        with(processScope) {
             launch {
                 apiHostDiscovery.discover()
             }
