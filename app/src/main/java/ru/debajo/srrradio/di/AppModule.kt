@@ -196,8 +196,9 @@ internal interface AppModule : AppApi {
     fun provideSettingsViewModel(
         themeManager: SrrradioThemeManager,
         loadM3uInteractor: LoadM3uInteractor,
-        sendErrorsHelper: SendErrorsHelper
-    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendErrorsHelper)
+        sendErrorsHelper: SendErrorsHelper,
+        appIconManager: AppIconManager
+    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendErrorsHelper, appIconManager)
 
     fun provideSrrradioThemeManager(
         sharedPreferences: SharedPreferences,
@@ -219,7 +220,10 @@ internal interface AppModule : AppApi {
     fun providePopularStationsProcessor(searchStationsUseCase: SearchStationsUseCase): PopularStationsProcessor =
         PopularStationsProcessor(searchStationsUseCase)
 
-    fun provideAppIconManager(context: Context): AppIconManager = AppIconManager(context)
+    fun provideAppIconManager(
+        context: Context,
+        sharedPreferences: SharedPreferences,
+    ): AppIconManager = AppIconManager(context, sharedPreferences)
 
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
@@ -284,7 +288,8 @@ internal interface AppModule : AppApi {
                     updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase,
                     userStationUseCase = dependencies.userStationUseCase,
                 ),
-                sendErrorsHelper = provideSendErrorsHelper(dependencies.context)
+                sendErrorsHelper = provideSendErrorsHelper(dependencies.context),
+                appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences)
             )
 
         override val collectionViewModel: CollectionViewModel
@@ -306,7 +311,7 @@ internal interface AppModule : AppApi {
         override val themeManager: SrrradioThemeManager by lazy {
             provideSrrradioThemeManager(
                 sharedPreferences = dependencies.sharedPreferences,
-                appIconManager = provideAppIconManager(dependencies.context),
+                appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences),
             )
         }
 
