@@ -25,11 +25,6 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         navController = rootController
     )
 
-    val sendLogs: Screen = Screen(
-        route = "sendLogs",
-        navController = rootController
-    )
-
     class Main(
         override val navController: NavHostController
     ) : AbstractScreen {

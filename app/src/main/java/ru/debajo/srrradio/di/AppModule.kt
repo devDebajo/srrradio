@@ -10,7 +10,7 @@ import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
-import ru.debajo.srrradio.error.SendErrorsHelper
+import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
@@ -28,7 +28,6 @@ import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandR
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
 import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistViewModel
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
-import ru.debajo.srrradio.ui.host.main.settings.logs.LogsListViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
@@ -194,8 +193,8 @@ internal interface AppModule : AppApi {
     fun provideSettingsViewModel(
         themeManager: SrrradioThemeManager,
         loadM3uInteractor: LoadM3uInteractor,
-        sendErrorsHelper: SendErrorsHelper
-    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendErrorsHelper)
+        sendingErrorsManager: SendingErrorsManager,
+    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendingErrorsManager)
 
     fun provideSrrradioThemeManager(
         sharedPreferences: SharedPreferences,
@@ -210,30 +209,29 @@ internal interface AppModule : AppApi {
         return TrackCollectionListener(tracksCollectionUseCase)
     }
 
-    fun provideSendErrorsHelper(context: Context): SendErrorsHelper = SendErrorsHelper(context)
-
-    fun provideLogsListViewModel(sendErrorsHelper: SendErrorsHelper): LogsListViewModel = LogsListViewModel(sendErrorsHelper)
-
     fun providePopularStationsProcessor(searchStationsUseCase: SearchStationsUseCase): PopularStationsProcessor =
         PopularStationsProcessor(searchStationsUseCase)
 
     fun provideAppIconManager(context: Context): AppIconManager = AppIconManager(context)
+
+    fun provideSendingErrorsManager(
+        sharedPreferences: SharedPreferences,
+        firebaseCrashlytics: FirebaseCrashlytics,
+    ): SendingErrorsManager = SendingErrorsManager(sharedPreferences, firebaseCrashlytics)
 
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
             get() = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase)
 
+        private val firebaseCrashlytics: FirebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
+
         override val mediaSessionController: MediaSessionController by lazy { provideMediaSessionController(dependencies.context) }
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
-        override val sendErrorsHelper: SendErrorsHelper
-            get() = provideSendErrorsHelper(dependencies.context)
-
-        override val firebaseCrashlytics: FirebaseCrashlytics by lazy {
-            FirebaseCrashlytics.getInstance()
-        }
+        override val sendingErrorsManager: SendingErrorsManager
+            get() = provideSendingErrorsManager(dependencies.sharedPreferences, firebaseCrashlytics)
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
@@ -283,14 +281,11 @@ internal interface AppModule : AppApi {
                     updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase,
                     userStationUseCase = dependencies.userStationUseCase,
                 ),
-                sendErrorsHelper = provideSendErrorsHelper(dependencies.context)
+                sendingErrorsManager = sendingErrorsManager
             )
 
         override val collectionViewModel: CollectionViewModel
             get() = provideCollectionViewModel(dependencies.tracksCollectionUseCase)
-
-        override val logsListViewModel: LogsListViewModel
-            get() = provideLogsListViewModel(sendErrorsHelper)
 
         override val defaultPlaylistViewModel: DefaultPlaylistViewModel
             get() = DefaultPlaylistViewModel(

@@ -19,6 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -42,7 +43,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
     private val coroutineScope: CoroutineScope by ProcessScope
     private val sleepTimer: SleepTimer by lazy { AppApiHolder.get().sleepTimer }
 
-    override val coroutineContext: CoroutineContext = coroutineScope.coroutineContext + Job()
+    override val coroutineContext: CoroutineContext = coroutineScope.coroutineContext + SupervisorJob()
 
     override fun onBind(intent: Intent?): IBinder? = null
 

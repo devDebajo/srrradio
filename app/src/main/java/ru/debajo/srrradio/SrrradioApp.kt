@@ -13,9 +13,8 @@ import ru.debajo.srrradio.data.di.DomainDependenciesImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.domain.di.DomainApiHolder
-import ru.debajo.srrradio.error.FileLogTimberTree
 import ru.debajo.srrradio.error.OnlyErrorsTree
-import ru.debajo.srrradio.error.SendErrorsHelper
+import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.media.MediaController
 import timber.log.Timber
 
@@ -23,7 +22,7 @@ class SrrradioApp : Application() {
 
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
     private val apiHostDiscovery: ApiHostDiscovery by lazy { DataApiHolder.get().apiHostDiscovery }
-    private val sendErrorsHelper: SendErrorsHelper by lazy { AppApiHolder.get().sendErrorsHelper }
+    private val sendingErrorsManager: SendingErrorsManager by lazy { AppApiHolder.get().sendingErrorsManager }
 
     override fun onCreate() {
         super.onCreate()
@@ -44,16 +43,11 @@ class SrrradioApp : Application() {
     }
 
     private fun initLogs() {
+        sendingErrorsManager.init()
         if (BuildConfig.DEBUG) {
-            Timber.plant(
-                Timber.DebugTree(),
-                FileLogTimberTree(sendErrorsHelper)
-            )
+            Timber.plant(Timber.DebugTree())
         } else {
-            Timber.plant(
-                FileLogTimberTree(sendErrorsHelper),
-                OnlyErrorsTree()
-            )
+            Timber.plant(OnlyErrorsTree(sendingErrorsManager))
         }
     }
 
