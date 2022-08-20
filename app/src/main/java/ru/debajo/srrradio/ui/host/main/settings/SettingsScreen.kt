@@ -51,8 +51,6 @@ import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
-import ru.debajo.srrradio.ui.navigation.NavTree
-import timber.log.Timber
 
 @Composable
 fun SettingsScreen() {
@@ -78,7 +76,6 @@ fun SettingsScreen() {
 @Composable
 private fun SettingsList() {
     val viewModel = SettingsViewModel.Local.current
-    LaunchedEffect(viewModel) { viewModel.update() }
     val state by viewModel.state.collectAsState()
     val expandedGroup = rememberSaveable { mutableStateOf(-1) }
     SettingsBackPress(expandedGroup)
@@ -126,21 +123,11 @@ private fun SettingsList() {
                 }
             }
 
-            if (state.canSendLogs) {
-                val navTree = NavTree.current
-                SettingsText(text = stringResource(R.string.settings_send_logs)) {
-                    navTree.sendLogs.navigate()
-                }
-                SettingsText(text = stringResource(R.string.settings_clear_logs)) {
-                    viewModel.clearLogs()
-                }
-            }
-            if (BuildConfig.DEBUG) {
-                SettingsText(text = "Add error logs") {
-                    Timber.e(IllegalStateException("Test log"))
-                    viewModel.update()
-                }
-            }
+            SettingsSwitch(
+                text = stringResource(R.string.settings_auto_send_errors),
+                checked = state.autoSendErrors,
+                onClick = { viewModel.onAutoSendErrorsClick() }
+            )
         }
 
         Spacer(Modifier.height(12.dp))
@@ -281,6 +268,32 @@ fun SettingsColor(
                     .background(color)
             )
         }
+    }
+}
+
+@Composable
+private fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp, horizontal = 16.dp)
+    ) {
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f)
+        )
+        Spacer(Modifier.width(8.dp))
+        val haptic = LocalHapticFeedback.current
+        Switch(
+            checked = checked,
+            onCheckedChange = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onClick()
+            }
+        )
     }
 }
 

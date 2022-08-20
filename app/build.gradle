@@ -1,10 +1,12 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'com.google.gms.google-services'
+    id 'com.google.firebase.crashlytics'
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "ru.debajo.srrradio"
@@ -91,6 +93,11 @@ dependencies {
     implementation 'com.google.android.exoplayer:exoplayer:2.18.1'
     implementation 'com.google.android.exoplayer:extension-mediasession:2.18.1'
     implementation 'com.github.devDebajo:reduktor:1.0.0-alpha04'
+
+    implementation platform('com.google.firebase:firebase-bom:30.3.1')
+    implementation 'com.google.firebase:firebase-crashlytics'
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation 'androidx.lifecycle:lifecycle-process:2.5.1'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }

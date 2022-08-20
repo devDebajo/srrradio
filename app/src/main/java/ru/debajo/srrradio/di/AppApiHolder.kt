@@ -1,7 +1,7 @@
 package ru.debajo.srrradio.di
 
-import ru.debajo.srrradio.common.di.ExtDependenciesModuleApiHolder
+import ru.debajo.srrradio.common.di.ModuleApiHolder
 
-internal object AppApiHolder : ExtDependenciesModuleApiHolder<AppApi, AppDependencies>() {
-    override fun buildApi(dependencies: AppDependencies): AppApi = AppModule.Impl(dependencies)
+internal object AppApiHolder : ModuleApiHolder<AppApi>() {
+    override fun buildApi(): AppApi = AppModule.Impl(AppDependencies.Impl)
 }

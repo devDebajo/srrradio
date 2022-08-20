@@ -2,7 +2,7 @@ package ru.debajo.srrradio.di
 
 import android.content.Context
 import android.content.SharedPreferences
-import kotlinx.coroutines.CoroutineScope
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
@@ -10,7 +10,7 @@ import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
-import ru.debajo.srrradio.error.SendErrorsHelper
+import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
@@ -28,7 +28,6 @@ import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandR
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetReduktor
 import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistViewModel
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
-import ru.debajo.srrradio.ui.host.main.settings.logs.LogsListViewModel
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
@@ -88,13 +87,11 @@ internal interface AppModule : AppApi {
         context: Context,
         stationCoverLoader: StationCoverLoader,
         mediaSessionController: MediaSessionController,
-        coroutineScope: CoroutineScope
     ): RadioPlayer {
         return RadioPlayer(
             context = context,
             stationCoverLoader = stationCoverLoader,
             mediaSessionController = mediaSessionController,
-            coroutineScope = coroutineScope
         )
     }
 
@@ -196,9 +193,9 @@ internal interface AppModule : AppApi {
     fun provideSettingsViewModel(
         themeManager: SrrradioThemeManager,
         loadM3uInteractor: LoadM3uInteractor,
-        sendErrorsHelper: SendErrorsHelper,
-        appIconManager: AppIconManager
-    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendErrorsHelper, appIconManager)
+        sendingErrorsManager: SendingErrorsManager,
+        appIconManager: AppIconManager,
+    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendingErrorsManager, appIconManager)
 
     fun provideSrrradioThemeManager(
         sharedPreferences: SharedPreferences,
@@ -213,10 +210,6 @@ internal interface AppModule : AppApi {
         return TrackCollectionListener(tracksCollectionUseCase)
     }
 
-    fun provideSendErrorsHelper(context: Context): SendErrorsHelper = SendErrorsHelper(context)
-
-    fun provideLogsListViewModel(sendErrorsHelper: SendErrorsHelper): LogsListViewModel = LogsListViewModel(sendErrorsHelper)
-
     fun providePopularStationsProcessor(searchStationsUseCase: SearchStationsUseCase): PopularStationsProcessor =
         PopularStationsProcessor(searchStationsUseCase)
 
@@ -225,20 +218,24 @@ internal interface AppModule : AppApi {
         sharedPreferences: SharedPreferences,
     ): AppIconManager = AppIconManager(context, sharedPreferences)
 
+    fun provideSendingErrorsManager(
+        sharedPreferences: SharedPreferences,
+        firebaseCrashlytics: FirebaseCrashlytics,
+    ): SendingErrorsManager = SendingErrorsManager(sharedPreferences, firebaseCrashlytics)
+
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
             get() = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase)
 
+        private val firebaseCrashlytics: FirebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
+
         override val mediaSessionController: MediaSessionController by lazy { provideMediaSessionController(dependencies.context) }
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
-        override val sendErrorsHelper: SendErrorsHelper
-            get() = provideSendErrorsHelper(dependencies.context)
-
-        override val coroutineScope: CoroutineScope
-            get() = dependencies.applicationCoroutineScope
+        override val sendingErrorsManager: SendingErrorsManager
+            get() = provideSendingErrorsManager(dependencies.sharedPreferences, firebaseCrashlytics)
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
@@ -288,15 +285,12 @@ internal interface AppModule : AppApi {
                     updateFavoriteStationStateUseCase = dependencies.updateFavoriteStationStateUseCase,
                     userStationUseCase = dependencies.userStationUseCase,
                 ),
-                sendErrorsHelper = provideSendErrorsHelper(dependencies.context),
-                appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences)
+                sendingErrorsManager = sendingErrorsManager,
+                appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences),
             )
 
         override val collectionViewModel: CollectionViewModel
             get() = provideCollectionViewModel(dependencies.tracksCollectionUseCase)
-
-        override val logsListViewModel: LogsListViewModel
-            get() = provideLogsListViewModel(sendErrorsHelper)
 
         override val defaultPlaylistViewModel: DefaultPlaylistViewModel
             get() = DefaultPlaylistViewModel(
@@ -320,13 +314,11 @@ internal interface AppModule : AppApi {
                 player = provideRadioPlayer(
                     context = dependencies.context,
                     stationCoverLoader = provideStationCoverLoader(dependencies.context),
-                    coroutineScope = dependencies.applicationCoroutineScope,
                     mediaSessionController = mediaSessionController,
                 ),
                 lastStationUseCase = dependencies.lastStationUseCase,
                 loadPlaylistUseCase = dependencies.loadPlaylistUseCase,
                 mediaSessionController = mediaSessionController,
-                coroutineScope = dependencies.applicationCoroutineScope,
             )
         }
     }

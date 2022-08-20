@@ -1,9 +1,10 @@
 package ru.debajo.srrradio
 
 import android.app.Application
-import kotlinx.coroutines.CoroutineScope
+import androidx.lifecycle.LifecycleCoroutineScope
+import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.common.di.CommonApiHolder
 import ru.debajo.srrradio.common.di.CommonDependencies
@@ -11,18 +12,17 @@ import ru.debajo.srrradio.data.di.DataApiHolder
 import ru.debajo.srrradio.data.di.DomainDependenciesImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.di.AppApiHolder
-import ru.debajo.srrradio.di.AppDependencies
 import ru.debajo.srrradio.domain.di.DomainApiHolder
-import ru.debajo.srrradio.error.FileLogTimberTree
-import ru.debajo.srrradio.error.SendErrorsHelper
+import ru.debajo.srrradio.error.OnlyErrorsTree
+import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.media.MediaController
 import timber.log.Timber
 
-class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJob()) {
+class SrrradioApp : Application() {
 
     private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
     private val apiHostDiscovery: ApiHostDiscovery by lazy { DataApiHolder.get().apiHostDiscovery }
-    private val sendErrorsHelper: SendErrorsHelper by lazy { AppApiHolder.get().sendErrorsHelper }
+    private val sendingErrorsManager: SendingErrorsManager by lazy { AppApiHolder.get().sendingErrorsManager }
 
     override fun onCreate() {
         super.onCreate()
@@ -31,20 +31,23 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
         initLogs()
         initFatalErrors()
 
-        launch {
-            apiHostDiscovery.discover()
-        }
+        with(ProcessScopeImmediate) {
+            launch {
+                apiHostDiscovery.discover()
+            }
 
-        launch(Main) {
-            mediaController.prepare()
+            launch(Main) {
+                mediaController.prepare()
+            }
         }
     }
 
     private fun initLogs() {
+        sendingErrorsManager.init()
         if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree(), FileLogTimberTree(sendErrorsHelper))
+            Timber.plant(Timber.DebugTree())
         } else {
-            Timber.plant(FileLogTimberTree(sendErrorsHelper))
+            Timber.plant(OnlyErrorsTree(sendingErrorsManager))
         }
     }
 
@@ -59,6 +62,11 @@ class SrrradioApp : Application(), CoroutineScope by CoroutineScope(SupervisorJo
     private fun initDi() {
         CommonApiHolder.init(CommonDependencies.Impl(this))
         DomainApiHolder.init(DomainDependenciesImpl)
-        AppApiHolder.init(AppDependencies.Impl(this))
     }
 }
+
+val ProcessScopeImmediate: LifecycleCoroutineScope
+    get() = ProcessLifecycleOwner.get().lifecycle.coroutineScope
+
+val ProcessScope: Lazy<LifecycleCoroutineScope>
+    get() = lazy { ProcessScopeImmediate }

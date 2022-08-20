@@ -44,7 +44,6 @@ import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.rememberSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
-import ru.debajo.srrradio.ui.host.main.settings.logs.LogsListScreen
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.navigation.SrrradioNavigationHost
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
@@ -136,10 +135,6 @@ class HostActivity : ComponentActivity() {
 
                 composable(navTree.collection.route) {
                     CollectionScreen()
-                }
-
-                composable(navTree.sendLogs.route) {
-                    LogsListScreen()
                 }
             }
         }

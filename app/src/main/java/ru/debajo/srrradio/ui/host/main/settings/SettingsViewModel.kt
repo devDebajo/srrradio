@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendErrorsHelper
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
@@ -18,7 +19,7 @@ import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 internal class SettingsViewModel(
     private val themeManager: SrrradioThemeManager,
     private val loadM3uInteractor: LoadM3uInteractor,
-    private val sendErrorsHelper: SendErrorsHelper,
+    private val sendingErrorsManager: SendingErrorsManager,
     private val appIconManager: AppIconManager,
 ) : ViewModel() {
 
@@ -27,7 +28,10 @@ internal class SettingsViewModel(
 
     init {
         updateState {
-            copy(dynamicIcon = appIconManager.dynamicIcon)
+            copy(
+                autoSendErrors = sendingErrorsManager.isEnabled,
+                dynamicIcon = appIconManager.dynamicIcon
+            )
         }
 
         viewModelScope.launch {
@@ -45,11 +49,10 @@ internal class SettingsViewModel(
         }
     }
 
-    fun update() {
-        viewModelScope.launch {
-            updateState {
-                copy(canSendLogs = sendErrorsHelper.canSend())
-            }
+    fun onAutoSendErrorsClick() {
+        updateState {
+            sendingErrorsManager.updateEnabled(!autoSendErrors)
+            copy(autoSendErrors = !autoSendErrors)
         }
     }
 
@@ -65,15 +68,6 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             loadM3uInteractor.load(filePath)
             updateState { copy(loadingM3u = false) }
-        }
-    }
-
-    fun clearLogs() {
-        viewModelScope.launch {
-            sendErrorsHelper.clearAll()
-            updateState {
-                copy(canSendLogs = false)
-            }
         }
     }
 
