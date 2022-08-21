@@ -12,8 +12,8 @@ android {
         applicationId "ru.debajo.srrradio"
         minSdk 21
         targetSdk 31
-        versionCode 5
-        versionName "1.0.4"
+        versionCode 6
+        versionName "1.0.5"
 
         buildConfigField "String", "PRIVACY_POLICY", '"http://188.120.246.136/srrradio_privacy_policy.html"'
         buildConfigField "String", "DATABASE_HOMEPAGE", '"https://www.radio-browser.info/"'
