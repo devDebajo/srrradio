@@ -42,7 +42,6 @@ class SrrradioApp : Application() {
 
         processLifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStop(owner: LifecycleOwner) {
-                Timber.d("yopta onStop")
                 appIconManager.enable(themeManager.currentTheme.value.icon)
             }
         })
