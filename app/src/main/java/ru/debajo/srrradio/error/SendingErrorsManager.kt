@@ -2,6 +2,7 @@ package ru.debajo.srrradio.error
 
 import android.content.SharedPreferences
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import ru.debajo.srrradio.BuildConfig
 
 class SendingErrorsManager(
     private val sharedPreferences: SharedPreferences,
@@ -20,7 +21,7 @@ class SendingErrorsManager(
         }
 
     fun init() {
-        firebaseCrashlytics.setCrashlyticsCollectionEnabled(enabledInPrefs)
+        updateEnabledInternal(enabledInPrefs)
     }
 
     fun send(error: Throwable) {
@@ -31,7 +32,11 @@ class SendingErrorsManager(
 
     fun updateEnabled(enabled: Boolean) {
         enabledInPrefs = enabled
-        firebaseCrashlytics.setCrashlyticsCollectionEnabled(enabled)
+        updateEnabledInternal(enabled)
+    }
+
+    private fun updateEnabledInternal(enabled: Boolean) {
+        firebaseCrashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG && enabled)
     }
 
     private companion object {

@@ -4,14 +4,19 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Looper
+import androidx.annotation.RequiresPermission
 import androidx.core.content.ContextCompat
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.withTimeout
+import timber.log.Timber
 
 interface UserLocationUseCase {
     suspend fun getCurrentLocation(): Pair<Double, Double>?
@@ -22,12 +27,19 @@ internal class UserLocationUseCaseImpl(
     private val locationManager: LocationManager,
 ) : UserLocationUseCase {
 
+    @SuppressLint("MissingPermission")
     override suspend fun getCurrentLocation(): Pair<Double, Double>? {
-        if (!context.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+        if (!context.checkPermission(LOCATION_PERMISSION)) {
             return null
         }
 
-        return observeLocation().firstOrNull()
+        return runCatching {
+            withTimeout(20_000) { observeLocation().firstOrNull() }
+        }
+            .onFailure { Timber.e(it) }
+            .recoverCatching { lastCachedLocation() }
+            .onFailure { Timber.e(it) }
+            .getOrNull()
     }
 
     private fun Context.checkPermission(permission: String): Boolean {
@@ -35,24 +47,40 @@ internal class UserLocationUseCaseImpl(
                 PackageManager.PERMISSION_GRANTED
     }
 
-    @SuppressLint("MissingPermission")
+    @RequiresPermission(LOCATION_PERMISSION)
+    private fun lastCachedLocation(): Pair<Double, Double>? {
+        return locationManager.getLastKnownLocation(PROVIDER)?.convert()
+    }
+
+    @RequiresPermission(LOCATION_PERMISSION)
     private fun observeLocation(): Flow<Pair<Double, Double>> {
         return callbackFlow {
-            val listener = LocationListener {
-                trySend(it.latitude to it.longitude)
-            }
+            val listener = LocationListener { trySend(it.convert()) }
 
-            locationManager.requestLocationUpdates(
-                LocationManager.PASSIVE_PROVIDER,
-                2000,
-                100f,
-                listener,
-                Looper.getMainLooper()
-            )
+            runCatching {
+                locationManager.requestLocationUpdates(
+                    PROVIDER,
+                    2000,
+                    100f,
+                    listener,
+                    Looper.getMainLooper()
+                )
+            }.onFailure {
+                locationManager.removeUpdates(listener)
+                cancel("Problem with location", it)
+            }
 
             awaitClose {
                 locationManager.removeUpdates(listener)
             }
         }
     }
+
+    private fun Location.convert(): Pair<Double, Double> = latitude to longitude
+
+    private companion object {
+        const val PROVIDER = LocationManager.GPS_PROVIDER
+    }
 }
+
+const val LOCATION_PERMISSION = Manifest.permission.ACCESS_FINE_LOCATION

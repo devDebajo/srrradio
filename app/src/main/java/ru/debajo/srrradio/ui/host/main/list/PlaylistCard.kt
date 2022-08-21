@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.host.main.list
 
-import android.Manifest
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import ru.debajo.srrradio.domain.LOCATION_PERMISSION
 import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.model.UiPlaylistIcon
 
@@ -30,7 +30,7 @@ fun NearPlaylistCard(
 ) {
     PermissionClickable(
         modifier = modifier,
-        permission = Manifest.permission.ACCESS_COARSE_LOCATION,
+        permission = LOCATION_PERMISSION,
         onClick = { onClick(item) }
     ) { innerListener ->
         PlaylistCard(
