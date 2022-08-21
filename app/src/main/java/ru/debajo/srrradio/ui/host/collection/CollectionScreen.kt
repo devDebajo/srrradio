@@ -22,7 +22,6 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 
@@ -136,7 +136,7 @@ private fun CollectionItem(
     onClick: (UiCollectionItem) -> Unit,
     onDelete: (UiCollectionItem) -> Unit
 ) {
-    OutlinedCard(
+    AppCard(
         modifier = modifier,
         onClick = { onClick(item) },
         content = {

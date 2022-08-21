@@ -217,6 +217,7 @@ fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
                 .weight(1f)
         )
 
+        Spacer(Modifier.width(8.dp))
         val haptic = LocalHapticFeedback.current
         Switch(
             checked = checked,

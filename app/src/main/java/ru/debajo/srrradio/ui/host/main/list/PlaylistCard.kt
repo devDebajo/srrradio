@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -20,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.model.UiPlaylistIcon
 
 @Composable
@@ -47,7 +47,7 @@ fun PlaylistCard(
     item: UiPlaylistIcon,
     onClick: (UiPlaylistIcon) -> Unit,
 ) {
-    OutlinedCard(
+    AppCard(
         modifier = modifier.size(100.dp),
         onClick = { onClick(item) },
     ) {

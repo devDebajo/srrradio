@@ -24,7 +24,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
@@ -53,7 +53,7 @@ fun StationItem(
     onPlayClick: (UiStation, UiStationPlayingState) -> Unit,
     onFavoriteClick: (UiStation, Boolean) -> Unit,
 ) {
-    OutlinedCard(modifier = modifier) {
+    AppCard(modifier = modifier) {
         Row(
             modifier = Modifier
                 .height(HEIGHT)

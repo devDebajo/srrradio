@@ -11,7 +11,7 @@ class AppIconManager(
 ) {
 
     var dynamicIcon: Boolean
-        get() = sharedPreferences.getBoolean(DYNAMIC_ICON, false)
+        get() = sharedPreferences.getBoolean(DYNAMIC_ICON, true)
         set(value) {
             sharedPreferences.edit()
                 .putBoolean(DYNAMIC_ICON, value)

@@ -3,12 +3,12 @@ package ru.debajo.srrradio.ui.host.main.settings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import ru.debajo.srrradio.ui.common.AppCard
 
 @Composable
 fun SettingsGroup(
@@ -17,7 +17,7 @@ fun SettingsGroup(
     onHeaderClick: () -> Unit,
     block: @Composable () -> Unit
 ) {
-    OutlinedCard(Modifier.fillMaxWidth()) {
+    AppCard(Modifier.fillMaxWidth()) {
         Column {
             SettingsText(
                 alpha = if (state == SettingsGroupState.HALF_ALPHA) 0.2f else 1f,
