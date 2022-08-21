@@ -9,14 +9,17 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.dp
+
+private const val ELEVATION_DP = 1
 
 @Composable
 fun AppCard(
     modifier: Modifier = Modifier,
     shape: Shape = CardDefaults.outlinedShape,
     colors: CardColors = CardDefaults.outlinedCardColors(),
-    elevation: CardElevation = CardDefaults.outlinedCardElevation(),
-    border: BorderStroke = CardDefaults.outlinedCardBorder(),
+    elevation: CardElevation = CardDefaults.outlinedCardElevation(ELEVATION_DP.dp),
+    border: BorderStroke = CardDefaults.outlinedCardBorder(false),
     content: @Composable ColumnScope.() -> Unit
 ) {
     OutlinedCard(
@@ -35,8 +38,8 @@ fun AppCard(
     modifier: Modifier = Modifier,
     shape: Shape = CardDefaults.outlinedShape,
     colors: CardColors = CardDefaults.outlinedCardColors(),
-    elevation: CardElevation = CardDefaults.outlinedCardElevation(),
-    border: BorderStroke = CardDefaults.outlinedCardBorder(),
+    elevation: CardElevation = CardDefaults.outlinedCardElevation(ELEVATION_DP.dp),
+    border: BorderStroke = CardDefaults.outlinedCardBorder(false),
     content: @Composable ColumnScope.() -> Unit
 ) {
     OutlinedCard(

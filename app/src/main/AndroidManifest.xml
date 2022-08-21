@@ -54,6 +54,20 @@
         </activity-alias>
 
         <activity-alias
+            android:name="ru.debajo.srrradio.ui.host.HostActivity.sand"
+            android:enabled="false"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher_sand"
+            android:roundIcon="@mipmap/ic_launcher_sand_round"
+            android:targetActivity=".ui.host.HostActivity">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <activity-alias
             android:name="ru.debajo.srrradio.ui.host.HostActivity.mint"
             android:enabled="false"
             android:exported="true"

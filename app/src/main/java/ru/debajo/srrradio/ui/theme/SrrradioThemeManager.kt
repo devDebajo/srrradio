@@ -43,6 +43,7 @@ internal class SrrradioThemeManager(
             DynamicThemeOptional,
             SynthTheme,
             BlueTheme,
+            SandTheme,
             MintTheme,
         )
     }
