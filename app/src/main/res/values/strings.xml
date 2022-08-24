@@ -53,6 +53,7 @@
     <string name="notification_channel_description">Radio controls notification</string>
 
     <string name="settings_group_app_theme">App theme</string>
+    <string name="settings_dynamic_app_icon">Dynamic app icon</string>
 
     <string name="settings_group_data">Data</string>
     <string name="settings_import_m3u">Import m3u</string>

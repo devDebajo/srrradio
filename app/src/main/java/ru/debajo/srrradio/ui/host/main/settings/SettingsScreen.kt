@@ -108,7 +108,7 @@ private fun SettingsList(bottomPadding: Dp) {
             }
 
             SettingsSwitch(
-                text = "Динамическая иконка приложения",
+                text = stringResource(R.string.settings_dynamic_app_icon),
                 checked = state.dynamicIcon,
             ) {
                 viewModel.onDynamicIconClick()

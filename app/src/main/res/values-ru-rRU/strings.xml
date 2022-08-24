@@ -46,6 +46,7 @@
     <string name="notification_channel_description">Уведомление для управления воспроизведением</string>
 
     <string name="settings_group_app_theme">Тема приложения</string>
+    <string name="settings_dynamic_app_icon">Динамическая иконка приложения</string>
 
     <string name="settings_group_data">Данные</string>
     <string name="settings_import_m3u">Импорт m3u</string>
