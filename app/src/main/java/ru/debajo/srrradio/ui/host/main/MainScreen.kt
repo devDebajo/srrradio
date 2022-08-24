@@ -223,7 +223,7 @@ private fun RadioScreenContent() {
                         }
 
                         composable(navTree.main.settings.route) {
-                            SettingsScreen()
+                            SettingsScreen(listBottomPadding)
                         }
                     }
                 }

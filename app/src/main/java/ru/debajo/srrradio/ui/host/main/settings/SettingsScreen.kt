@@ -18,7 +18,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -41,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,7 +57,7 @@ import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
 
 @Composable
-fun SettingsScreen() {
+fun SettingsScreen(bottomPadding: Dp) {
     CollapsingToolbarScaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -69,19 +72,24 @@ fun SettingsScreen() {
             )
             Spacer(Modifier.height(8.dp))
         },
-        body = { SettingsList() },
+        body = { SettingsList(bottomPadding) },
         scrollStrategy = ScrollStrategy.EnterAlwaysCollapsed
     )
 }
 
 @Composable
-private fun SettingsList() {
+private fun SettingsList(bottomPadding: Dp) {
     val viewModel = SettingsViewModel.Local.current
     val state by viewModel.state.collectAsState()
     val expandedGroup = rememberSaveable { mutableStateOf(-1) }
     SettingsBackPress(expandedGroup)
 
-    Column(Modifier.fillMaxSize()) {
+    Column(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = bottomPadding)
+    ) {
         Spacer(Modifier.height(8.dp))
 
         SettingsGroup(
