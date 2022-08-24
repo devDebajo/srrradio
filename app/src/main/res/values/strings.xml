@@ -58,6 +58,14 @@
     <string name="settings_import_m3u">Import m3u</string>
     <string name="settings_auto_send_errors">Send errors automatically</string>
 
+    <string name="settings_group_account">Account</string>
+    <string name="settings_login">Login</string>
+    <string name="settings_logout">Logout</string>
+    <string name="settings_delete_account">Delete account</string>
+    <string name="settings_delete_account_confirmation">Are you sure to delete yor account with all synchronization data?</string>
+    <string name="settings_delete_account_confirmation_sure">I\'m sure</string>
+    <string name="settings_delete_account_confirmation_cancel">Cancel</string>
+
     <string name="settings_group_app">Application</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_data_source">Stations source (API)</string>

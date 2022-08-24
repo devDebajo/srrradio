@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.di
 
+import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.common.di.ModuleApi
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
@@ -31,4 +32,5 @@ internal interface AppApi : ModuleApi {
     val mediaSessionController: MediaSessionController
     val sleepTimer: SleepTimer
     val sendingErrorsManager: SendingErrorsManager
+    val authManager: AuthManager
 }

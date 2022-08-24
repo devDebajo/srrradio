@@ -51,6 +51,14 @@
     <string name="settings_import_m3u">Импорт m3u</string>
     <string name="settings_auto_send_errors">Автоматическая отправка ошибок</string>
 
+    <string name="settings_group_account">Аккаунт</string>
+    <string name="settings_login">Войти</string>
+    <string name="settings_logout">Выйти</string>
+    <string name="settings_delete_account">Удалить аккаунт</string>
+    <string name="settings_delete_account_confirmation">Вы уверены, что хотите удалить свой аккаунт вместе со всеми данными?</string>
+    <string name="settings_delete_account_confirmation_sure">Удалить</string>
+    <string name="settings_delete_account_confirmation_cancel">Отмена</string>
+
     <string name="settings_group_app">Приложение</string>
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
     <string name="settings_data_source">Источник радиостанций (API)</string>

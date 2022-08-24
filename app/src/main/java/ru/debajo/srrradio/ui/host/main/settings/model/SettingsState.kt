@@ -5,4 +5,5 @@ internal data class SettingsState(
     val loadingM3u: Boolean = false,
     val autoSendErrors: Boolean = false,
     val dynamicIcon: Boolean = false,
+    val authStatus: SettingsAuthStatus = SettingsAuthStatus.LOGGED_OUT,
 )

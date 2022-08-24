@@ -2,7 +2,9 @@ package ru.debajo.srrradio.di
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
+import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
@@ -195,7 +197,14 @@ internal interface AppModule : AppApi {
         loadM3uInteractor: LoadM3uInteractor,
         sendingErrorsManager: SendingErrorsManager,
         appIconManager: AppIconManager,
-    ): SettingsViewModel = SettingsViewModel(themeManager, loadM3uInteractor, sendingErrorsManager, appIconManager)
+        authManager: AuthManager
+    ): SettingsViewModel = SettingsViewModel(
+        themeManager = themeManager,
+        loadM3uInteractor = loadM3uInteractor,
+        sendingErrorsManager = sendingErrorsManager,
+        appIconManager = appIconManager,
+        authManager = authManager,
+    )
 
     fun provideSrrradioThemeManager(
         sharedPreferences: SharedPreferences,
@@ -230,12 +239,16 @@ internal interface AppModule : AppApi {
 
         private val firebaseCrashlytics: FirebaseCrashlytics by lazy { FirebaseCrashlytics.getInstance() }
 
+        private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+
         override val mediaSessionController: MediaSessionController by lazy { provideMediaSessionController(dependencies.context) }
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
         override val sendingErrorsManager: SendingErrorsManager
             get() = provideSendingErrorsManager(dependencies.sharedPreferences, firebaseCrashlytics)
+
+        override val authManager: AuthManager by lazy { AuthManager(firebaseAuth, dependencies.context) }
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(
@@ -287,6 +300,7 @@ internal interface AppModule : AppApi {
                 ),
                 sendingErrorsManager = sendingErrorsManager,
                 appIconManager = appIconManager,
+                authManager = authManager,
             )
 
         override val collectionViewModel: CollectionViewModel

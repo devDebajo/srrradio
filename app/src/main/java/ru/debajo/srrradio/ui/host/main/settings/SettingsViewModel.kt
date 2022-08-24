@@ -8,8 +8,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import ru.debajo.srrradio.auth.AuthManager
+import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
+import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
@@ -20,6 +23,7 @@ internal class SettingsViewModel(
     private val loadM3uInteractor: LoadM3uInteractor,
     private val sendingErrorsManager: SendingErrorsManager,
     private val appIconManager: AppIconManager,
+    private val authManager: AuthManager,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -43,6 +47,19 @@ internal class SettingsViewModel(
                 }
                 updateState {
                     copy(themes = themes)
+                }
+            }
+        }
+
+        viewModelScope.launch {
+            authManager.authState.collect { authState ->
+                updateState {
+                    copy(
+                        authStatus = when (authState) {
+                            is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
+                            is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
+                        }
+                    )
                 }
             }
         }
@@ -74,6 +91,22 @@ internal class SettingsViewModel(
         updateState {
             appIconManager.dynamicIcon = !dynamicIcon
             copy(dynamicIcon = !dynamicIcon)
+        }
+    }
+
+    fun login() {
+        viewModelScope.launch {
+            authManager.signIn()
+        }
+    }
+
+    fun logout() {
+        authManager.signOut()
+    }
+
+    fun deleteUser() {
+        viewModelScope.launch {
+            authManager.deleteUser()
         }
     }
 

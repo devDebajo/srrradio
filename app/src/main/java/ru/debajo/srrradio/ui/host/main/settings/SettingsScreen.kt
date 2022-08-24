@@ -51,6 +51,7 @@ import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
+import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
 
 @Composable
 fun SettingsScreen() {
@@ -133,9 +134,34 @@ private fun SettingsList() {
         Spacer(Modifier.height(12.dp))
 
         SettingsGroup(
-            title = stringResource(R.string.settings_group_app),
+            title = stringResource(R.string.settings_group_account),
             state = calculateGroupState(expandedGroup, 2),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(2) }
+        ) {
+            when (state.authStatus) {
+                SettingsAuthStatus.LOGGED_IN -> {
+                    SettingsText(text = stringResource(R.string.settings_logout)) {
+                        viewModel.logout()
+                    }
+
+                    SettingsText(text = stringResource(R.string.settings_delete_account)) {
+                        viewModel.deleteUser()
+                    }
+                }
+                SettingsAuthStatus.LOGGED_OUT -> {
+                    SettingsText(text = stringResource(R.string.settings_login)) {
+                        viewModel.login()
+                    }
+                }
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        SettingsGroup(
+            title = stringResource(R.string.settings_group_app),
+            state = calculateGroupState(expandedGroup, 3),
+            onHeaderClick = { expandedGroup.onGroupHeaderClick(3) }
         ) {
             val context = LocalContext.current
             SettingsText(

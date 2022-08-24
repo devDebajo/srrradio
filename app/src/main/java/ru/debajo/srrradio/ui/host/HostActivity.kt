@@ -28,9 +28,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.launch
 import ru.debajo.reduktor.lazyViewModel
+import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.ext.AndroidColor
 import ru.debajo.srrradio.ui.ext.colorInt
@@ -56,6 +59,7 @@ class HostActivity : ComponentActivity() {
     private val sleepTimerViewModel: SleepTimerViewModel by lazyViewModel { AppApiHolder.get().sleepTimerViewModel }
     private val settingsViewModel: SettingsViewModel by lazyViewModel { AppApiHolder.get().settingsViewModel }
     private val themeManager: SrrradioThemeManager by lazy { AppApiHolder.get().themeManager }
+    private val authManager: AuthManager by lazy { AppApiHolder.get().authManager }
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -66,6 +70,7 @@ class HostActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        authManager.setActivity(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
@@ -108,6 +113,14 @@ class HostActivity : ComponentActivity() {
                     }
                 }
             }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        lifecycleScope.launch {
+            authManager.onActivityResult(requestCode, data)
         }
     }
 
