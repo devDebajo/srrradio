@@ -17,7 +17,9 @@ internal class UserStationUseCaseImpl(
             id = UUID.randomUUID().toString(),
             stream = stream,
             name = name,
-            image = poster
+            image = poster,
+            latitude = null,
+            longitude = null,
         )
 
         stationDao.insert(dbStation)

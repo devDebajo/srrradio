@@ -9,4 +9,11 @@ internal val MIGRATIONS: Array<Migration> = arrayOf(
             database.execSQL("CREATE TABLE IF NOT EXISTS `DbTrackCollectionItem` (`name` TEXT NOT NULL, `stationId` TEXT NOT NULL, `stationName` TEXT NOT NULL, PRIMARY KEY(`name`))")
         }
     },
+
+    object : Migration(2, 3) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `DbStation` ADD COLUMN `latitude` REAL DEFAULT null")
+            database.execSQL("ALTER TABLE `DbStation` ADD COLUMN `longitude` REAL DEFAULT null")
+        }
+    },
 )
