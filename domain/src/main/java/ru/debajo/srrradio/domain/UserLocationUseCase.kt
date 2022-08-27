@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeout
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import timber.log.Timber
 
 interface UserLocationUseCase {
@@ -33,7 +34,7 @@ internal class UserLocationUseCaseImpl(
             return null
         }
 
-        return runCatching {
+        return runCatchingNonCancellation {
             withTimeout(20_000) { observeLocation().firstOrNull() }
         }
             .onFailure { Timber.e(it) }

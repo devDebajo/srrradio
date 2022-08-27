@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 
 class SleepTimer {
 
@@ -37,7 +38,7 @@ class SleepTimer {
         taskMutable
             .filterIsInstance<Task.Pause>()
             .collect {
-                runCatching {
+                runCatchingNonCancellation {
                     delay(it.at - System.currentTimeMillis())
                     onPause()
                     taskMutable.value = Task.None

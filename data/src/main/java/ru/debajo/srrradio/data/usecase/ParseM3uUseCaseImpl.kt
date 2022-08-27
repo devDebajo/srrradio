@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import net.bjoernpetersen.m3u.M3uParser
 import net.bjoernpetersen.m3u.model.M3uEntry
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.ParseM3uUseCase
 
 internal class ParseM3uUseCaseImpl(
@@ -13,7 +14,7 @@ internal class ParseM3uUseCaseImpl(
 ) : ParseM3uUseCase {
 
     override suspend fun parse(m3uFilePath: String): List<ParseM3uUseCase.ParsedStation> {
-        return runCatching {
+        return runCatchingNonCancellation {
             parseUnsafe(m3uFilePath).map {
                 ParseM3uUseCase.ParsedStation(
                     title = it.title,

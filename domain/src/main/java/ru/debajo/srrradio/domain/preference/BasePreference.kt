@@ -4,12 +4,13 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import org.joda.time.DateTime
 
 abstract class BasePreference<T : Any?>(
     private val sharedPreferences: SharedPreferences,
 ) : ReadWriteProperty<Any, T> {
 
-    val timestamp: Long
+    val timestamp: DateTime
         get() = getPersistedTimestamp()
 
     abstract val key: String
@@ -22,7 +23,7 @@ abstract class BasePreference<T : Any?>(
 
     fun get(): T {
         return if (key in sharedPreferences) {
-            sharedPreferences.read(key)
+            runCatching { sharedPreferences.read(key) }.getOrElse { defaultValue() }
         } else {
             defaultValue()
         }
@@ -43,15 +44,16 @@ abstract class BasePreference<T : Any?>(
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = set(value)
 
     private fun SharedPreferences.Editor.persistNowEdited(): SharedPreferences.Editor {
-        return putLong(getTimestampKey(), System.currentTimeMillis())
+        val now = DateTime.now()
+        return putString(getTimestampKey(), now.toString())
     }
 
-    private fun getPersistedTimestamp(): Long {
+    private fun getPersistedTimestamp(): DateTime {
         val key = getTimestampKey()
         return if (key in sharedPreferences) {
-            sharedPreferences.getLong(key, 0L)
+            sharedPreferences.getString(key, null)!!.let { DateTime.parse(it) }
         } else {
-            0L
+            DateTime(0)
         }
     }
 

@@ -17,4 +17,7 @@ internal interface DbTrackCollectionItemDao {
 
     @Query("SELECT * FROM DbTrackCollectionItem")
     fun observe(): Flow<List<DbTrackCollectionItem>>
+
+    @Query("SELECT * FROM DbTrackCollectionItem")
+    suspend fun getAll(): List<DbTrackCollectionItem>
 }

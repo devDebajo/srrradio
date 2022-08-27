@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.model
 
 import androidx.compose.runtime.Immutable
+import ru.debajo.srrradio.domain.model.LatLng
 import ru.debajo.srrradio.domain.model.Station
 
 @Immutable
@@ -9,6 +10,7 @@ data class UiStation(
     val name: String,
     val stream: String,
     val image: String?,
+    val location: LatLng?,
 )
 
 internal fun Station.toUi(): UiStation {
@@ -17,6 +19,7 @@ internal fun Station.toUi(): UiStation {
         name = name,
         stream = stream,
         image = image,
+        location = location,
     )
 }
 
@@ -25,6 +28,7 @@ internal fun UiStation.toDomain(): Station {
         id = id,
         name = name,
         stream = stream,
-        image = image
+        image = image,
+        location = location,
     )
 }

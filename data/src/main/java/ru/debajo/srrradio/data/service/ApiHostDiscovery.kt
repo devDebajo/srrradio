@@ -12,10 +12,11 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import ru.debajo.srrradio.common.lazySuspend
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 
 class ApiHostDiscovery {
 
-    private val host = lazySuspend { runCatching { findServers().first() }.getOrNull() ?: DEFAULT_HOST }
+    private val host = lazySuspend { runCatchingNonCancellation { findServers().first() }.getOrNull() ?: DEFAULT_HOST }
 
     suspend fun discover() {
         supervisorScope {

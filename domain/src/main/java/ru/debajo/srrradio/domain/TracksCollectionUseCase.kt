@@ -9,5 +9,7 @@ interface TracksCollectionUseCase {
 
     suspend fun delete(track: String)
 
-    suspend fun observe(): Flow<List<CollectionItem>>
+    fun observe(): Flow<List<CollectionItem>>
+
+    suspend fun get(): List<CollectionItem>
 }

@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.mapLatest
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.ui.model.UiStation
@@ -31,7 +32,7 @@ class SearchStationsCommandProcessor(
     }
 
     private suspend fun searchSafe(query: String, searchBlock: suspend () -> List<Station>): CommandResult {
-        return runCatching {
+        return runCatchingNonCancellation {
             delay(500)
             SearchResult(query, searchBlock().convert())
         }.getOrElse { CommandResult.EMPTY }

@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.tasks.asDeferred
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 
 class AuthManager(
     private val firebaseAuth: FirebaseAuth,
@@ -56,7 +57,7 @@ class AuthManager(
             .build()
 
 
-        val beginSignInResult = runCatching {
+        val beginSignInResult = runCatchingNonCancellation {
             oneTapClient.beginSignIn(signInRequest).asDeferred().await()
         }.getOrNull()
 
@@ -80,7 +81,7 @@ class AuthManager(
     }
 
     suspend fun deleteUser() {
-        runCatching {
+        runCatchingNonCancellation {
             currentUser?.delete()?.asDeferred()?.await()
             signOut()
         }
@@ -90,7 +91,7 @@ class AuthManager(
         if (requestCode != SIGN_IN_REQUEST) {
             return
         }
-        val idToken = runCatching {
+        val idToken = runCatchingNonCancellation {
             val signInCredential = oneTapClient.getSignInCredentialFromIntent(data)
             signInCredential.googleIdToken
         }.getOrNull()
@@ -103,7 +104,7 @@ class AuthManager(
     }
 
     private suspend fun firebaseAuthWithGoogle(idToken: String): AuthState {
-        val authResult = runCatching {
+        val authResult = runCatchingNonCancellation {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             firebaseAuth.signInWithCredential(credential).asDeferred().await()
         }.getOrNull()

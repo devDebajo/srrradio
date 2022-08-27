@@ -10,6 +10,8 @@ interface FavoriteStationsStateUseCase {
     suspend fun isFavorite(stationId: String): Boolean
 
     fun observe(): Flow<List<Station>>
+
+    suspend fun get(): List<Station>
 }
 
 internal class FavoriteStationsStateUseCaseImpl(
@@ -30,5 +32,9 @@ internal class FavoriteStationsStateUseCaseImpl(
         return repository.observeFavoriteStations().onEach { stations ->
             favoriteStationsIds.set(stations.map { it.id }.toSet())
         }
+    }
+
+    override suspend fun get(): List<Station> {
+        return repository.getFavoriteStations()
     }
 }

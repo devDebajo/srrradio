@@ -1,14 +1,11 @@
 package ru.debajo.srrradio.domain.repository
 
-import ru.debajo.srrradio.domain.model.CollectionItem
-import ru.debajo.srrradio.domain.model.Station
+import ru.debajo.srrradio.domain.model.AppStateSnapshot
 
 interface SyncRepository {
-    suspend fun getFavoriteStations(userId: String): List<Station>
+    suspend fun save(userId: String, snapshot: AppStateSnapshot)
 
-    suspend fun saveFavoriteStations(userId: String, stations: List<Station>)
+    suspend fun delete(userId: String)
 
-    suspend fun getCollection(userId: String): List<CollectionItem>
-
-    suspend fun saveCollection(userId: String, collection: List<CollectionItem>)
+    suspend fun load(userId: String): AppStateSnapshot?
 }

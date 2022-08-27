@@ -3,6 +3,7 @@ package ru.debajo.srrradio.data.repository
 import android.location.Location
 import ru.debajo.srrradio.data.model.RemoteStation
 import ru.debajo.srrradio.data.service.ServiceHolder
+import ru.debajo.srrradio.domain.model.LatLng
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
@@ -62,6 +63,7 @@ internal class SearchStationsRepositoryImpl(
                 name = station.name.trim(),
                 stream = station.stream,
                 image = station.image,
+                location = LatLng.from(station.latitude, station.longitude),
             )
         }
     }

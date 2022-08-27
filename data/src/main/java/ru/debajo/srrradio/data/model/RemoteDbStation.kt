@@ -17,9 +17,9 @@ internal data class RemoteDbStation(
     @SerialName("image")
     val image: String? = null,
 
-    @SerialName("geo_lat")
+    @SerialName("lat")
     val latitude: Double? = null,
 
-    @SerialName("geo_long")
+    @SerialName("lon")
     val longitude: Double? = null,
 )

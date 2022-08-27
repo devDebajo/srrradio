@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.processor.interactor
 
 import android.net.Uri
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
@@ -18,7 +19,7 @@ class LoadM3uInteractor(
         get() = Uri.parse(this.stream).scheme in listOf("http", "https")
 
     suspend fun load(m3uFilePath: String) {
-        runCatching { loadUnsafe(m3uFilePath) }
+        runCatchingNonCancellation { loadUnsafe(m3uFilePath) }
     }
 
     private suspend fun loadUnsafe(m3uFilePath: String) {
@@ -52,7 +53,8 @@ class LoadM3uInteractor(
             id = station.id,
             name = parsedStation.title ?: station.name,
             stream = parsedStation.stream,
-            image = parsedStation.poster ?: station.image
+            image = parsedStation.poster ?: station.image,
+            location = station.location,
         )
     }
 }

@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.ProcessScope
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.service.PlayerNotificationService
 import ru.debajo.srrradio.ui.model.UiStation
 
@@ -122,7 +123,7 @@ class RadioPlayer(
         })
     }
 
-    private suspend fun updateMediaSession(playerState: State.HasStation) = runCatching {
+    private suspend fun updateMediaSession(playerState: State.HasStation) = runCatchingNonCancellation {
         mediaSessionController.update {
             isActive = true
             station = playerState.station.name

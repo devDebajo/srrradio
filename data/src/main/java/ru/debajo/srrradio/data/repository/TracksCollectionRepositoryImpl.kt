@@ -26,14 +26,19 @@ internal class TracksCollectionRepositoryImpl(
         dao.delete(track)
     }
 
-    override suspend fun observe(): Flow<List<CollectionItem>> {
+    override fun observe(): Flow<List<CollectionItem>> {
         return dao.observe().map { it.convert() }
+    }
+
+    override suspend fun get(): List<CollectionItem> {
+        return dao.getAll().convert()
     }
 
     private fun List<DbTrackCollectionItem>.convert(): List<CollectionItem> {
         return map {
             CollectionItem(
                 track = it.name,
+                stationId = it.stationId,
                 stationName = it.stationName
             )
         }
