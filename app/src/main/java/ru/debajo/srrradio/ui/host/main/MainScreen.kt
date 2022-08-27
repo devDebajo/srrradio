@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
 import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
@@ -76,7 +75,6 @@ val bottomSheetBgColor: Color
     get() = MaterialTheme.colorScheme.onSecondary
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 fun MainScreen() {
     val sleepTimerViewModel = SleepTimerViewModel.Local.current
     val state by sleepTimerViewModel.state.collectAsState()
@@ -146,7 +144,6 @@ class SnackbarLauncher(
 }
 
 @Composable
-@OptIn(ExperimentalMaterialApi::class)
 private fun RadioScreenContent() {
     val bottomSheetViewModel = PlayerBottomSheetViewModel.Local.current
     val bottomSheetState by bottomSheetViewModel.state.collectAsState()

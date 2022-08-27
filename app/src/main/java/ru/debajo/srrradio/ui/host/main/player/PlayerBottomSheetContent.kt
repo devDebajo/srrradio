@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeProgress
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
@@ -102,7 +101,6 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 val PlayerBottomSheetPeekHeight = 60.dp
 
-@ExperimentalMaterialApi
 val SwipeProgress<BottomSheetValue>.normalizedFraction: Float
     get() {
         return when {
@@ -114,7 +112,7 @@ val SwipeProgress<BottomSheetValue>.normalizedFraction: Float
     }
 
 @Composable
-@OptIn(ExperimentalPagerApi::class, ExperimentalMaterialApi::class, FlowPreview::class)
+@OptIn(ExperimentalPagerApi::class, FlowPreview::class)
 fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val sleepTimerViewModel = SleepTimerViewModel.Local.current

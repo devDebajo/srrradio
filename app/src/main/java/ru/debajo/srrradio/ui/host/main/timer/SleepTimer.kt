@@ -1,7 +1,6 @@
 package ru.debajo.srrradio.ui.host.main.timer
 
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +13,6 @@ class SleepTimer {
 
     private val taskMutable: MutableStateFlow<Task> = MutableStateFlow(Task.None)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun observeState(): Flow<State> {
         return taskMutable.flatMapLatest { task ->
             when (task) {

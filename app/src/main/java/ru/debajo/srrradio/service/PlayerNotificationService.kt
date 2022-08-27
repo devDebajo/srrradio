@@ -17,7 +17,6 @@ import androidx.core.app.NotificationCompat
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -47,7 +46,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
     override fun onBind(intent: Intent?): IBinder? = null
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCreate() {
         super.onCreate()
         prepareChannel()

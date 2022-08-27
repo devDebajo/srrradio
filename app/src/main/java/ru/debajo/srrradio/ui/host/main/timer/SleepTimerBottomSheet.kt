@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.pluralStringResource
@@ -60,7 +59,6 @@ fun SleepTimerBottomSheet() {
 }
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 private fun formatSecondsMinutes(leftMinutes: Int, leftSeconds: Int): String {
     val minutesString = pluralStringResource(R.plurals.sleep_timer_minutes, leftMinutes, leftMinutes)
     if (leftSeconds <= 0) {

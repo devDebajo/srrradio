@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.processor
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -18,7 +17,6 @@ class SearchStationsCommandProcessor(
     private val searchStationsUseCase: SearchStationsUseCase,
 ) : CommandProcessor {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun invoke(commands: Flow<Command>): Flow<CommandResult> {
         return commands
             .filterIsInstance<Action>()

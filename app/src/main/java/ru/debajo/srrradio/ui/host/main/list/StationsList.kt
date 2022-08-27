@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.host.main.list
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -122,7 +121,6 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ListContent(
     state: StationsListState,

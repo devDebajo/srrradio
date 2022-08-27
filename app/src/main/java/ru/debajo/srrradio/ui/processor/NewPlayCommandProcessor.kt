@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.processor
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapLatest
@@ -10,7 +9,6 @@ import ru.debajo.reduktor.CommandResult
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.ui.model.UiPlaylist
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class NewPlayCommandProcessor(
     private val mediaController: MediaController,
 ) : CommandProcessor {

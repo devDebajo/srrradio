@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.processor
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.mapLatest
@@ -14,7 +13,6 @@ class AddFavoriteStationProcessor(
     private val useCase: UpdateFavoriteStationStateUseCase,
 ) : CommandProcessor {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun invoke(commands: Flow<Command>): Flow<CommandResult> {
         return commands
             .filterIsInstance<Update>()

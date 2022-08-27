@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.processor
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
@@ -17,7 +16,6 @@ class MediaStateListenerCommandProcessor(
     private val mediaController: MediaController,
 ) : CommandProcessor {
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     override fun invoke(commands: Flow<Command>): Flow<CommandResult> {
         return commands
             .filterIsInstance<ListenerCommand>()

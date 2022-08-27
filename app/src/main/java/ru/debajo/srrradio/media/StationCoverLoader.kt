@@ -12,7 +12,6 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlin.math.roundToInt
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.debajo.srrradio.R
 
@@ -20,7 +19,6 @@ class StationCoverLoader(private val context: Context) {
 
     val emptyBitmap: Bitmap by lazy { createEmptyBitmap(context) }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     suspend fun loadImage(url: String?): Bitmap? {
         url ?: return null
         return suspendCancellableCoroutine {

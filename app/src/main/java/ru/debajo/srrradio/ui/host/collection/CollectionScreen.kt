@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.host.collection
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -94,7 +93,6 @@ fun <T> ListScreen(
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 fun CollectionScreen() {
     val viewModel = viewModel { AppApiHolder.get().collectionViewModel }
     LaunchedEffect(viewModel) { viewModel.load() }
