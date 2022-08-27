@@ -1,7 +1,6 @@
 package ru.debajo.srrradio.di
 
 import android.content.Context
-import android.content.SharedPreferences
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import ru.debajo.srrradio.auth.AuthManager
@@ -13,7 +12,9 @@ import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.error.SendingErrorsManager
+import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.icon.AppIconManager
+import ru.debajo.srrradio.icon.DynamicIconPreference
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
@@ -45,6 +46,7 @@ import ru.debajo.srrradio.ui.processor.TrackCollectionListener
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
 import ru.debajo.srrradio.ui.processor.interactor.UserStationsInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
+import ru.debajo.srrradio.ui.theme.SrrradioThemePreference
 
 internal interface AppModule : AppApi {
     fun provideStationsListViewModel(
@@ -207,9 +209,9 @@ internal interface AppModule : AppApi {
     )
 
     fun provideSrrradioThemeManager(
-        sharedPreferences: SharedPreferences,
         appIconManager: AppIconManager,
-    ): SrrradioThemeManager = SrrradioThemeManager(sharedPreferences)
+        themePreference: SrrradioThemePreference,
+    ): SrrradioThemeManager = SrrradioThemeManager(themePreference)
 
     fun provideCollectionViewModel(tracksCollectionUseCase: TracksCollectionUseCase): CollectionViewModel {
         return CollectionViewModel(tracksCollectionUseCase)
@@ -224,13 +226,13 @@ internal interface AppModule : AppApi {
 
     fun provideAppIconManager(
         context: Context,
-        sharedPreferences: SharedPreferences,
-    ): AppIconManager = AppIconManager(context, sharedPreferences)
+        dynamicIconPreference: DynamicIconPreference,
+    ): AppIconManager = AppIconManager(context, dynamicIconPreference)
 
     fun provideSendingErrorsManager(
-        sharedPreferences: SharedPreferences,
+        sendingErrorsPreference: SendingErrorsPreference,
         firebaseCrashlytics: FirebaseCrashlytics,
-    ): SendingErrorsManager = SendingErrorsManager(sharedPreferences, firebaseCrashlytics)
+    ): SendingErrorsManager = SendingErrorsManager(sendingErrorsPreference, firebaseCrashlytics)
 
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
@@ -246,7 +248,10 @@ internal interface AppModule : AppApi {
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
 
         override val sendingErrorsManager: SendingErrorsManager
-            get() = provideSendingErrorsManager(dependencies.sharedPreferences, firebaseCrashlytics)
+            get() = provideSendingErrorsManager(
+                sendingErrorsPreference = SendingErrorsPreference(dependencies.sharedPreferences),
+                firebaseCrashlytics = firebaseCrashlytics
+            )
 
         override val authManager: AuthManager by lazy { AuthManager(firebaseAuth, dependencies.context) }
 
@@ -318,13 +323,19 @@ internal interface AppModule : AppApi {
 
         override val themeManager: SrrradioThemeManager by lazy {
             provideSrrradioThemeManager(
-                sharedPreferences = dependencies.sharedPreferences,
-                appIconManager = provideAppIconManager(dependencies.context, dependencies.sharedPreferences),
+                appIconManager = provideAppIconManager(
+                    context = dependencies.context,
+                    dynamicIconPreference = DynamicIconPreference(dependencies.sharedPreferences)
+                ),
+                themePreference = SrrradioThemePreference(dependencies.sharedPreferences),
             )
         }
 
         override val appIconManager: AppIconManager
-            get() = provideAppIconManager(dependencies.context, dependencies.sharedPreferences)
+            get() = provideAppIconManager(
+                context = dependencies.context,
+                dynamicIconPreference = DynamicIconPreference(dependencies.sharedPreferences)
+            )
 
         override val mediaController: MediaController by lazy {
             MediaController(

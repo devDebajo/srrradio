@@ -2,21 +2,14 @@ package ru.debajo.srrradio.icon
 
 import android.content.ComponentName
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 
 class AppIconManager(
     private val context: Context,
-    private val sharedPreferences: SharedPreferences,
+    dynamicIconPreference: DynamicIconPreference,
 ) {
 
-    var dynamicIcon: Boolean
-        get() = sharedPreferences.getBoolean(DYNAMIC_ICON, true)
-        set(value) {
-            sharedPreferences.edit()
-                .putBoolean(DYNAMIC_ICON, value)
-                .apply()
-        }
+    var dynamicIcon: Boolean by dynamicIconPreference
 
     fun isEnabled(icon: AppIcon): Boolean {
         val componentEnabledSetting = context.packageManager.getComponentEnabledSetting(icon.componentName)
@@ -47,10 +40,4 @@ class AppIconManager(
 
     private val AppIcon.componentName: ComponentName
         get() = ComponentName(context.packageName, "ru.debajo.srrradio.ui.host.HostActivity.$componentSegment")
-
-    private companion object {
-        const val DYNAMIC_ICON = "DYNAMIC_ICON"
-    }
 }
-
-

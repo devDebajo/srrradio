@@ -19,6 +19,8 @@ import ru.debajo.srrradio.data.repository.SearchStationsRepositoryImpl
 import ru.debajo.srrradio.data.repository.TracksCollectionRepositoryImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
+import ru.debajo.srrradio.data.usecase.LastPlaylistIdPreference
+import ru.debajo.srrradio.data.usecase.LastStationIdPreference
 import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
 import ru.debajo.srrradio.data.usecase.LoadPlaylistUseCaseImpl
 import ru.debajo.srrradio.data.usecase.ParseM3uUseCaseImpl
@@ -54,7 +56,10 @@ internal interface DataModule : DataApiInternal {
         return TracksCollectionRepositoryImpl(dao)
     }
 
-    fun provideLastStationUseCase(sharedPreferences: SharedPreferences): LastStationUseCase = LastStationUseCaseImpl(sharedPreferences)
+    fun provideLastStationUseCase(
+        lastPlaylistIdPreference: LastPlaylistIdPreference,
+        lastStationIdPreference: LastStationIdPreference,
+    ): LastStationUseCase = LastStationUseCaseImpl(lastPlaylistIdPreference, lastStationIdPreference)
 
     fun provideLoadPlaylistUseCase(
         playlistDao: DbPlaylistDao,
@@ -118,7 +123,10 @@ internal interface DataModule : DataApiInternal {
         override val apiHostDiscovery: ApiHostDiscovery by lazy { ApiHostDiscovery() }
 
         override val lastStationUseCase: LastStationUseCase
-            get() = provideLastStationUseCase(sharedPreferences)
+            get() = provideLastStationUseCase(
+                lastPlaylistIdPreference = LastPlaylistIdPreference(sharedPreferences),
+                lastStationIdPreference = LastStationIdPreference(sharedPreferences),
+            )
 
         override val loadPlaylistUseCase: LoadPlaylistUseCase
             get() = provideLoadPlaylistUseCase(dbPlaylistDao, dbStationDao, dbPlaylistMappingDao)

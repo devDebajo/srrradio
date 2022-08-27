@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.theme
 
-import android.content.SharedPreferences
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 internal class SrrradioThemeManager(
-    private val sharedPreferences: SharedPreferences,
+    private val themePreference: SrrradioThemePreference,
 ) {
 
     private val currentThemeMutable: MutableStateFlow<AppTheme> = MutableStateFlow(loadCurrent())
@@ -22,20 +21,16 @@ internal class SrrradioThemeManager(
     }
 
     private fun saveSelected(code: String) {
-        sharedPreferences.edit()
-            .putString(KEY, code)
-            .apply()
+        themePreference.set(code)
     }
 
     private fun loadCurrent(): AppTheme {
-        val key = sharedPreferences.getString(KEY, null) ?: return defaultTheme
+        val key = themePreference.get() ?: return defaultTheme
         return themes.firstOrNull { it.code == key } ?: defaultTheme
     }
 
     companion object {
         val Local: ProvidableCompositionLocal<SrrradioThemeManager> = staticCompositionLocalOf { TODO() }
-
-        private const val KEY = "CURRENT_THEME"
 
         private val defaultTheme: AppTheme = SynthTheme
 
