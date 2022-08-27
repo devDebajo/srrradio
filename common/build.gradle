@@ -6,4 +6,5 @@ dependencies {
     api "joda-time:joda-time:$joda_time_version"
     api "com.jakewharton.timber:timber:$timber_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
+    api "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
 }

@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.ui.host.collection
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -43,9 +42,3 @@ class CollectionViewModel(
         }
     }
 }
-
-@Immutable
-data class UiCollectionItem(
-    val track: String,
-    val stationName: String,
-)
