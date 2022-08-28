@@ -50,6 +50,7 @@ import androidx.compose.ui.unit.sp
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
+import org.joda.time.DateTime
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.optionalClickable
@@ -137,6 +138,18 @@ private fun SettingsList(bottomPadding: Dp) {
                 checked = state.autoSendErrors,
                 onClick = { viewModel.onAutoSendErrorsClick() }
             )
+
+            if (state.authStatus == SettingsAuthStatus.LOGGED_IN) {
+                SettingsText(
+                    text = stringResource(R.string.settings_sync),
+                    loadingIndicator = state.synchronization,
+                    subtitle = state.lastSyncDate?.let {
+                        stringResource(R.string.settings_last_sync, it.format())
+                    },
+                ) {
+                    viewModel.sync()
+                }
+            }
         }
 
         Spacer(Modifier.height(12.dp))
@@ -148,14 +161,6 @@ private fun SettingsList(bottomPadding: Dp) {
         ) {
             when (state.authStatus) {
                 SettingsAuthStatus.LOGGED_IN -> {
-                    SettingsText(
-                        text = stringResource(R.string.settings_sync),
-                        loadingIndicator = state.synchronization,
-                        subtitle = state.lastSyncDate?.toString(),
-                    ) {
-                        viewModel.sync()
-                    }
-
                     SettingsText(text = stringResource(R.string.settings_logout)) {
                         viewModel.logout()
                     }
@@ -199,6 +204,10 @@ private fun SettingsList(bottomPadding: Dp) {
     }
 }
 
+private fun DateTime.format(): String {
+    return toString("dd:MM:yy, HH:ss")
+}
+
 private fun Context.openUrl(url: String) {
     startActivity(Intent(Intent.ACTION_VIEW).setData(Uri.parse(url)))
 }
@@ -209,6 +218,7 @@ fun SettingsText(
     subtitle: String? = null,
     alpha: Float = 1f,
     fontSize: TextUnit = 14.sp,
+    subtitleFontSize: TextUnit = 10.sp,
     fontWeight: FontWeight? = null,
     loadingIndicator: Boolean = false,
     onClick: (() -> Unit)? = null,
@@ -236,7 +246,11 @@ fun SettingsText(
                 fontWeight = fontWeight,
             )
             if (subtitle != null) {
-                Text(subtitle)
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = subtitle,
+                    fontSize = subtitleFontSize,
+                )
             }
         }
 

@@ -63,6 +63,7 @@
     <string name="settings_login">Login</string>
     <string name="settings_logout">Logout</string>
     <string name="settings_sync">Sync</string>
+    <string name="settings_last_sync">Last sync: %s</string>
     <string name="settings_delete_account">Delete account</string>
     <string name="settings_delete_account_confirmation">Are you sure to delete yor account with all synchronization data?</string>
     <string name="settings_delete_account_confirmation_sure">I\'m sure</string>

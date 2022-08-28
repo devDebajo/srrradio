@@ -7,6 +7,6 @@ data class Timestamped<T>(
     val timestamp: DateTime,
 )
 
-fun <T> T.timestampedAt(timestamp: DateTime): Timestamped<T> {
+fun <T> T.timestampedAt(timestamp: DateTime = DateTime.now()): Timestamped<T> {
     return Timestamped(this, timestamp)
 }
