@@ -6,6 +6,7 @@ import ru.debajo.srrradio.common.di.CommonApiHolder
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
+import ru.debajo.srrradio.domain.SyncUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.di.DomainDependencies
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
@@ -39,4 +40,7 @@ object DomainDependenciesImpl : DomainDependencies {
 
     override val parseM3uUseCase: ParseM3uUseCase
         get() = DataApiHolder.get().parseM3uUseCase
+
+    override val syncUseCase: SyncUseCase
+        get() = DataApiHolder.get().syncRepository
 }

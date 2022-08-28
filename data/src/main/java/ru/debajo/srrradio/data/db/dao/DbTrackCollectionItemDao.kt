@@ -12,6 +12,9 @@ internal interface DbTrackCollectionItemDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: DbTrackCollectionItem)
 
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(items: List<DbTrackCollectionItem>)
+
     @Query("DELETE FROM DbTrackCollectionItem WHERE name=:name")
     suspend fun delete(name: String)
 

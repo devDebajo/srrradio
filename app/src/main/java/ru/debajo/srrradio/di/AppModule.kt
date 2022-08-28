@@ -20,6 +20,8 @@ import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
+import ru.debajo.srrradio.sync.AppStateSnapshotMerger
+import ru.debajo.srrradio.sync.AppSynchronizer
 import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
@@ -200,13 +202,15 @@ internal interface AppModule : AppApi {
         loadM3uInteractor: LoadM3uInteractor,
         sendingErrorsManager: SendingErrorsManager,
         appIconManager: AppIconManager,
-        authManager: AuthManager
+        authManager: AuthManager,
+        appSynchronizer: AppSynchronizer,
     ): SettingsViewModel = SettingsViewModel(
         themeManager = themeManager,
         loadM3uInteractor = loadM3uInteractor,
         sendingErrorsManager = sendingErrorsManager,
         appIconManager = appIconManager,
         authManager = authManager,
+        appSynchronizer = appSynchronizer,
     )
 
     fun provideSrrradioThemeManager(
@@ -244,6 +248,15 @@ internal interface AppModule : AppApi {
 
         private val firebaseAuth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
 
+        private val appSynchronizer: AppSynchronizer by lazy {
+            AppSynchronizer(
+                syncUseCase = dependencies.syncUseCase,
+                authManager = authManager,
+                appStateSnapshotExtractor = appStateSnapshotExtractor,
+                appStateSnapshotMerger = AppStateSnapshotMerger(),
+            )
+        }
+
         override val mediaSessionController: MediaSessionController by lazy { provideMediaSessionController(dependencies.context) }
 
         override val sleepTimer: SleepTimer by lazy { provideSleepTimer() }
@@ -259,8 +272,10 @@ internal interface AppModule : AppApi {
         override val appStateSnapshotExtractor: AppStateSnapshotExtractor
             get() = AppStateSnapshotExtractor(
                 dynamicIconPreference = DynamicIconPreference(dependencies.sharedPreferences),
+                themeManager = themeManager,
                 themePreference = SrrradioThemePreference(dependencies.sharedPreferences),
                 sendingErrorsPreference = SendingErrorsPreference(dependencies.sharedPreferences),
+                sendingErrorsManager = sendingErrorsManager,
                 collectionUseCase = dependencies.tracksCollectionUseCase,
                 favoriteStationsStateUseCase = dependencies.favoriteStationsStateUseCase,
             )
@@ -316,6 +331,7 @@ internal interface AppModule : AppApi {
                 sendingErrorsManager = sendingErrorsManager,
                 appIconManager = appIconManager,
                 authManager = authManager,
+                appSynchronizer = appSynchronizer
             )
 
         override val collectionViewModel: CollectionViewModel

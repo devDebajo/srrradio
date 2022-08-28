@@ -13,6 +13,9 @@ internal interface DbFavoriteStationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: DbFavoriteStation)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(items: List<DbFavoriteStation>)
+
     @Query("DELETE FROM DbFavoriteStation WHERE stationId=:stationId")
     suspend fun delete(stationId: String)
 

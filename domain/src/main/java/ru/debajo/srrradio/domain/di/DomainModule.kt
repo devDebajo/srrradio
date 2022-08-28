@@ -8,6 +8,7 @@ import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
+import ru.debajo.srrradio.domain.SyncUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCaseImpl
@@ -67,5 +68,8 @@ internal interface DomainModule : DomainApi {
 
         override val userLocationUseCase: UserLocationUseCase
             get() = provideUserLocationUseCase(dependencies.context, dependencies.locationManager)
+
+        override val syncUseCase: SyncUseCase
+            get() = dependencies.syncUseCase
     }
 }

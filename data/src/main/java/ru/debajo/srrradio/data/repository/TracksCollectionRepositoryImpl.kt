@@ -22,6 +22,16 @@ internal class TracksCollectionRepositoryImpl(
         )
     }
 
+    override suspend fun save(collection: List<CollectionItem>) {
+        dao.insert(collection.map {
+            DbTrackCollectionItem(
+                name = it.track,
+                stationId = it.stationId,
+                stationName = it.stationName
+            )
+        })
+    }
+
     override suspend fun delete(track: String) {
         dao.delete(track)
     }

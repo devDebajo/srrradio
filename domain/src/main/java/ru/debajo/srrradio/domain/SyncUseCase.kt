@@ -1,8 +1,11 @@
 package ru.debajo.srrradio.domain
 
-//class SyncUseCase internal constructor(
-//    private val syncRepository: SyncRepository,
-//    private val authmana
-//) {
-//
-//}
+import ru.debajo.srrradio.domain.model.AppStateSnapshot
+
+interface SyncUseCase {
+    suspend fun save(userId: String, snapshot: AppStateSnapshot)
+
+    suspend fun delete(userId: String)
+
+    suspend fun load(userId: String): AppStateSnapshot?
+}

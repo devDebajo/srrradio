@@ -33,4 +33,9 @@ internal class FavoriteStationsRepositoryImpl(
     override suspend fun getFavoriteStations(): List<Station> {
         return dbFavoriteStationDao.getStations().map { station -> station.toDomain() }
     }
+
+    override suspend fun save(stations: List<Station>) {
+        dbStationDao.insert(stations.map { it.toDb() })
+        dbFavoriteStationDao.insert(stations.map { DbFavoriteStation(it.id) })
+    }
 }

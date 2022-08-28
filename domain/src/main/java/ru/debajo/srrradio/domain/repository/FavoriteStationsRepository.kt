@@ -9,4 +9,6 @@ interface FavoriteStationsRepository {
     fun observeFavoriteStations(): Flow<List<Station>>
 
     suspend fun getFavoriteStations(): List<Station>
+
+    suspend fun save(stations: List<Station>)
 }

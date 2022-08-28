@@ -9,6 +9,8 @@ import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 interface FavoriteStationsStateUseCase {
     suspend fun isFavorite(stationId: String): Boolean
 
+    suspend fun save(stations: List<Station>)
+
     fun observe(): Flow<List<Station>>
 
     suspend fun get(): List<Station>
@@ -24,6 +26,10 @@ internal class FavoriteStationsStateUseCaseImpl(
 
     override suspend fun isFavorite(stationId: String): Boolean {
         return stationId in getFavoriteStationsIds()
+    }
+
+    override suspend fun save(stations: List<Station>) {
+        repository.save(stations)
     }
 
     private suspend fun getFavoriteStationsIds(): Set<String> = favoriteStationsIds.get()

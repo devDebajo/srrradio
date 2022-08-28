@@ -4,6 +4,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -12,6 +13,7 @@ import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
+import ru.debajo.srrradio.sync.AppSynchronizer
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
@@ -24,6 +26,7 @@ internal class SettingsViewModel(
     private val sendingErrorsManager: SendingErrorsManager,
     private val appIconManager: AppIconManager,
     private val authManager: AuthManager,
+    private val appSynchronizer: AppSynchronizer,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -106,7 +109,20 @@ internal class SettingsViewModel(
 
     fun deleteUser() {
         viewModelScope.launch {
+            appSynchronizer.deleteSyncData()
             authManager.deleteUser()
+        }
+    }
+
+    fun sync() {
+        viewModelScope.launch(IO) {
+            appSynchronizer.sync()
+            updateState {
+                copy(
+                    autoSendErrors = sendingErrorsManager.isEnabled,
+                    dynamicIcon = appIconManager.dynamicIcon
+                )
+            }
         }
     }
 
