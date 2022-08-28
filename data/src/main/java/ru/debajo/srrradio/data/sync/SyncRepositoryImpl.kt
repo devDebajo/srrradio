@@ -1,12 +1,20 @@
 package ru.debajo.srrradio.data.sync
 
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import java.lang.reflect.Type
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.asDeferred
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
 import org.joda.time.DateTime
-import ru.debajo.srrradio.common.model.IsDebug
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.data.BuildConfig
 import ru.debajo.srrradio.data.model.RemoteDbAppStateSnapshot
 import ru.debajo.srrradio.data.model.RemoteDbStation
 import ru.debajo.srrradio.data.model.RemoteDbTrackCollectionItem
@@ -18,15 +26,15 @@ import ru.debajo.srrradio.domain.model.timestampedAt
 import ru.debajo.srrradio.domain.repository.SyncRepository
 
 internal class SyncRepositoryImpl(
-    private val isDebug: IsDebug,
-    private val json: Json
+    private val gson: Gson,
+    private val database: FirebaseDatabase,
 ) : SyncRepository {
-
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance()
 
     override suspend fun save(userId: String, snapshot: AppStateSnapshot) {
         val toSave = snapshot.toRemote()
-        TODO("Not yet implemented")
+        val json = gson.toJson(toSave)
+        val map = gson.fromJson<Map<String, Any?>>(json, typeToken<Map<String, Any?>>())
+        database.getReference(createPath(userId)).setValueAsync(map)
     }
 
     override suspend fun delete(userId: String) {
@@ -34,12 +42,14 @@ internal class SyncRepositoryImpl(
     }
 
     override suspend fun load(userId: String): AppStateSnapshot? {
-        TODO("Not yet implemented")
+        return runCatchingNonCancellation {
+            database.getReference(createPath(userId)).getOnce().parseToRemote().toDomain()
+        }.getOrNull()
     }
 
-    private suspend fun <T : Any?> DatabaseReference.setValueAsync(value: T, serializer: KSerializer<T>) {
-        val element = json.encodeToJsonElement(serializer, value)
-        setValueAsync(element)
+    private fun DataSnapshot.parseToRemote(): RemoteDbAppStateSnapshot {
+        val json = gson.toJson(value)
+        return gson.fromJson(json, RemoteDbAppStateSnapshot::class.java)
     }
 
     private suspend fun DatabaseReference.setValueAsync(value: Any?) {
@@ -47,7 +57,7 @@ internal class SyncRepositoryImpl(
     }
 
     private fun createPath(userId: String): String {
-        val prodOrDebugKey = if (isDebug.isDebug) "debug" else "prod"
+        val prodOrDebugKey = if (BuildConfig.DEBUG) "debug" else "prod"
         return "sync_data/${prodOrDebugKey}/${userId}"
     }
 
@@ -90,7 +100,7 @@ internal class SyncRepositoryImpl(
             id = id,
             name = name,
             stream = stream,
-            image = image,
+            image = image?.takeIf { it.isNotEmpty() },
             latitude = location?.latitude,
             longitude = location?.longitude,
         )
@@ -112,5 +122,28 @@ internal class SyncRepositoryImpl(
             image = image,
             location = LatLng.from(latitude, longitude)
         )
+    }
+
+    @Suppress("ThrowableNotThrown")
+    private suspend fun DatabaseReference.getOnce(): DataSnapshot {
+        return suspendCancellableCoroutine { continuation ->
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    continuation.resume(snapshot)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    continuation.resumeWithException(error.toException())
+                }
+
+            }
+            addListenerForSingleValueEvent(listener)
+
+            continuation.invokeOnCancellation { removeEventListener(listener) }
+        }
+    }
+
+    private inline fun <reified T> typeToken(): Type {
+        return object : TypeToken<T>() {}.type
     }
 }

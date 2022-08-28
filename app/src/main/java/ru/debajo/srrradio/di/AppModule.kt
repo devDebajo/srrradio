@@ -19,6 +19,7 @@ import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
+import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
@@ -254,6 +255,15 @@ internal interface AppModule : AppApi {
             )
 
         override val authManager: AuthManager by lazy { AuthManager(firebaseAuth, dependencies.context) }
+
+        override val appStateSnapshotExtractor: AppStateSnapshotExtractor
+            get() = AppStateSnapshotExtractor(
+                dynamicIconPreference = DynamicIconPreference(dependencies.sharedPreferences),
+                themePreference = SrrradioThemePreference(dependencies.sharedPreferences),
+                sendingErrorsPreference = SendingErrorsPreference(dependencies.sharedPreferences),
+                collectionUseCase = dependencies.tracksCollectionUseCase,
+                favoriteStationsStateUseCase = dependencies.favoriteStationsStateUseCase,
+            )
 
         override val stationsListViewModel: StationsListViewModel
             get() = provideStationsListViewModel(

@@ -6,6 +6,7 @@ import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
+import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
 import ru.debajo.srrradio.ui.host.collection.CollectionViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
@@ -32,5 +33,7 @@ internal interface AppApi : ModuleApi {
     val mediaSessionController: MediaSessionController
     val sleepTimer: SleepTimer
     val sendingErrorsManager: SendingErrorsManager
+
     val authManager: AuthManager
+    val appStateSnapshotExtractor: AppStateSnapshotExtractor
 }

@@ -1,16 +1,14 @@
 package ru.debajo.srrradio.data.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 internal data class RemoteDbTrackCollectionItem(
-    @SerialName("name")
+    @SerializedName("name")
     val name: String? = null,
 
-    @SerialName("stationId")
+    @SerializedName("stationId")
     val stationId: String? = null,
 
-    @SerialName("stationName")
+    @SerializedName("stationName")
     val stationName: String? = null,
 )

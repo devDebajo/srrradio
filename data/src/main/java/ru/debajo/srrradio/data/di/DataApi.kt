@@ -10,6 +10,7 @@ import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
+import ru.debajo.srrradio.domain.repository.SyncRepository
 import ru.debajo.srrradio.domain.repository.TracksCollectionRepository
 
 interface DataApi : ModuleApi {
@@ -22,6 +23,7 @@ interface DataApi : ModuleApi {
     val userStationUseCase: UserStationUseCase
     val parseM3uUseCase: ParseM3uUseCase
     val tracksCollectionRepository: TracksCollectionRepository
+    val syncRepository: SyncRepository
 }
 
 internal interface DataApiInternal : DataApi {

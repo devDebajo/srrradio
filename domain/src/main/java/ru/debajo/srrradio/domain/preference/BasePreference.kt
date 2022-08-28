@@ -51,7 +51,9 @@ abstract class BasePreference<T : Any?>(
     private fun getPersistedTimestamp(): DateTime {
         val key = getTimestampKey()
         return if (key in sharedPreferences) {
-            sharedPreferences.getString(key, null)!!.let { DateTime.parse(it) }
+            runCatching {
+                sharedPreferences.getString(key, null)!!.let { DateTime.parse(it) }
+            }.getOrElse { DateTime(0) }
         } else {
             DateTime(0)
         }

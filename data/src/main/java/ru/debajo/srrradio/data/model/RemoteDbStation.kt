@@ -1,25 +1,23 @@
 package ru.debajo.srrradio.data.model
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.google.gson.annotations.SerializedName
 
-@Serializable
 internal data class RemoteDbStation(
-    @SerialName("id")
+    @SerializedName("id")
     val id: String? = null,
 
-    @SerialName("name")
+    @SerializedName("name")
     val name: String? = null,
 
-    @SerialName("stream")
+    @SerializedName("stream")
     val stream: String? = null,
 
-    @SerialName("image")
+    @SerializedName("image")
     val image: String? = null,
 
-    @SerialName("lat")
+    @SerializedName("lat")
     val latitude: Double? = null,
 
-    @SerialName("lon")
+    @SerializedName("lon")
     val longitude: Double? = null,
 )

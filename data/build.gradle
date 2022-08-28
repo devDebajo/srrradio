@@ -2,6 +2,17 @@ apply from: '../gradle/android_module.gradle'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 
+android {
+    defaultConfig {
+        Properties properties = new Properties()
+        if (project.rootProject.file("local.properties").canRead()) {
+            properties.load(project.rootProject.file("local.properties").newDataInputStream())
+        }
+
+        buildConfigField "String", "REALTIME_DB_PATH", properties.getProperty("firebase.db.path", "")
+    }
+}
+
 dependencies {
     implementation project(":common")
     implementation project(":common-di")
@@ -14,6 +25,7 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlin_serialization_version"
     implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$kotlin_serialization_converter_version"
     implementation "com.github.bjoernpetersen:m3u-parser:$m3u_parser_version"
+    implementation "com.google.code.gson:gson:$gson_version"
 
     implementation "androidx.room:room-ktx:$room_version"
     implementation "androidx.room:room-runtime:$room_version"
