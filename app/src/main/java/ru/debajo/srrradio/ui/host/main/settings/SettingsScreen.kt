@@ -148,7 +148,10 @@ private fun SettingsList(bottomPadding: Dp) {
         ) {
             when (state.authStatus) {
                 SettingsAuthStatus.LOGGED_IN -> {
-                    SettingsText(text = stringResource(R.string.settings_sync)) {
+                    SettingsText(
+                        text = stringResource(R.string.settings_sync),
+                        loadingIndicator = state.synchronization
+                    ) {
                         viewModel.sync()
                     }
 

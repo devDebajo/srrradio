@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.auth.AuthState
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.sync.AppSynchronizer
@@ -115,13 +116,22 @@ internal class SettingsViewModel(
     }
 
     fun sync() {
+        if (stateMutable.value.synchronization) {
+            return
+        }
         viewModelScope.launch(IO) {
-            appSynchronizer.sync()
+            updateState {
+                copy(synchronization = true)
+            }
+            runCatchingNonCancellation { appSynchronizer.sync() }
             updateState {
                 copy(
                     autoSendErrors = sendingErrorsManager.isEnabled,
                     dynamicIcon = appIconManager.dynamicIcon
                 )
+            }
+            updateState {
+                copy(synchronization = false)
             }
         }
     }

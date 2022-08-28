@@ -6,4 +6,5 @@ internal data class SettingsState(
     val autoSendErrors: Boolean = false,
     val dynamicIcon: Boolean = false,
     val authStatus: SettingsAuthStatus = SettingsAuthStatus.LOGGED_OUT,
+    val synchronization: Boolean = false,
 )

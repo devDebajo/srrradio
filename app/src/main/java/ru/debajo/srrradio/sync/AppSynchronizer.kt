@@ -11,11 +11,15 @@ internal class AppSynchronizer(
 ) {
     suspend fun sync() {
         val userId = authManager.currentUser?.uid ?: return
-        val actualSnapshot = syncUseCase.load(userId) ?: return
+        val actualSnapshot = syncUseCase.load(userId)
         val localSnapshot = appStateSnapshotExtractor.extract()
-        val mergedSnapshot = appStateSnapshotMerger.merge(localSnapshot, actualSnapshot)
-        appStateSnapshotExtractor.applyNewSnapshot(mergedSnapshot)
-        syncUseCase.save(userId, mergedSnapshot)
+        if (actualSnapshot != null) {
+            val mergedSnapshot = appStateSnapshotMerger.merge(localSnapshot, actualSnapshot)
+            appStateSnapshotExtractor.applyNewSnapshot(mergedSnapshot)
+            syncUseCase.save(userId, mergedSnapshot)
+        } else {
+            syncUseCase.save(userId, localSnapshot)
+        }
     }
 
     suspend fun deleteSyncData() {
