@@ -67,6 +67,14 @@ internal class SettingsViewModel(
                 }
             }
         }
+
+        viewModelScope.launch(IO) {
+            appSynchronizer.observeLastSyncDate().collect {
+                updateState {
+                    copy(lastSyncDate = it)
+                }
+            }
+        }
     }
 
     fun onAutoSendErrorsClick() {

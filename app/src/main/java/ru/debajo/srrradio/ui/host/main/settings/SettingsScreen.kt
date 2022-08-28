@@ -150,7 +150,8 @@ private fun SettingsList(bottomPadding: Dp) {
                 SettingsAuthStatus.LOGGED_IN -> {
                     SettingsText(
                         text = stringResource(R.string.settings_sync),
-                        loadingIndicator = state.synchronization
+                        loadingIndicator = state.synchronization,
+                        subtitle = state.lastSyncDate?.toString(),
                     ) {
                         viewModel.sync()
                     }
@@ -205,6 +206,7 @@ private fun Context.openUrl(url: String) {
 @Composable
 fun SettingsText(
     text: String,
+    subtitle: String? = null,
     alpha: Float = 1f,
     fontSize: TextUnit = 14.sp,
     fontWeight: FontWeight? = null,
@@ -220,17 +222,23 @@ fun SettingsText(
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .optionalClickable(onClick)
                 .padding(vertical = 18.dp, horizontal = 16.dp)
                 .weight(1f)
                 .alpha(alphaAnimatable.value),
-            text = text,
-            fontSize = fontSize,
-            fontWeight = fontWeight,
-        )
+        ) {
+            Text(
+                text = text,
+                fontSize = fontSize,
+                fontWeight = fontWeight,
+            )
+            if (subtitle != null) {
+                Text(subtitle)
+            }
+        }
 
         if (loadingIndicator) {
             CircularProgressIndicator(

@@ -10,6 +10,11 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.asDeferred
 import org.joda.time.DateTime
@@ -29,6 +34,14 @@ internal class SyncRepositoryImpl(
     private val gson: Gson,
     private val database: FirebaseDatabase,
 ) : SyncRepository {
+
+    override fun observeLastSyncDate(userId: String): Flow<DateTime?> {
+        return database.getReference("${createPath(userId)}/createTimestamp").observe()
+            .map {
+                runCatching { (it.value as? String)?.let { DateTime.parse(it) } }
+                    .getOrNull()
+            }
+    }
 
     override suspend fun save(userId: String, snapshot: AppStateSnapshot) {
         val toSave = snapshot.toRemote()
@@ -135,11 +148,29 @@ internal class SyncRepositoryImpl(
                 override fun onCancelled(error: DatabaseError) {
                     continuation.resumeWithException(error.toException())
                 }
-
             }
             addListenerForSingleValueEvent(listener)
 
             continuation.invokeOnCancellation { removeEventListener(listener) }
+        }
+    }
+
+    @Suppress("ThrowableNotThrown")
+    private fun DatabaseReference.observe(): Flow<DataSnapshot> {
+        return callbackFlow {
+            val listener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    trySend(snapshot)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    cancel("The firebase error", error.toException())
+                }
+            }
+
+            addValueEventListener(listener)
+
+            awaitClose { removeEventListener(listener) }
         }
     }
 
