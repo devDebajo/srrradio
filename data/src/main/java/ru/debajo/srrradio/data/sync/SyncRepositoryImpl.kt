@@ -16,7 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.tasks.asDeferred
+import kotlinx.coroutines.tasks.await
 import org.joda.time.DateTime
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.data.BuildConfig
@@ -51,7 +51,7 @@ internal class SyncRepositoryImpl(
     }
 
     override suspend fun delete(userId: String) {
-        database.getReference(createPath(userId)).removeValue().asDeferred().await()
+        database.getReference(createPath(userId)).removeValue().await()
     }
 
     override suspend fun load(userId: String): AppStateSnapshot? {
@@ -66,7 +66,7 @@ internal class SyncRepositoryImpl(
     }
 
     private suspend fun DatabaseReference.setValueAsync(value: Any?) {
-        setValue(value).asDeferred().await()
+        setValue(value).await()
     }
 
     private fun createPath(userId: String): String {

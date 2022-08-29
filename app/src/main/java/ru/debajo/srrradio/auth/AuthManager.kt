@@ -13,7 +13,9 @@ import java.lang.ref.WeakReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.tasks.asDeferred
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import ru.debajo.srrradio.ProcessScopeImmediate
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 
@@ -38,6 +40,12 @@ class AuthManager(
         firebaseAuth.addAuthStateListener {
             authStateMutable.value = getCurrentAuthState(it.currentUser)
         }
+
+        ProcessScopeImmediate.launch {
+            runCatchingNonCancellation {
+                firebaseAuth.currentUser?.reload()?.await()
+            }
+        }
     }
 
     fun setActivity(activity: ComponentActivity) {
@@ -58,7 +66,7 @@ class AuthManager(
 
 
         val beginSignInResult = runCatchingNonCancellation {
-            oneTapClient.beginSignIn(signInRequest).asDeferred().await()
+            oneTapClient.beginSignIn(signInRequest).await()
         }.getOrNull()
 
         if (beginSignInResult == null) {
@@ -78,11 +86,12 @@ class AuthManager(
 
     fun signOut() {
         firebaseAuth.signOut()
+        authStateMutable.value = getCurrentAuthState(null)
     }
 
     suspend fun deleteUser() {
         runCatchingNonCancellation {
-            currentUser?.delete()?.asDeferred()?.await()
+            currentUser?.delete()?.await()
             signOut()
         }
     }
@@ -106,7 +115,7 @@ class AuthManager(
     private suspend fun firebaseAuthWithGoogle(idToken: String): AuthState {
         val authResult = runCatchingNonCancellation {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
-            firebaseAuth.signInWithCredential(credential).asDeferred().await()
+            firebaseAuth.signInWithCredential(credential).await()
         }.getOrNull()
 
         return getCurrentAuthState(authResult?.user)

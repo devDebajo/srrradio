@@ -205,7 +205,7 @@ private fun SettingsList(bottomPadding: Dp) {
 }
 
 private fun DateTime.format(): String {
-    return toString("dd:MM:yy, HH:ss")
+    return toString("dd:MM:yy, HH:mm")
 }
 
 private fun Context.openUrl(url: String) {
