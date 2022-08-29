@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.bumptech.glide.Glide
@@ -12,12 +13,25 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import kotlin.math.roundToInt
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.debajo.srrradio.R
 
 class StationCoverLoader(private val context: Context) {
 
-    val emptyBitmap: Bitmap by lazy { createEmptyBitmap(context) }
+    private val emptyBitmapMutable: MutableStateFlow<Bitmap> = MutableStateFlow(createEmptyBitmap(context))
+    val emptyBitmap: StateFlow<Bitmap> = emptyBitmapMutable.asStateFlow()
+
+    private var bgColor: Int = Color.parseColor("#6c586b")
+    private var iconColor: Int = Color.parseColor("#907A88")
+
+    fun setColors(@ColorInt bgColor: Int, @ColorInt iconColor: Int) {
+        this.bgColor = bgColor
+        this.iconColor = iconColor
+        emptyBitmapMutable.value = createEmptyBitmap(context)
+    }
 
     suspend fun loadImage(url: String?): Bitmap? {
         url ?: return null
@@ -53,7 +67,7 @@ class StationCoverLoader(private val context: Context) {
     private fun createEmptyBitmap(context: Context): Bitmap {
         val bitmap = Bitmap.createBitmap(400, 400, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.parseColor("#6c586b"))
+        canvas.drawColor(bgColor)
         val drawable = ContextCompat.getDrawable(context, R.drawable.ic_radio)!!
         val drawableWidth = bitmap.width * 0.45f
         val drawableHeight = bitmap.height * 0.45f
@@ -66,7 +80,7 @@ class StationCoverLoader(private val context: Context) {
             (drawableTop + drawableHeight).roundToInt()
         )
         val wrappedDrawable = DrawableCompat.wrap(drawable)
-        DrawableCompat.setTint(wrappedDrawable, Color.parseColor("#907A88"))
+        DrawableCompat.setTint(wrappedDrawable, iconColor)
         wrappedDrawable.draw(canvas)
         return bitmap
     }

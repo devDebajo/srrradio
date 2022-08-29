@@ -20,6 +20,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -31,6 +32,7 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.auth.AuthManager
@@ -130,6 +132,18 @@ class HostActivity : ComponentActivity() {
         LaunchedEffect(Unit) {
             snapshotFlow { navigationColor.value }.collect {
                 window.navigationBarColor = it.colorInt
+            }
+        }
+
+        val stationCoverLoader = remember { AppApiHolder.get().stationCoverLoader }
+        val secondaryColor = rememberUpdatedState(MaterialTheme.colorScheme.secondary)
+        val onSecondaryColor = rememberUpdatedState(MaterialTheme.colorScheme.onSecondary)
+        LaunchedEffect(Unit) {
+            combine(
+                snapshotFlow { secondaryColor.value },
+                snapshotFlow { onSecondaryColor.value }
+            ) { a, b -> a to b }.collect { (secondary, onSecondary) ->
+                stationCoverLoader.setColors(secondary.colorInt, onSecondary.colorInt)
             }
         }
     }

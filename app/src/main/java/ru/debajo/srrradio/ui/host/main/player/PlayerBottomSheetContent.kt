@@ -64,6 +64,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -515,6 +516,7 @@ fun StationCover(
         val maxHeight = maxHeight
         GlideImage(
             modifier = modifier.background(MaterialTheme.colorScheme.secondary),
+            contentScale = ContentScale.Fit,
             imageModel = url,
             loading = { CircularProgressIndicator(Modifier.align(Alignment.Center)) },
             failure = {
@@ -525,7 +527,7 @@ fun StationCover(
                             .align(Alignment.Center),
                         contentDescription = stringResource(R.string.accessibility_station_poster),
                         painter = painterResource(R.drawable.ic_radio),
-                        tint = Color(0xff907A88),
+                        tint = MaterialTheme.colorScheme.onSecondary,
                     )
                 }
             }

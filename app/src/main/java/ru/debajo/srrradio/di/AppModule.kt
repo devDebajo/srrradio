@@ -241,6 +241,10 @@ internal interface AppModule : AppApi {
 
     class Impl(private val dependencies: AppDependencies) : AppModule {
 
+        override val stationCoverLoader: StationCoverLoader by lazy {
+            provideStationCoverLoader(dependencies.context)
+        }
+
         private val searchStationsCommandProcessor: SearchStationsCommandProcessor
             get() = provideSearchStationsCommandProcessor(dependencies.searchStationsUseCase)
 
@@ -367,7 +371,7 @@ internal interface AppModule : AppApi {
             MediaController(
                 player = provideRadioPlayer(
                     context = dependencies.context,
-                    stationCoverLoader = provideStationCoverLoader(dependencies.context),
+                    stationCoverLoader = stationCoverLoader,
                     mediaSessionController = mediaSessionController,
                 ),
                 lastStationUseCase = dependencies.lastStationUseCase,

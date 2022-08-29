@@ -34,6 +34,8 @@ class RadioPlayer(
 
     private val coroutineScope: LifecycleCoroutineScope by ProcessScope
 
+    private val emptyStationCoverListener: EmptyStationCoverListener = EmptyStationCoverListener(mediaSessionController, stationCoverLoader)
+
     private val audioAttributes: AudioAttributes by lazy {
         AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
@@ -128,12 +130,14 @@ class RadioPlayer(
             isActive = true
             station = playerState.station.name
             playingTitle = playerState.playingTitle
-            cover = stationCoverLoader.emptyBitmap
+            cover = stationCoverLoader.emptyBitmap.value
             playbackState = playerState.playbackState
         }
+        emptyStationCoverListener.listen = true
 
         val bitmap = stationCoverLoader.loadImage(playerState.station.image)
         if (bitmap != null) {
+            emptyStationCoverListener.listen = false
             mediaSessionController.update {
                 cover = bitmap
             }
@@ -260,5 +264,27 @@ class RadioPlayer(
 
     private companion object {
         val DEACTIVATE_DELAY_MS = TimeUnit.MINUTES.toMillis(3)
+    }
+}
+
+private class EmptyStationCoverListener(
+    private val mediaSessionController: MediaSessionController,
+    private val stationCoverLoader: StationCoverLoader,
+) {
+
+    private val coroutineScope: LifecycleCoroutineScope by ProcessScope
+
+    var listen: Boolean = false
+
+    init {
+        coroutineScope.launch(Main) {
+            stationCoverLoader.emptyBitmap.collect { emptyBitmap ->
+                if (listen) {
+                    mediaSessionController.update {
+                        cover = emptyBitmap
+                    }
+                }
+            }
+        }
     }
 }
