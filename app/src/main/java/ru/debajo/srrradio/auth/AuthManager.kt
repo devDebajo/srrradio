@@ -92,8 +92,8 @@ class AuthManager(
     suspend fun deleteUser() {
         runCatchingNonCancellation {
             currentUser?.delete()?.await()
-            signOut()
         }
+        signOut()
     }
 
     suspend fun onActivityResult(requestCode: Int, data: Intent?) {

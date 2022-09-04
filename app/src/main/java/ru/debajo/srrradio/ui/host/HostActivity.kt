@@ -37,6 +37,9 @@ import kotlinx.coroutines.launch
 import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.common.alert.AlertDialogHost
+import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
+import ru.debajo.srrradio.ui.common.alert.rememberAlertDialogState
 import ru.debajo.srrradio.ui.ext.AndroidColor
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.rememberFixedHapticFeedback
@@ -98,9 +101,10 @@ class HostActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         val snackbarLauncher = rememberSnackbarLauncher()
-
+                        val alertDialogState = rememberAlertDialogState()
                         CompositionLocalProvider(
-                            LocalSnackbarLauncher provides snackbarLauncher
+                            LocalSnackbarLauncher provides snackbarLauncher,
+                            LocalAlertDialogState provides alertDialogState,
                         ) {
                             Box {
                                 HostScreen()
@@ -110,6 +114,7 @@ class HostActivity : ComponentActivity() {
                                         .systemBarsPadding()
                                         .align(Alignment.BottomCenter),
                                 )
+                                AlertDialogHost(state = alertDialogState)
                             }
                         }
                     }

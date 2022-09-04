@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.flowOf
 import org.joda.time.DateTime
 import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.auth.AuthState
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.SyncUseCase
 import timber.log.Timber
 
@@ -43,6 +44,8 @@ internal class AppSynchronizer(
 
     suspend fun deleteSyncData() {
         val userId = authManager.currentUser?.uid ?: return
-        syncUseCase.delete(userId)
+        runCatchingNonCancellation {
+            syncUseCase.delete(userId)
+        }
     }
 }

@@ -53,6 +53,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.joda.time.DateTime
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
 import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
@@ -164,9 +165,15 @@ private fun SettingsList(bottomPadding: Dp) {
                     SettingsText(text = stringResource(R.string.settings_logout)) {
                         viewModel.logout()
                     }
-
+                    val alertDialogState = LocalAlertDialogState.current
                     SettingsText(text = stringResource(R.string.settings_delete_account)) {
-                        viewModel.deleteUser()
+                        alertDialogState.alert(
+                            title = R.string.settings_delete_account,
+                            content = R.string.settings_delete_account_confirmation,
+                            confirm = R.string.settings_delete_account_confirmation_sure,
+                            dismiss = R.string.settings_delete_account_confirmation_cancel,
+                            onConfirm = { viewModel.deleteUser() }
+                        )
                     }
                 }
                 SettingsAuthStatus.LOGGED_OUT -> {
@@ -275,6 +282,7 @@ fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
         Text(
             text = text,
             fontSize = 14.sp,
+            lineHeight = 16.sp,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f)
