@@ -18,6 +18,7 @@ import kotlinx.coroutines.tasks.await
 import ru.debajo.srrradio.ProcessScopeImmediate
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.common.utils.toTimber
 
 class AuthManager(
     private val firebaseAuth: FirebaseAuth,
@@ -67,7 +68,7 @@ class AuthManager(
 
         val beginSignInResult = runCatchingNonCancellation {
             oneTapClient.beginSignIn(signInRequest).await()
-        }.getOrNull()
+        }.toTimber().getOrNull()
 
         if (beginSignInResult == null) {
             authStateMutable.value = getCurrentAuthState(firebaseAuth.currentUser)
@@ -92,7 +93,7 @@ class AuthManager(
     suspend fun deleteUser() {
         runCatchingNonCancellation {
             currentUser?.delete()?.await()
-        }
+        }.toTimber()
         signOut()
     }
 
@@ -103,7 +104,9 @@ class AuthManager(
         val idToken = runCatchingNonCancellation {
             val signInCredential = oneTapClient.getSignInCredentialFromIntent(data)
             signInCredential.googleIdToken
-        }.getOrNull()
+        }
+            .toTimber()
+            .getOrNull()
 
         if (idToken == null) {
             authStateMutable.value = getCurrentAuthState(firebaseAuth.currentUser)
@@ -116,7 +119,9 @@ class AuthManager(
         val authResult = runCatchingNonCancellation {
             val credential = GoogleAuthProvider.getCredential(idToken, null)
             firebaseAuth.signInWithCredential(credential).await()
-        }.getOrNull()
+        }
+            .toTimber()
+            .getOrNull()
 
         return getCurrentAuthState(authResult?.user)
     }
