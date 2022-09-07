@@ -3,7 +3,7 @@ package ru.debajo.srrradio.common
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-interface LazySuspend<T> {
+fun interface LazySuspend<T> {
     suspend fun get(): T
 }
 

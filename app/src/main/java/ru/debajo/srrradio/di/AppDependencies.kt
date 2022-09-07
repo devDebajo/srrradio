@@ -15,6 +15,7 @@ import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserLocationUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
 import ru.debajo.srrradio.domain.di.DomainApiHolder
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 
 internal interface AppDependencies {
 
@@ -30,6 +31,7 @@ internal interface AppDependencies {
     val parseM3uUseCase: ParseM3uUseCase
     val syncUseCase: SyncUseCase
     val sharedPreferences: SharedPreferences
+    val configRepository: ConfigRepository
 
     object Impl : AppDependencies {
 
@@ -64,9 +66,12 @@ internal interface AppDependencies {
             get() = DomainApiHolder.get().parseM3uUseCase
 
         override val syncUseCase: SyncUseCase
-            get() =DomainApiHolder.get().syncUseCase
+            get() = DomainApiHolder.get().syncUseCase
 
         override val sharedPreferences: SharedPreferences
             get() = DataApiHolder.get().sharedPreferences
+
+        override val configRepository: ConfigRepository
+            get() = DataApiHolder.get().configRepository
     }
 }

@@ -4,11 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.room.Room
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import ru.debajo.srrradio.data.BuildConfig
+import ru.debajo.srrradio.data.config.ConfigRepositoryImpl
 import ru.debajo.srrradio.data.db.MIGRATIONS
 import ru.debajo.srrradio.data.db.SrrradioDatabase
 import ru.debajo.srrradio.data.db.dao.DbFavoriteStationDao
@@ -32,6 +34,7 @@ import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.domain.ParseM3uUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 import ru.debajo.srrradio.domain.repository.SyncRepository
@@ -108,6 +111,10 @@ internal interface DataModule : DataApiInternal {
             FirebaseDatabase.getInstance(BuildConfig.REALTIME_DB_PATH)
         }
 
+        private val firebaseRemoteConfig: FirebaseRemoteConfig by lazy {
+            FirebaseRemoteConfig.getInstance()
+        }
+
         private val dbPlaylistDao: DbPlaylistDao by lazy { database.dbPlaylistDao() }
 
         private val dbStationDao: DbStationDao by lazy { database.dbStationDao() }
@@ -153,5 +160,9 @@ internal interface DataModule : DataApiInternal {
 
         override val syncRepository: SyncRepository
             get() = SyncRepositoryImpl(gson = gson, database = firebaseDatabase)
+
+        override val configRepository: ConfigRepository by lazy {
+            ConfigRepositoryImpl(firebaseRemoteConfig)
+        }
     }
 }

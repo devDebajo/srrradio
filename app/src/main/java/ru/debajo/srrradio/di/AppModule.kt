@@ -11,6 +11,7 @@ import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.TracksCollectionUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
 import ru.debajo.srrradio.domain.UserStationUseCase
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.icon.AppIconManager
@@ -204,6 +205,7 @@ internal interface AppModule : AppApi {
         appIconManager: AppIconManager,
         authManager: AuthManager,
         appSynchronizer: AppSynchronizer,
+        configRepository: ConfigRepository,
     ): SettingsViewModel = SettingsViewModel(
         themeManager = themeManager,
         loadM3uInteractor = loadM3uInteractor,
@@ -211,6 +213,7 @@ internal interface AppModule : AppApi {
         appIconManager = appIconManager,
         authManager = authManager,
         appSynchronizer = appSynchronizer,
+        configRepository = configRepository,
     )
 
     fun provideSrrradioThemeManager(
@@ -335,7 +338,8 @@ internal interface AppModule : AppApi {
                 sendingErrorsManager = sendingErrorsManager,
                 appIconManager = appIconManager,
                 authManager = authManager,
-                appSynchronizer = appSynchronizer
+                appSynchronizer = appSynchronizer,
+                configRepository = dependencies.configRepository
             )
 
         override val collectionViewModel: CollectionViewModel

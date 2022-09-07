@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.sync.AppSynchronizer
@@ -28,6 +29,7 @@ internal class SettingsViewModel(
     private val appIconManager: AppIconManager,
     private val authManager: AuthManager,
     private val appSynchronizer: AppSynchronizer,
+    private val configRepository: ConfigRepository,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -56,14 +58,21 @@ internal class SettingsViewModel(
         }
 
         viewModelScope.launch {
-            authManager.authState.collect { authState ->
+            val config = configRepository.provide()
+            if (config.authEnabled) {
+                authManager.authState.collect { authState ->
+                    updateState {
+                        copy(
+                            authStatus = when (authState) {
+                                is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
+                                is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
+                            }
+                        )
+                    }
+                }
+            } else {
                 updateState {
-                    copy(
-                        authStatus = when (authState) {
-                            is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
-                            is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
-                        }
-                    )
+                    copy(authStatus = SettingsAuthStatus.NOT_SUPPORTED)
                 }
             }
         }

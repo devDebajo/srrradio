@@ -1,3 +1,7 @@
 package ru.debajo.srrradio.ui.host.main.settings.model
 
-enum class SettingsAuthStatus { LOGGED_IN, LOGGED_OUT }
+enum class SettingsAuthStatus {
+    NOT_SUPPORTED,
+    LOGGED_IN,
+    LOGGED_OUT
+}

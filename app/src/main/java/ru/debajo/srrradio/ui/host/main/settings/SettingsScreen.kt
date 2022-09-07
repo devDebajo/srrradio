@@ -153,33 +153,35 @@ private fun SettingsList(bottomPadding: Dp) {
             }
         }
 
-        Spacer(Modifier.height(12.dp))
-
-        SettingsGroup(
-            title = stringResource(R.string.settings_group_account),
-            state = calculateGroupState(expandedGroup, 2),
-            onHeaderClick = { expandedGroup.onGroupHeaderClick(2) }
-        ) {
-            when (state.authStatus) {
-                SettingsAuthStatus.LOGGED_IN -> {
-                    SettingsText(text = stringResource(R.string.settings_logout)) {
-                        viewModel.logout()
+        if (state.authStatus != SettingsAuthStatus.NOT_SUPPORTED) {
+            Spacer(Modifier.height(12.dp))
+            SettingsGroup(
+                title = stringResource(R.string.settings_group_account),
+                state = calculateGroupState(expandedGroup, 2),
+                onHeaderClick = { expandedGroup.onGroupHeaderClick(2) }
+            ) {
+                when (state.authStatus) {
+                    SettingsAuthStatus.LOGGED_IN -> {
+                        SettingsText(text = stringResource(R.string.settings_logout)) {
+                            viewModel.logout()
+                        }
+                        val alertDialogState = LocalAlertDialogState.current
+                        SettingsText(text = stringResource(R.string.settings_delete_account)) {
+                            alertDialogState.alert(
+                                title = R.string.settings_delete_account,
+                                content = R.string.settings_delete_account_confirmation,
+                                confirm = R.string.settings_delete_account_confirmation_sure,
+                                dismiss = R.string.settings_delete_account_confirmation_cancel,
+                                onConfirm = { viewModel.deleteUser() }
+                            )
+                        }
                     }
-                    val alertDialogState = LocalAlertDialogState.current
-                    SettingsText(text = stringResource(R.string.settings_delete_account)) {
-                        alertDialogState.alert(
-                            title = R.string.settings_delete_account,
-                            content = R.string.settings_delete_account_confirmation,
-                            confirm = R.string.settings_delete_account_confirmation_sure,
-                            dismiss = R.string.settings_delete_account_confirmation_cancel,
-                            onConfirm = { viewModel.deleteUser() }
-                        )
+                    SettingsAuthStatus.LOGGED_OUT -> {
+                        SettingsText(text = stringResource(R.string.settings_login)) {
+                            viewModel.login()
+                        }
                     }
-                }
-                SettingsAuthStatus.LOGGED_OUT -> {
-                    SettingsText(text = stringResource(R.string.settings_login)) {
-                        viewModel.login()
-                    }
+                    SettingsAuthStatus.NOT_SUPPORTED -> Unit
                 }
             }
         }

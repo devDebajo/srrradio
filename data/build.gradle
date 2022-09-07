@@ -32,6 +32,7 @@ dependencies {
 
     implementation platform("com.google.firebase:firebase-bom:$firebase_bom_version")
     implementation 'com.google.firebase:firebase-database'
+    implementation "com.google.firebase:firebase-config"
 
     kapt "androidx.room:room-compiler:$room_version"
 }
