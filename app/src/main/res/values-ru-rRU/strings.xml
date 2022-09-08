@@ -73,6 +73,7 @@
     <string name="theme_sand">Песок</string>
     <string name="theme_light">Светлая</string>
     <string name="theme_dynamic">Динамическая</string>
+    <string name="theme_graphite">Графит</string>
 
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>

@@ -39,6 +39,7 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.host.main.list.model.DefaultPlaylists
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
@@ -95,6 +96,7 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
                     shape = RoundedCornerShape(12.dp),
                     maxLines = 1,
                     singleLine = true,
+                    colors = outlinedTextFieldColors(),
                     trailingIcon = {
                         if (state.searchQuery.isNotEmpty()) {
                             IconButton(onClick = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged("")) }) {

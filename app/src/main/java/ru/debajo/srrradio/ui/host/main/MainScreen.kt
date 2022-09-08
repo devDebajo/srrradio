@@ -40,6 +40,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -72,7 +73,7 @@ import ru.debajo.srrradio.ui.navigation.NavTree
 
 val bottomSheetBgColor: Color
     @Composable
-    get() = MaterialTheme.colorScheme.onSecondary
+    get() = Color.Black.copy(alpha = 0.1f).compositeOver(MaterialTheme.colorScheme.onSecondary)
 
 @Composable
 fun MainScreen() {
@@ -174,6 +175,7 @@ private fun RadioScreenContent() {
         BottomSheetScaffold(
             scaffoldState = scaffoldState,
             backgroundColor = MaterialTheme.colorScheme.surface,
+            sheetElevation = 1.dp,
             sheetBackgroundColor = bottomSheetBgColor,
             sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
             content = {

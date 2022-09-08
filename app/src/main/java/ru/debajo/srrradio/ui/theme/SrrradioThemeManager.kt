@@ -40,6 +40,7 @@ internal class SrrradioThemeManager(
             BlueTheme,
             SandTheme,
             MintTheme,
+            GraphiteTheme,
         )
     }
 }

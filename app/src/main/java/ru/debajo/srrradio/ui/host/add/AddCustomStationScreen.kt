@@ -37,6 +37,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationEvent
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationNews
 import ru.debajo.srrradio.ui.navigation.NavTree
@@ -80,6 +81,7 @@ fun AddCustomStationScreen() {
             shape = RoundedCornerShape(12.dp),
             label = { Text(stringResource(R.string.stream_url)) },
             value = state.stream,
+            colors = outlinedTextFieldColors(),
             keyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.Sentences),
             onValueChange = { viewModel.onEvent(AddCustomStationEvent.OnStreamChanged(it)) },
             trailingIcon = {
@@ -101,6 +103,7 @@ fun AddCustomStationScreen() {
             shape = RoundedCornerShape(12.dp),
             label = { Text(stringResource(R.string.stream_name)) },
             value = state.name,
+            colors = outlinedTextFieldColors(),
             keyboardOptions = KeyboardOptions.Default.copy(capitalization = KeyboardCapitalization.Sentences),
             enabled = state.canEditName,
             onValueChange = { viewModel.onEvent(AddCustomStationEvent.OnNameChanged(it)) },

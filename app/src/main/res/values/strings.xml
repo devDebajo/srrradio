@@ -80,6 +80,7 @@
     <string name="theme_sand">Sand</string>
     <string name="theme_light">Light</string>
     <string name="theme_dynamic">Dynamic</string>
+    <string name="theme_graphite">Graphite</string>
 
     <string name="accessibility_next_station">Next station</string>
     <string name="accessibility_previous_station">Previous station</string>
