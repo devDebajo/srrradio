@@ -23,6 +23,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -85,6 +86,7 @@ fun StationItem(
                 onFavoriteClick(station, !favorite)
             }) {
                 Icon(
+                    tint = favorite.select(MaterialTheme.colorScheme.primary, LocalContentColor.current),
                     imageVector = favorite.select(Icons.Rounded.Favorite, Icons.Rounded.FavoriteBorder),
                     contentDescription = favorite.stringResource(R.string.accessibility_remove_favorite, R.string.accessibility_add_favorite)
                 )

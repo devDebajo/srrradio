@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +36,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationEvent
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationNews
@@ -66,12 +66,7 @@ fun AddCustomStationScreen() {
             .padding(horizontal = 16.dp)
             .systemBarsPadding(),
     ) {
-        Text(
-            text = stringResource(R.string.add_stream_title),
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold,
-            fontSize = 36.sp,
-        )
+        AppScreenTitle(text = stringResource(R.string.add_stream_title))
         Spacer(Modifier.height(10.dp))
 
         OutlinedTextField(

@@ -21,6 +21,7 @@ import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -262,7 +263,8 @@ private fun Navigation(
             floatingActionButton = {
                 val navTree = NavTree.current
                 FloatingActionButton(
-                    onClick = { navTree.addCustomStation.navigate() }
+                    onClick = { navTree.addCustomStation.navigate() },
+                    containerColor = FloatingActionButtonDefaults.containerColor,
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,

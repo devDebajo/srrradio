@@ -53,6 +53,7 @@ import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import org.joda.time.DateTime
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
 import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
@@ -66,12 +67,7 @@ fun SettingsScreen(bottomPadding: Dp) {
             .padding(horizontal = 16.dp),
         state = rememberCollapsingToolbarScaffoldState(),
         toolbar = {
-            Text(
-                text = stringResource(R.string.settings_title),
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 36.sp,
-            )
+            AppScreenTitle(text = stringResource(R.string.settings_title))
             Spacer(Modifier.height(8.dp))
         },
         body = { SettingsList(bottomPadding) },

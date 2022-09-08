@@ -16,12 +16,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +40,7 @@ import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.host.main.list.model.DefaultPlaylists
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
@@ -68,18 +70,20 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    AppScreenTitle(
                         text = stringResource(R.string.radio_title),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 36.sp,
                     )
 
                     if (!state.collectionEmpty) {
                         Spacer(modifier = Modifier.weight(1f))
 
                         val navTree = NavTree.current
-                        OutlinedButton(onClick = { navTree.collection.navigate() }) {
+                        TextButton(
+                            onClick = { navTree.collection.navigate() },
+                            colors = ButtonDefaults.textButtonColors(
+                                MaterialTheme.colorScheme.onSecondary
+                            ),
+                        ) {
                             Text(
                                 text = stringResource(R.string.track_collection),
                                 fontSize = 12.sp
@@ -234,6 +238,6 @@ private fun TextElement(modifier: Modifier = Modifier, element: UiTextElement) {
         text = element.text,
         fontSize = 11.sp,
         fontWeight = FontWeight.Medium,
-        color = MaterialTheme.colorScheme.primary,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 }

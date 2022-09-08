@@ -32,15 +32,15 @@ internal class SrrradioThemeManager(
     companion object {
         val Local: ProvidableCompositionLocal<SrrradioThemeManager> = staticCompositionLocalOf { TODO() }
 
-        private val defaultTheme: AppTheme = SynthTheme
+        private val defaultTheme: AppTheme = GraphiteTheme
 
         private val themes: List<AppTheme> = listOfNotNull(
+            GraphiteTheme,
             DynamicThemeOptional,
             SynthTheme,
             BlueTheme,
             SandTheme,
             MintTheme,
-            GraphiteTheme,
         )
     }
 }

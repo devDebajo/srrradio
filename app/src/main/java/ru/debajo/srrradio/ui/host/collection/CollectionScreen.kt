@@ -20,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +40,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.AppApiHolder
 import ru.debajo.srrradio.ui.common.AppCard
+import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 
@@ -62,13 +62,7 @@ fun <T> ListScreen(
         Column(
             Modifier.padding(horizontal = 16.dp)
         ) {
-            Text(
-                text = title,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 36.sp,
-                lineHeight = 44.sp,
-            )
+            AppScreenTitle(text = title)
             Spacer(modifier = Modifier.height(16.dp))
             Box(modifier = Modifier.fillMaxSize()) {
                 if (items.isEmpty()) {
