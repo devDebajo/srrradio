@@ -46,48 +46,57 @@ import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 import ru.debajo.srrradio.ui.theme.SrrradioThemePreference
 
 val AppModule: Module = module {
-    single { StationCoverLoader(get()) }
-    factory { SearchStationsCommandProcessor(get()) }
     single { FirebaseCrashlytics.getInstance() }
     single { FirebaseAuth.getInstance() }
+    
+    single { AuthManager(get(), get()) }
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
-    single { MediaSessionController(get()) }
+    factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get()) }
+
+    single { StationCoverLoader(get()) }
     single { SleepTimer() }
     factory { SendingErrorsManager(get(), get()) }
-    single { AuthManager(get(), get()) }
-    factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get()) }
-    factory { StationsListViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    factory { SleepTimerViewModel(get()) }
-    factory { AddCustomStationViewModel(get(), get(), get(), get()) }
-    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    factory { CollectionViewModel(get()) }
-    factory { DefaultPlaylistViewModel(get(), get(), get(), get(), get(), get()) }
-    factory { SendingErrorsPreference(get()) }
-    factory { DynamicIconPreference(get()) }
-    factory { SrrradioThemePreference(get()) }
+
     single { SrrradioThemeManager(get()) }
     factory { AppIconManager(get(), get()) }
+
+    single { MediaSessionController(get()) }
     single {
         val player = RadioPlayer(get(), get(), get())
         MediaController(player, get(), get(), get())
     }
+
+    factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    factory { SleepTimerViewModel(get()) }
+    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    factory { AddCustomStationViewModel(get(), get(), get(), get()) }
+    factory { CollectionViewModel(get()) }
+    factory { DefaultPlaylistViewModel(get(), get(), get(), get(), get(), get()) }
+    factory { StationsListViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+
+    factory { SendingErrorsPreference(get()) }
+    factory { SrrradioThemePreference(get()) }
+    factory { DynamicIconPreference(get()) }
+
+    factory { UserStationsInteractor(get(), get()) }
+    factory { LoadM3uInteractor(get(), get(), get(), get()) }
+
     factory { StationsListReduktor(get()) }
     factory { StationsListCommandResultReduktor(get()) }
-    factory { MediaStateListenerCommandProcessor(get()) }
+    factory { PlayerBottomSheetReduktor(get()) }
+    factory { PlayerBottomSheetCommandResultReduktor() }
+    factory { AddCustomStationReduktor() }
+    factory { AddCustomStationCommandResultReduktor() }
+
+    factory { SearchStationsCommandProcessor(get()) }
     factory { NewPlayCommandProcessor(get()) }
+    factory { MediaStateListenerCommandProcessor(get()) }
     factory { ListenFavoriteStationsProcessor(get()) }
     factory { AddFavoriteStationProcessor(get()) }
     factory { TrackCollectionListener(get()) }
     factory { PopularStationsProcessor(get()) }
-    factory { PlayerBottomSheetReduktor(get()) }
-    factory { PlayerBottomSheetCommandResultReduktor() }
     factory { SleepTimerListenerProcessor(get()) }
     factory { AddTrackToCollectionProcessor(get()) }
-    factory { LoadM3uInteractor(get(), get(), get(), get()) }
-    factory { AddCustomStationReduktor() }
-    factory { AddCustomStationCommandResultReduktor() }
     factory { SaveCustomStationProcessor(get()) }
-    factory { UserStationsInteractor(get(), get()) }
 }
