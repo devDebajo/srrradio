@@ -16,6 +16,8 @@ import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
 import ru.debajo.srrradio.sync.AppStateSnapshotMerger
 import ru.debajo.srrradio.sync.AppSynchronizer
+import ru.debajo.srrradio.ui.common.SnowFallPreference
+import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
@@ -48,7 +50,7 @@ import ru.debajo.srrradio.ui.theme.SrrradioThemePreference
 val AppModule: Module = module {
     single { FirebaseCrashlytics.getInstance() }
     single { FirebaseAuth.getInstance() }
-    
+
     single { AuthManager(get(), get()) }
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
@@ -69,7 +71,7 @@ val AppModule: Module = module {
 
     factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { SleepTimerViewModel(get()) }
-    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { AddCustomStationViewModel(get(), get(), get(), get()) }
     factory { CollectionViewModel(get()) }
     factory { DefaultPlaylistViewModel(get(), get(), get(), get(), get(), get()) }
@@ -78,7 +80,9 @@ val AppModule: Module = module {
     factory { SendingErrorsPreference(get()) }
     factory { SrrradioThemePreference(get()) }
     factory { DynamicIconPreference(get()) }
+    factory { SnowFallPreference(get()) }
 
+    single { SnowFallUseCase(get(), get()) }
     factory { UserStationsInteractor(get(), get()) }
     factory { LoadM3uInteractor(get(), get(), get(), get()) }
 

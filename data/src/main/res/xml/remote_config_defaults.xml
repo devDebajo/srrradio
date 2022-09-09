@@ -4,4 +4,8 @@
         <key>auth_enabled</key>
         <value>false</value>
     </entry>
+    <entry>
+        <key>snow_fall_toggle_visible</key>
+        <value>false</value>
+    </entry>
 </defaults>

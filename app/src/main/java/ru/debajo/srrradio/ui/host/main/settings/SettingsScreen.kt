@@ -189,6 +189,14 @@ private fun SettingsList(bottomPadding: Dp) {
             state = calculateGroupState(expandedGroup, 3),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(3) }
         ) {
+            if (state.snowFallToggleVisible) {
+                SettingsSwitch(
+                    text = "Снегопад",
+                    checked = state.snowFallEnabled,
+                    onClick = { viewModel.snowFallClick() }
+                )
+            }
+
             val context = LocalContext.current
             SettingsText(
                 text = stringResource(R.string.settings_privacy_policy)

@@ -16,6 +16,7 @@ import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.sync.AppSynchronizer
+import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
@@ -30,6 +31,7 @@ internal class SettingsViewModel(
     private val authManager: AuthManager,
     private val appSynchronizer: AppSynchronizer,
     private val configRepository: ConfigRepository,
+    private val snowFallUseCase: SnowFallUseCase,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -41,6 +43,17 @@ internal class SettingsViewModel(
                 autoSendErrors = sendingErrorsManager.isEnabled,
                 dynamicIcon = appIconManager.dynamicIcon
             )
+        }
+
+        viewModelScope.launch {
+            snowFallUseCase.enabled.collect { snowFallEnabled ->
+                updateState {
+                    copy(
+                        snowFallToggleVisible = snowFallUseCase.toggleAvailable(),
+                        snowFallEnabled = snowFallEnabled,
+                    )
+                }
+            }
         }
 
         viewModelScope.launch {
@@ -105,6 +118,15 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             loadM3uInteractor.load(filePath)
             updateState { copy(loadingM3u = false) }
+        }
+    }
+
+    fun snowFallClick() {
+        viewModelScope.launch {
+            updateState {
+                snowFallUseCase.updateEnabled(!snowFallEnabled)
+                copy(snowFallEnabled = !snowFallEnabled)
+            }
         }
     }
 

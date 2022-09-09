@@ -10,4 +10,6 @@ internal data class SettingsState(
     val authStatus: SettingsAuthStatus = SettingsAuthStatus.NOT_SUPPORTED,
     val synchronization: Boolean = false,
     val lastSyncDate: DateTime? = null,
+    val snowFallToggleVisible: Boolean = false,
+    val snowFallEnabled: Boolean = false,
 )

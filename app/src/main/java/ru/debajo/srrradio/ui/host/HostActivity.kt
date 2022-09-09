@@ -12,6 +12,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
@@ -20,6 +22,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
@@ -27,6 +31,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
@@ -39,6 +44,8 @@ import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.di.diViewModels
 import ru.debajo.srrradio.media.StationCoverLoader
+import ru.debajo.srrradio.ui.common.SnowFall
+import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.common.alert.AlertDialogHost
 import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
 import ru.debajo.srrradio.ui.common.alert.rememberAlertDialogState
@@ -67,6 +74,7 @@ class HostActivity : ComponentActivity() {
     private val settingsViewModel: SettingsViewModel by diViewModels()
     private val themeManager: SrrradioThemeManager by inject()
     private val authManager: AuthManager by inject()
+    private val snowFallUseCase: SnowFallUseCase by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -117,6 +125,15 @@ class HostActivity : ComponentActivity() {
                                         .align(Alignment.BottomCenter),
                                 )
                                 AlertDialogHost(state = alertDialogState)
+
+                                val snowFallEnabled by snowFallUseCase.enabled.collectAsState()
+                                if (snowFallEnabled) {
+                                    SnowFall(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(200.dp)
+                                    )
+                                }
                             }
                         }
                     }
