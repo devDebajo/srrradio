@@ -15,9 +15,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.di.diViewModel
 import ru.debajo.srrradio.ui.host.collection.ListScreen
 import ru.debajo.srrradio.ui.host.main.list.StationItem
 
@@ -36,7 +35,7 @@ fun DefaultPlaylistScreen(
     listBottomPadding: Dp,
     strategy: DefaultPlaylistScreenStrategy,
 ) {
-    val viewModel = viewModel { AppApiHolder.get().defaultPlaylistViewModel }
+    val viewModel: DefaultPlaylistViewModel = diViewModel()
 
     LaunchedEffect(viewModel, strategy) {
         viewModel.load(strategy)

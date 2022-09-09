@@ -4,11 +4,11 @@ import androidx.room.TypeConverter
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.Json
-import ru.debajo.srrradio.data.di.DataApiHolder
+import ru.debajo.srrradio.common.utils.inject
 
 internal class SrrradioDbConverter {
 
-    private val json: Json by lazy { DataApiHolder.internalApi.json }
+    private val json: Json by inject()
 
     @TypeConverter
     fun toString(input: List<String>): String {

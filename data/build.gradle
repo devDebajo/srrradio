@@ -15,7 +15,6 @@ android {
 
 dependencies {
     implementation project(":common")
-    implementation project(":common-di")
     implementation project(":domain")
 
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttp_version"

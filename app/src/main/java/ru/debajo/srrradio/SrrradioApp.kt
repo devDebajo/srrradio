@@ -1,6 +1,7 @@
 package ru.debajo.srrradio
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.LifecycleOwner
@@ -8,13 +9,14 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
-import ru.debajo.srrradio.common.di.CommonApiHolder
-import ru.debajo.srrradio.common.di.CommonDependencies
-import ru.debajo.srrradio.data.di.DataApiHolder
-import ru.debajo.srrradio.data.di.DomainDependenciesImpl
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
+import ru.debajo.srrradio.common.di.CommonModule
+import ru.debajo.srrradio.common.utils.inject
+import ru.debajo.srrradio.data.di.DataModule
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
-import ru.debajo.srrradio.di.AppApiHolder
-import ru.debajo.srrradio.domain.di.DomainApiHolder
+import ru.debajo.srrradio.di.AppModule
+import ru.debajo.srrradio.domain.di.DomainModule
 import ru.debajo.srrradio.error.OnlyErrorsTree
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
@@ -24,11 +26,11 @@ import timber.log.Timber
 
 class SrrradioApp : Application() {
 
-    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
-    private val apiHostDiscovery: ApiHostDiscovery by lazy { DataApiHolder.get().apiHostDiscovery }
-    private val sendingErrorsManager: SendingErrorsManager by lazy { AppApiHolder.get().sendingErrorsManager }
-    private val appIconManager: AppIconManager by lazy { AppApiHolder.get().appIconManager }
-    private val themeManager: SrrradioThemeManager by lazy { AppApiHolder.get().themeManager }
+    private val mediaController: MediaController by inject()
+    private val apiHostDiscovery: ApiHostDiscovery by inject()
+    private val sendingErrorsManager: SendingErrorsManager by inject()
+    private val appIconManager: AppIconManager by inject()
+    private val themeManager: SrrradioThemeManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -75,8 +77,17 @@ class SrrradioApp : Application() {
     }
 
     private fun initDi() {
-        CommonApiHolder.init(CommonDependencies.Impl(this))
-        DomainApiHolder.init(DomainDependenciesImpl)
+        startKoin {
+            modules(
+                module {
+                    single<Context> { this@SrrradioApp }
+                },
+                AppModule,
+                CommonModule,
+                DataModule,
+                DomainModule,
+            )
+        }
     }
 }
 

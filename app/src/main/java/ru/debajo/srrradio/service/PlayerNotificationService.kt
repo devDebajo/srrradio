@@ -26,7 +26,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.ProcessScope
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.model.MediaState
@@ -35,12 +35,12 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 
 class PlayerNotificationService : Service(), CoroutineScope {
 
-    private val notificationManager: NotificationManager by lazy { getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager }
-    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
-    private val mediaSessionController: MediaSessionController by lazy { AppApiHolder.get().mediaSessionController }
+    private val notificationManager: NotificationManager by inject()
+    private val mediaController: MediaController by inject()
+    private val mediaSessionController: MediaSessionController by inject()
     private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
     private val coroutineScope: CoroutineScope by ProcessScope
-    private val sleepTimer: SleepTimer by lazy { AppApiHolder.get().sleepTimer }
+    private val sleepTimer: SleepTimer by inject()
 
     override val coroutineContext: CoroutineContext = coroutineScope.coroutineContext + SupervisorJob()
 

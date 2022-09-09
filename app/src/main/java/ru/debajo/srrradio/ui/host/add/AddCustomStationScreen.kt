@@ -31,11 +31,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.di.diViewModel
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationEvent
@@ -44,7 +43,7 @@ import ru.debajo.srrradio.ui.navigation.NavTree
 
 @Composable
 fun AddCustomStationScreen() {
-    val viewModel: AddCustomStationViewModel = viewModel { AppApiHolder.get().addCustomStationViewModel }
+    val viewModel: AddCustomStationViewModel = diViewModel()
     val state by viewModel.state.collectAsState()
     val navTree = NavTree.current
     val focusRequester = remember { FocusRequester() }

@@ -18,6 +18,5 @@ dependencyResolutionManagement {
 rootProject.name = "Srrradio"
 include ':app'
 include ':data'
-include ':common-di'
 include ':common'
 include ':domain'

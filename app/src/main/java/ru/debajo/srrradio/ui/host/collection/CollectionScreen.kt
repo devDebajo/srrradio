@@ -36,9 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.di.diViewModel
 import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.ext.longPress
@@ -88,7 +87,7 @@ fun <T> ListScreen(
 
 @Composable
 fun CollectionScreen() {
-    val viewModel = viewModel { AppApiHolder.get().collectionViewModel }
+    val viewModel: CollectionViewModel = diViewModel()
     LaunchedEffect(viewModel) { viewModel.load() }
 
     val state by viewModel.state.collectAsState()

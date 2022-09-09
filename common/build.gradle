@@ -1,10 +1,10 @@
 apply from: '../gradle/android_module.gradle'
 
 dependencies {
-    implementation project(":common-di")
     api "androidx.core:core-ktx:$core_ktx_version"
     api "joda-time:joda-time:$joda_time_version"
     api "com.jakewharton.timber:timber:$timber_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
+    api "io.insert-koin:koin-core:3.2.0"
 }

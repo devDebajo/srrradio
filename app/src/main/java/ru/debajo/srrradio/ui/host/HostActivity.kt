@@ -34,9 +34,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import ru.debajo.reduktor.lazyViewModel
 import ru.debajo.srrradio.auth.AuthManager
-import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.common.utils.getFromDi
+import ru.debajo.srrradio.common.utils.inject
+import ru.debajo.srrradio.di.diViewModels
+import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.ui.common.alert.AlertDialogHost
 import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
 import ru.debajo.srrradio.ui.common.alert.rememberAlertDialogState
@@ -59,12 +61,12 @@ import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
 class HostActivity : ComponentActivity() {
 
-    private val stationsListViewModel: StationsListViewModel by lazyViewModel { AppApiHolder.get().stationsListViewModel }
-    private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by lazyViewModel { AppApiHolder.get().playerBottomSheetViewModel }
-    private val sleepTimerViewModel: SleepTimerViewModel by lazyViewModel { AppApiHolder.get().sleepTimerViewModel }
-    private val settingsViewModel: SettingsViewModel by lazyViewModel { AppApiHolder.get().settingsViewModel }
-    private val themeManager: SrrradioThemeManager by lazy { AppApiHolder.get().themeManager }
-    private val authManager: AuthManager by lazy { AppApiHolder.get().authManager }
+    private val stationsListViewModel: StationsListViewModel by diViewModels()
+    private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by diViewModels()
+    private val sleepTimerViewModel: SleepTimerViewModel by diViewModels()
+    private val settingsViewModel: SettingsViewModel by diViewModels()
+    private val themeManager: SrrradioThemeManager by inject()
+    private val authManager: AuthManager by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -140,7 +142,7 @@ class HostActivity : ComponentActivity() {
             }
         }
 
-        val stationCoverLoader = remember { AppApiHolder.get().stationCoverLoader }
+        val stationCoverLoader: StationCoverLoader = remember { getFromDi() }
         val secondaryColor = rememberUpdatedState(MaterialTheme.colorScheme.secondary)
         val onSecondaryColor = rememberUpdatedState(MaterialTheme.colorScheme.onSecondary)
         LaunchedEffect(Unit) {

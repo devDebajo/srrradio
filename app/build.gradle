@@ -84,7 +84,6 @@ dependencies {
     implementation project(":data")
     implementation project(":domain")
     implementation project(":common")
-    implementation project(":common-di")
 
     implementation "androidx.core:core-ktx:$core_ktx_version"
     implementation "androidx.core:core-splashscreen:$splash_version"

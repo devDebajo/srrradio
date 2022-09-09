@@ -4,12 +4,12 @@ import android.content.Intent
 import android.view.KeyEvent
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
-import ru.debajo.srrradio.di.AppApiHolder
+import ru.debajo.srrradio.common.utils.inject
 
 class MediaButtonHandler : MediaSessionConnector.MediaButtonEventHandler {
 
-    private val mediaController: MediaController by lazy { AppApiHolder.get().mediaController }
-    private val mediaSessionController: MediaSessionController by lazy { AppApiHolder.get().mediaSessionController }
+    private val mediaController: MediaController by inject()
+    private val mediaSessionController: MediaSessionController by inject()
 
     override fun onMediaButtonEvent(player: Player, mediaButtonEvent: Intent): Boolean {
         if (mediaButtonEvent.action != Intent.ACTION_MEDIA_BUTTON) {
