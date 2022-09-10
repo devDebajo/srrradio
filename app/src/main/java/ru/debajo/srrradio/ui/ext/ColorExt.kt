@@ -2,7 +2,9 @@ package ru.debajo.srrradio.ui.ext
 
 import android.os.Build
 import androidx.annotation.ColorInt
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 
 typealias AndroidColor = android.graphics.Color
 
@@ -18,3 +20,13 @@ val Color.colorInt: Int
                     (blue * 255.0f + 0.5f).toInt()
         }
     }
+
+@Composable
+fun Color.darken(factor: Float): Color {
+    return Color.Black.copy(alpha = factor).compositeOver(this)
+}
+
+@Composable
+fun Color.lighten(factor: Float): Color {
+    return Color.White.copy(alpha = factor).compositeOver(this)
+}

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +17,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.AppTextButton
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.ext.textHandleMove
 
@@ -49,12 +49,11 @@ fun SleepTimerBottomSheet() {
             steps = state.steps,
         )
         Spacer(Modifier.height(20.dp))
-        OutlinedButton(
+        AppTextButton(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = { viewModel.onButtonClick() }
-        ) {
-            Text(state.buttonIsSave.stringResource(R.string.sleep_timer_save, R.string.sleep_timer_cancel))
-        }
+            text = state.buttonIsSave.stringResource(R.string.sleep_timer_save, R.string.sleep_timer_cancel),
+            onClick = { viewModel.onButtonClick() },
+        )
     }
 }
 

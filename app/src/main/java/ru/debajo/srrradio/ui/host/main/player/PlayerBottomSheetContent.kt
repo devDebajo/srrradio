@@ -90,10 +90,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.ext.colorInt
+import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.ext.toDp
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
+import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.PlayPauseButton
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
@@ -243,7 +245,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                     modifier = Modifier.width(itemSize),
                     text = station.name,
                     textSize = 18.sp,
-                    textColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    textColor = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
@@ -254,7 +256,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 .align(Alignment.CenterHorizontally),
             text = state.title ?: stringResource(R.string.no_track),
             textSize = 13.sp,
-            textColor = MaterialTheme.colorScheme.onPrimaryContainer
+            textColor = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(20.dp))
         Row(
@@ -335,13 +337,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 }
                 viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
             }
-            Box(
-                modifier = Modifier
-                    .padding(vertical = 5.dp)
-                    .width(1.dp)
-                    .fillMaxHeight()
-                    .background(MaterialTheme.colorScheme.onSecondaryContainer)
-            )
+            ActionButtonDivider()
             ActionButton(
                 icon = state.sleepTimerScheduled.select(Icons.Rounded.Timelapse, Icons.Rounded.Timer),
                 contentDescription = stringResource(R.string.accessibility_sleep_timer),
@@ -351,13 +347,7 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
             }
 
             if (!state.title.isNullOrEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .padding(vertical = 5.dp)
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(MaterialTheme.colorScheme.onSecondaryContainer)
-                )
+                ActionButtonDivider()
                 ActionButton(
                     icon = Icons.Rounded.Save,
                     contentDescription = stringResource(R.string.accessibility_save_track),
@@ -372,6 +362,17 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
 }
 
 @Composable
+private fun ActionButtonDivider() {
+    Box(
+        modifier = Modifier
+            .padding(vertical = 5.dp)
+            .width(1.dp)
+            .fillMaxHeight()
+            .background(MaterialTheme.colorScheme.outlineVariant)
+    )
+}
+
+@Composable
 private fun ActionsBar(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
@@ -379,7 +380,7 @@ private fun ActionsBar(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .background(bottomSheetBgColor.darken(0.3f))
     ) {
         content()
     }

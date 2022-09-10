@@ -15,7 +15,9 @@ internal val GraphiteTheme: AppTheme = AppTheme(
 
 private val GraphiteColors: ColorScheme = darkColorScheme(
     primary = Color(0xFF808AE3),
+    onPrimary = Color(0xFF292E49),
     surface = Color(0xFF212121),
+    secondary = Color(0xFFB2B9F3),
     onSecondary = Color(0xFF2D2D2D),
     primaryContainer = Color(0xFF4C528C),
 )

@@ -16,13 +16,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,6 +39,7 @@ import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.common.AppScreenTitle
+import ru.debajo.srrradio.ui.common.AppTextButton
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.host.main.list.model.DefaultPlaylists
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
@@ -78,17 +77,10 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
                         Spacer(modifier = Modifier.weight(1f))
 
                         val navTree = NavTree.current
-                        TextButton(
+                        AppTextButton(
                             onClick = { navTree.collection.navigate() },
-                            colors = ButtonDefaults.textButtonColors(
-                                MaterialTheme.colorScheme.onSecondary
-                            ),
-                        ) {
-                            Text(
-                                text = stringResource(R.string.track_collection),
-                                fontSize = 12.sp
-                            )
-                        }
+                            text = stringResource(R.string.track_collection),
+                        )
                     }
                 }
                 Spacer(Modifier.height(10.dp))

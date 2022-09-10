@@ -1,12 +1,14 @@
 package ru.debajo.srrradio.ui.common
 
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -14,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
@@ -80,4 +83,25 @@ fun AppScreenTitle(
         fontSize = 36.sp,
         lineHeight = 44.sp,
     )
+}
+
+@Composable
+fun AppTextButton(
+    modifier: Modifier = Modifier,
+    text: String,
+    fontSize: TextUnit = 12.sp,
+    onClick: () -> Unit,
+) {
+    TextButton(
+        modifier = modifier,
+        onClick = onClick,
+        colors = ButtonDefaults.textButtonColors(
+            MaterialTheme.colorScheme.onSecondary
+        ),
+    ) {
+        Text(
+            text = text,
+            fontSize = fontSize,
+        )
+    }
 }

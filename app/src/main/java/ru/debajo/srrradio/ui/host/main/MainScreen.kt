@@ -41,7 +41,6 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -58,6 +57,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.toDp
 import ru.debajo.srrradio.ui.host.main.list.StationsList
@@ -74,7 +74,7 @@ import ru.debajo.srrradio.ui.navigation.NavTree
 
 val bottomSheetBgColor: Color
     @Composable
-    get() = Color.Black.copy(alpha = 0.1f).compositeOver(MaterialTheme.colorScheme.onSecondary)
+    get() = MaterialTheme.colorScheme.onSecondary.darken(0.1f)
 
 @Composable
 fun MainScreen() {
@@ -256,7 +256,7 @@ private fun Navigation(
             Modifier
                 .fillMaxWidth()
                 .height(1.dp)
-                .background(MaterialTheme.colorScheme.secondary)
+                .background(MaterialTheme.colorScheme.outlineVariant)
         )
         BottomAppBar(
             containerColor = bottomSheetBgColor,
