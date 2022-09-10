@@ -24,8 +24,8 @@ class StationCoverLoader(private val context: Context) {
     private val emptyBitmapMutable: MutableStateFlow<Bitmap> = MutableStateFlow(createEmptyBitmap(context))
     val emptyBitmap: StateFlow<Bitmap> = emptyBitmapMutable.asStateFlow()
 
-    private var bgColor: Int = Color.parseColor("#6c586b")
-    private var iconColor: Int = Color.parseColor("#907A88")
+    private var bgColor: Int = Color.WHITE
+    private var iconColor: Int = Color.BLACK
 
     fun setColors(@ColorInt bgColor: Int, @ColorInt iconColor: Int) {
         this.bgColor = bgColor
