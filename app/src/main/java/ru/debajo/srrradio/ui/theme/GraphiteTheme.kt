@@ -10,7 +10,7 @@ internal val GraphiteTheme: AppTheme = AppTheme(
     code = "GraphiteTheme",
     nameRes = R.string.theme_graphite,
     colors = { GraphiteColors },
-    icon = AppIcon.WAVE,
+    icon = AppIcon.GRAPHITE,
 )
 
 private val GraphiteColors: ColorScheme = darkColorScheme(
