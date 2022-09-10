@@ -8,6 +8,8 @@ import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.auth.AuthManager
 import ru.debajo.srrradio.auth.AuthState
@@ -45,55 +47,41 @@ internal class SettingsViewModel(
             )
         }
 
-        viewModelScope.launch {
-            snowFallUseCase.enabled.collect { snowFallEnabled ->
+        viewModelScope.launch(IO) {
+            val config = configRepository.provide()
+
+            combine(
+                snowFallUseCase.enabled,
+                themeManager.currentTheme,
+                appSynchronizer.observeLastSyncDate().onStart { emit(null) },
+                authManager.authState,
+            ) { snowFallEnabled, currentTheme, lastSyncDate, authState ->
+                val themes = themeManager.supportedThemes.map {
+                    SettingsTheme(
+                        theme = it,
+                        selected = it.code == currentTheme.code
+                    )
+                }
+
+                val authStatus = if (config.authEnabled) {
+                    when (authState) {
+                        is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
+                        is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
+                    }
+                } else {
+                    SettingsAuthStatus.NOT_SUPPORTED
+                }
+
+                Quadriple(snowFallEnabled, themes, lastSyncDate, authStatus)
+            }.collect { (snowFallEnabled, themes, lastSyncDate, authStatus) ->
                 updateState {
                     copy(
                         snowFallToggleVisible = snowFallUseCase.toggleAvailable(),
                         snowFallEnabled = snowFallEnabled,
+                        themes = themes,
+                        authStatus = authStatus,
+                        lastSyncDate = lastSyncDate,
                     )
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            themeManager.currentTheme.collect { selected ->
-                val themes = themeManager.supportedThemes.map {
-                    SettingsTheme(
-                        theme = it,
-                        selected = it.code == selected.code
-                    )
-                }
-                updateState {
-                    copy(themes = themes)
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            val config = configRepository.provide()
-            if (config.authEnabled) {
-                authManager.authState.collect { authState ->
-                    updateState {
-                        copy(
-                            authStatus = when (authState) {
-                                is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
-                                is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
-                            }
-                        )
-                    }
-                }
-            } else {
-                updateState {
-                    copy(authStatus = SettingsAuthStatus.NOT_SUPPORTED)
-                }
-            }
-        }
-
-        viewModelScope.launch(IO) {
-            appSynchronizer.observeLastSyncDate().collect {
-                updateState {
-                    copy(lastSyncDate = it)
                 }
             }
         }
@@ -178,6 +166,8 @@ internal class SettingsViewModel(
     private inline fun updateState(block: SettingsState.() -> SettingsState) {
         stateMutable.value = stateMutable.value.block()
     }
+
+    private data class Quadriple<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)
 
     companion object {
         val Local: ProvidableCompositionLocal<SettingsViewModel> = staticCompositionLocalOf { TODO() }
