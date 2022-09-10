@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.activity.ComponentActivity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
+import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
@@ -20,22 +21,45 @@ import ru.debajo.srrradio.R
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.common.utils.toTimber
 
-class AuthManager(
+interface AuthManager {
+    val authState: StateFlow<AuthState>
+
+    val currentUser: FirebaseUser?
+        get() = (authState.value as? AuthState.Authenticated)?.user
+
+    fun setActivity(activity: ComponentActivity)
+
+    suspend fun signIn()
+
+    fun signOut()
+
+    suspend fun deleteUser()
+
+    suspend fun onActivityResult(requestCode: Int, data: Intent?)
+}
+
+object NotSupportedAuthManager : AuthManager {
+    override val authState: StateFlow<AuthState> = MutableStateFlow(AuthState.Unavailable)
+    override fun setActivity(activity: ComponentActivity) = Unit
+    override suspend fun signIn() = Unit
+    override fun signOut() = Unit
+    override suspend fun deleteUser() = Unit
+    override suspend fun onActivityResult(requestCode: Int, data: Intent?) = Unit
+}
+
+class AuthManagerImpl(
     private val firebaseAuth: FirebaseAuth,
     private val context: Context,
-) {
+) : AuthManager {
 
     private var activityRef: WeakReference<Activity>? = null
     private val activity: Activity?
         get() = activityRef?.get()
 
     private val authStateMutable: MutableStateFlow<AuthState> = MutableStateFlow(getCurrentAuthState(firebaseAuth.currentUser))
-    val authState: StateFlow<AuthState> = authStateMutable.asStateFlow()
+    override val authState: StateFlow<AuthState> = authStateMutable.asStateFlow()
 
-    val currentUser: FirebaseUser?
-        get() = (authState.value as? AuthState.Authenticated)?.user
-
-    private val oneTapClient = Identity.getSignInClient(context)
+    private val oneTapClient: SignInClient = Identity.getSignInClient(context)
 
     init {
         firebaseAuth.addAuthStateListener {
@@ -49,11 +73,11 @@ class AuthManager(
         }
     }
 
-    fun setActivity(activity: ComponentActivity) {
+    override fun setActivity(activity: ComponentActivity) {
         activityRef = WeakReference(activity)
     }
 
-    suspend fun signIn() {
+    override suspend fun signIn() {
         val signInRequest = BeginSignInRequest.builder()
             .setGoogleIdTokenRequestOptions(
                 BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
@@ -64,7 +88,6 @@ class AuthManager(
             )
             .setAutoSelectEnabled(false)
             .build()
-
 
         val beginSignInResult = runCatchingNonCancellation {
             oneTapClient.beginSignIn(signInRequest).await()
@@ -85,19 +108,17 @@ class AuthManager(
         )
     }
 
-    fun signOut() {
+    override fun signOut() {
         firebaseAuth.signOut()
         authStateMutable.value = getCurrentAuthState(null)
     }
 
-    suspend fun deleteUser() {
-        runCatchingNonCancellation {
-            currentUser?.delete()?.await()
-        }.toTimber()
+    override suspend fun deleteUser() {
+        runCatchingNonCancellation { currentUser?.delete()?.await() }.toTimber()
         signOut()
     }
 
-    suspend fun onActivityResult(requestCode: Int, data: Intent?) {
+    override suspend fun onActivityResult(requestCode: Int, data: Intent?) {
         if (requestCode != SIGN_IN_REQUEST) {
             return
         }

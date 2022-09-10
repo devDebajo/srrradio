@@ -11,10 +11,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import ru.debajo.srrradio.auth.AuthManager
+import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
-import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.sync.AppSynchronizer
@@ -30,9 +29,8 @@ internal class SettingsViewModel(
     private val loadM3uInteractor: LoadM3uInteractor,
     private val sendingErrorsManager: SendingErrorsManager,
     private val appIconManager: AppIconManager,
-    private val authManager: AuthManager,
+    private val authManagerProvider: AuthManagerProvider,
     private val appSynchronizer: AppSynchronizer,
-    private val configRepository: ConfigRepository,
     private val snowFallUseCase: SnowFallUseCase,
 ) : ViewModel() {
 
@@ -48,13 +46,11 @@ internal class SettingsViewModel(
         }
 
         viewModelScope.launch(IO) {
-            val config = configRepository.provide()
-
             combine(
                 snowFallUseCase.enabled,
                 themeManager.currentTheme,
                 appSynchronizer.observeLastSyncDate().onStart { emit(null) },
-                authManager.authState,
+                authManagerProvider().authState,
             ) { snowFallEnabled, currentTheme, lastSyncDate, authState ->
                 val themes = themeManager.supportedThemes.map {
                     SettingsTheme(
@@ -63,13 +59,10 @@ internal class SettingsViewModel(
                     )
                 }
 
-                val authStatus = if (config.authEnabled) {
-                    when (authState) {
-                        is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
-                        is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
-                    }
-                } else {
-                    SettingsAuthStatus.NOT_SUPPORTED
+                val authStatus = when (authState) {
+                    is AuthState.Anonymous -> SettingsAuthStatus.LOGGED_OUT
+                    is AuthState.Authenticated -> SettingsAuthStatus.LOGGED_IN
+                    is AuthState.Unavailable -> SettingsAuthStatus.NOT_SUPPORTED
                 }
 
                 Quadriple(snowFallEnabled, themes, lastSyncDate, authStatus)
@@ -127,18 +120,20 @@ internal class SettingsViewModel(
 
     fun login() {
         viewModelScope.launch {
-            authManager.signIn()
+            authManagerProvider().signIn()
         }
     }
 
     fun logout() {
-        authManager.signOut()
+        viewModelScope.launch {
+            authManagerProvider().signOut()
+        }
     }
 
     fun deleteUser() {
         viewModelScope.launch {
             appSynchronizer.deleteSyncData()
-            authManager.deleteUser()
+            authManagerProvider().deleteUser()
         }
     }
 

@@ -4,7 +4,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import ru.debajo.srrradio.auth.AuthManager
+import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.icon.AppIconManager
@@ -51,7 +51,7 @@ val AppModule: Module = module {
     single { FirebaseCrashlytics.getInstance() }
     single { FirebaseAuth.getInstance() }
 
-    single { AuthManager(get(), get()) }
+    single { AuthManagerProvider(get(), get(), get()) }
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
     factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get()) }
@@ -71,7 +71,7 @@ val AppModule: Module = module {
 
     factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { SleepTimerViewModel(get()) }
-    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { AddCustomStationViewModel(get(), get(), get(), get()) }
     factory { CollectionViewModel(get()) }
     factory { DefaultPlaylistViewModel(get(), get(), get(), get(), get(), get()) }

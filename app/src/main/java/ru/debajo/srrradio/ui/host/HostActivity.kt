@@ -39,7 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import ru.debajo.srrradio.auth.AuthManager
+import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.di.diViewModels
@@ -73,7 +73,7 @@ class HostActivity : ComponentActivity() {
     private val sleepTimerViewModel: SleepTimerViewModel by diViewModels()
     private val settingsViewModel: SettingsViewModel by diViewModels()
     private val themeManager: SrrradioThemeManager by inject()
-    private val authManager: AuthManager by inject()
+    private val authManagerProvider: AuthManagerProvider by inject()
     private val snowFallUseCase: SnowFallUseCase by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
@@ -85,7 +85,9 @@ class HostActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
-        authManager.setActivity(this)
+        lifecycleScope.launch {
+            authManagerProvider().setActivity(this@HostActivity)
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             window.attributes.layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
         }
@@ -146,7 +148,7 @@ class HostActivity : ComponentActivity() {
         super.onActivityResult(requestCode, resultCode, data)
 
         lifecycleScope.launch {
-            authManager.onActivityResult(requestCode, data)
+            authManagerProvider().onActivityResult(requestCode, data)
         }
     }
 
