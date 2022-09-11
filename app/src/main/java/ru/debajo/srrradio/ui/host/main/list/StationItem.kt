@@ -51,10 +51,11 @@ fun StationItem(
     station: UiStation,
     favorite: Boolean,
     playingState: UiStationPlayingState,
+    onClick: (UiStation, UiStationPlayingState) -> Unit,
     onPlayClick: (UiStation, UiStationPlayingState) -> Unit,
     onFavoriteClick: (UiStation, Boolean) -> Unit,
 ) {
-    AppCard(modifier = modifier) {
+    AppCard(modifier = modifier, onClick = { onClick(station, playingState) }) {
         Row(
             modifier = Modifier
                 .height(HEIGHT)

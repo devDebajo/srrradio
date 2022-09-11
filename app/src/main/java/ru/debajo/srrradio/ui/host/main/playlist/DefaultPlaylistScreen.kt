@@ -73,7 +73,8 @@ fun DefaultPlaylistScreen(
             favorite = item.favorite,
             playingState = item.playingState,
             onPlayClick = { station, playingState -> viewModel.onPlayClick(station, playingState) },
-            onFavoriteClick = { station, isFavorite -> viewModel.onFavoriteClick(station, isFavorite) }
+            onClick = { station, playingState -> viewModel.onPlayClick(station, playingState) },
+            onFavoriteClick = { station, isFavorite -> viewModel.onFavoriteClick(station, isFavorite) },
         )
     }
 }
