@@ -9,6 +9,7 @@ internal class AppStateSnapshotMerger {
             dynamicIcon = local.dynamicIcon mergeWith forSync.dynamicIcon,
             themeCode = local.themeCode mergeWith forSync.themeCode,
             autoSendErrors = local.autoSendErrors mergeWith forSync.autoSendErrors,
+            snowFall = local.snowFall mergeWith forSync.snowFall,
 
             collection = (local.collection + forSync.collection).distinct(),
             favoriteStations = (local.favoriteStations + forSync.favoriteStations).distinctBy { it.id },

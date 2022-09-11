@@ -13,6 +13,9 @@ internal data class RemoteDbAppStateSnapshot(
     @SerializedName("autoSendErrors")
     val autoSendErrors: Boolean = true,
 
+    @SerializedName("snowFall")
+    val snowFall: Boolean = true,
+
     @SerializedName("collection")
     val collection: List<RemoteDbTrackCollectionItem> = emptyList(),
 

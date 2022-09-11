@@ -80,6 +80,7 @@ internal class SyncRepositoryImpl(
             dynamicIcon = dynamicIcon.timestampedAt(timestamp),
             themeCode = themeCode.timestampedAt(timestamp),
             autoSendErrors = autoSendErrors.timestampedAt(timestamp),
+            snowFall = snowFall.timestampedAt(timestamp),
 
             collection = collection.mapNotNull { it.toDomain() },
             favoriteStations = favoriteStations.mapNotNull { it.toDomain() },
@@ -92,6 +93,7 @@ internal class SyncRepositoryImpl(
             dynamicIcon = dynamicIcon.value,
             themeCode = themeCode.value,
             autoSendErrors = autoSendErrors.value,
+            snowFall = snowFall.value,
 
             collection = collection.map { it.toRemote() },
             favoriteStations = favoriteStations.map { it.toRemote() },

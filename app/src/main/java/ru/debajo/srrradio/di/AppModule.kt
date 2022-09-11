@@ -54,7 +54,7 @@ val AppModule: Module = module {
     single { AuthManagerProvider(get(), get(), get()) }
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
-    factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get()) }
+    factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
 
     single { StationCoverLoader(get()) }
     single { SleepTimer() }

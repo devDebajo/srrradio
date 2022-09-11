@@ -191,7 +191,7 @@ private fun SettingsList(bottomPadding: Dp) {
         ) {
             if (state.snowFallToggleVisible) {
                 SettingsSwitch(
-                    text = "Снегопад",
+                    text = stringResource(R.string.settings_snow_fall),
                     checked = state.snowFallEnabled,
                     onClick = { viewModel.snowFallClick() }
                 )
