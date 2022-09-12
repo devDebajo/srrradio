@@ -3,6 +3,7 @@ package ru.debajo.srrradio.rate
 import android.content.ActivityNotFoundException
 import android.content.Context
 import ru.debajo.srrradio.BuildConfig
+import ru.debajo.srrradio.R
 import timber.log.Timber
 
 class RateAppManager(
@@ -67,10 +68,10 @@ class RateAppManager(
         hostActivityCreateCountPreference.set(0)
     }
 
-    enum class RateAction {
-        OPEN_GOOGLE_PLAY,
-        LATER,
-        NEVER
+    enum class RateAction(val res: Int) {
+        OPEN_GOOGLE_PLAY(R.string.rate_app_rate_button),
+        LATER(R.string.rate_app_later_button),
+        NEVER(R.string.rate_app_never_button)
     }
 
     private companion object {

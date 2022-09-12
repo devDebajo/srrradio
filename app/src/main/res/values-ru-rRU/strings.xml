@@ -68,6 +68,9 @@
     <string name="settings_data_source">Источник радиостанций (API)</string>
     <string name="settings_app_version">Версия приложения: %s</string>
 
+    <string name="settings_group_debug">Отладка</string>
+    <string name="settings_clear_rate_app_data">Сбросить оценку приложения</string>
+
     <string name="theme_synthwave">Неон</string>
     <string name="theme_mint">Мята</string>
     <string name="theme_blue">Волна</string>
@@ -75,6 +78,12 @@
     <string name="theme_light">Светлая</string>
     <string name="theme_dynamic">Динамическая</string>
     <string name="theme_graphite">Графит</string>
+
+    <string name="rate_app_title">Оцените приложение</string>
+    <string name="rate_app_message">Eсли вам нравится приложение, оцените его пожалуйста в Google Play</string>
+    <string name="rate_app_rate_button">Оценить</string>
+    <string name="rate_app_later_button">Не сейчас</string>
+    <string name="rate_app_never_button">Не предлагать</string>
 
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>

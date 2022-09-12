@@ -39,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import ru.debajo.srrradio.R
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
@@ -150,17 +151,9 @@ class HostActivity : ComponentActivity() {
     }
 
     private fun handleRateApp() {
-        fun RateAppManager.RateAction.text(): String {
-            return when (this) {
-                RateAppManager.RateAction.OPEN_GOOGLE_PLAY -> "Оценить"
-                RateAppManager.RateAction.LATER -> "Не сейчас"
-                RateAppManager.RateAction.NEVER -> "Не предлагать"
-            }
-        }
-
         rateAppManager.hostActivityCreated()
         val actions = rateAppManager.getRateActions()
-        if (actions.isEmpty()) {
+        if (actions.size != 2) {
             return
         }
 
@@ -168,10 +161,10 @@ class HostActivity : ComponentActivity() {
         val confirmAction = actions[1]
 
         alertDialogState.alert(
-            title = "Оцените приложение",
-            content = "Eсли вам нравится приложение, оцените его пожалуйста в Google Play",
-            confirm = confirmAction.text(),
-            dismiss = cancelAction.text(),
+            title = R.string.rate_app_title,
+            content = R.string.rate_app_message,
+            confirm = confirmAction.res,
+            dismiss = cancelAction.res,
             onDismiss = { rateAppManager.onRateAction(this, cancelAction) },
             onConfirm = { rateAppManager.onRateAction(this, confirmAction) },
         )

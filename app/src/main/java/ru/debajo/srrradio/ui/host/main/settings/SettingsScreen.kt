@@ -234,12 +234,12 @@ private fun DebugGroup(
     viewModel: SettingsViewModel,
 ) {
     SettingsGroup(
-        title = "Debug",
+        title = stringResource(R.string.settings_group_debug),
         state = calculateGroupState(expandedGroup, groupIndex),
         onHeaderClick = { expandedGroup.onGroupHeaderClick(groupIndex) }
     ) {
         SettingsText(
-            text = "Сбросить оценку приложения"
+            text = stringResource(R.string.settings_clear_rate_app_data)
         ) {
             viewModel.resetRateApp()
         }
