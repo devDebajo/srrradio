@@ -44,11 +44,12 @@ import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.di.diViewModels
 import ru.debajo.srrradio.media.StationCoverLoader
+import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.ui.common.SnowFall
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.common.alert.AlertDialogHost
+import ru.debajo.srrradio.ui.common.alert.AlertDialogState
 import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
-import ru.debajo.srrradio.ui.common.alert.rememberAlertDialogState
 import ru.debajo.srrradio.ui.ext.AndroidColor
 import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.rememberFixedHapticFeedback
@@ -75,6 +76,8 @@ class HostActivity : ComponentActivity() {
     private val themeManager: SrrradioThemeManager by inject()
     private val authManagerProvider: AuthManagerProvider by inject()
     private val snowFallUseCase: SnowFallUseCase by inject()
+    private val rateAppManager: RateAppManager by inject()
+    private val alertDialogState: AlertDialogState by lazy { AlertDialogState(this@HostActivity) }
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -85,6 +88,9 @@ class HostActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            handleRateApp()
+        }
         lifecycleScope.launch {
             authManagerProvider().setActivity(this@HostActivity)
         }
@@ -113,7 +119,6 @@ class HostActivity : ComponentActivity() {
                         color = MaterialTheme.colorScheme.background
                     ) {
                         val snackbarLauncher = rememberSnackbarLauncher()
-                        val alertDialogState = rememberAlertDialogState()
                         CompositionLocalProvider(
                             LocalSnackbarLauncher provides snackbarLauncher,
                             LocalAlertDialogState provides alertDialogState,
@@ -142,6 +147,34 @@ class HostActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun handleRateApp() {
+        fun RateAppManager.RateAction.text(): String {
+            return when (this) {
+                RateAppManager.RateAction.OPEN_GOOGLE_PLAY -> "Оценить"
+                RateAppManager.RateAction.LATER -> "Не сейчас"
+                RateAppManager.RateAction.NEVER -> "Не предлагать"
+            }
+        }
+
+        rateAppManager.hostActivityCreated()
+        val actions = rateAppManager.getRateActions()
+        if (actions.isEmpty()) {
+            return
+        }
+
+        val cancelAction = actions[0]
+        val confirmAction = actions[1]
+
+        alertDialogState.alert(
+            title = "Оцените приложение",
+            content = "Eсли вам нравится приложение, оцените его пожалуйста в Google Play",
+            confirm = confirmAction.text(),
+            dismiss = cancelAction.text(),
+            onDismiss = { rateAppManager.onRateAction(this, cancelAction) },
+            onConfirm = { rateAppManager.onRateAction(this, confirmAction) },
+        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -13,6 +13,10 @@ import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
+import ru.debajo.srrradio.rate.GoogleServicesUtils
+import ru.debajo.srrradio.rate.HostActivityCreateCountPreference
+import ru.debajo.srrradio.rate.RateAppManager
+import ru.debajo.srrradio.rate.RateAppStatePreference
 import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
 import ru.debajo.srrradio.sync.AppStateSnapshotMerger
 import ru.debajo.srrradio.sync.AppSynchronizer
@@ -51,7 +55,7 @@ val AppModule: Module = module {
     single { FirebaseCrashlytics.getInstance() }
     single { FirebaseAuth.getInstance() }
 
-    single { AuthManagerProvider(get(), get(), get()) }
+    single { AuthManagerProvider(get(), get(), get(), get()) }
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
     factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
@@ -63,6 +67,8 @@ val AppModule: Module = module {
     single { SrrradioThemeManager(get()) }
     factory { AppIconManager(get(), get()) }
 
+    single { RateAppManager(get(), get(), get()) }
+    single { GoogleServicesUtils(get()) }
     single { MediaSessionController(get()) }
     single {
         val player = RadioPlayer(get(), get(), get())
@@ -81,6 +87,8 @@ val AppModule: Module = module {
     factory { SrrradioThemePreference(get()) }
     factory { DynamicIconPreference(get()) }
     factory { SnowFallPreference(get()) }
+    factory { RateAppStatePreference(get()) }
+    factory { HostActivityCreateCountPreference(get()) }
 
     single { SnowFallUseCase(get(), get()) }
     factory { UserStationsInteractor(get(), get()) }

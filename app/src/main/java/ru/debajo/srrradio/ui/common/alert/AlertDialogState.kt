@@ -24,11 +24,29 @@ class AlertDialogState(private val context: Context) {
         onDismiss: () -> Unit = {},
         onConfirm: () -> Unit,
     ) {
-        this.content = Content(
+        alert(
             title = context.getString(title),
             content = context.getString(content),
-            confirmButton = context.getString(confirm),
-            dismissButton = context.getString(dismiss),
+            confirm = context.getString(confirm),
+            dismiss = context.getString(dismiss),
+            onDismiss = onDismiss,
+            onConfirm = onConfirm,
+        )
+    }
+
+    fun alert(
+        title: String,
+        content: String,
+        confirm: String,
+        dismiss: String,
+        onDismiss: () -> Unit = {},
+        onConfirm: () -> Unit,
+    ) {
+        this.content = Content(
+            title = title,
+            content = content,
+            confirmButton = confirm,
+            dismissButton = dismiss,
             onDismiss = onDismiss,
             onConfirm = onConfirm,
         )
