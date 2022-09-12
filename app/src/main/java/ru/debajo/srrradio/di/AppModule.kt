@@ -77,7 +77,7 @@ val AppModule: Module = module {
 
     factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }
     factory { SleepTimerViewModel(get()) }
-    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
     factory { AddCustomStationViewModel(get(), get(), get(), get()) }
     factory { CollectionViewModel(get()) }
     factory { DefaultPlaylistViewModel(get(), get(), get(), get(), get(), get()) }

@@ -2,6 +2,7 @@ package ru.debajo.srrradio.rate
 
 import android.content.ActivityNotFoundException
 import android.content.Context
+import ru.debajo.srrradio.BuildConfig
 import timber.log.Timber
 
 class RateAppManager(
@@ -56,6 +57,14 @@ class RateAppManager(
             RateAction.LATER -> rateAppStatePreference.set(RateAppState.LATER)
             RateAction.NEVER -> rateAppStatePreference.set(RateAppState.NEVER)
         }
+    }
+
+    fun resetForDebug() {
+        if (!BuildConfig.DEBUG) {
+            return
+        }
+        rateAppStatePreference.set(RateAppState.NOT_RATED)
+        hostActivityCreateCountPreference.set(0)
     }
 
     enum class RateAction {

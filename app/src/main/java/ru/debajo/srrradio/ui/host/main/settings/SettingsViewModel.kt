@@ -16,6 +16,7 @@ import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
+import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.sync.AppSynchronizer
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
@@ -32,6 +33,7 @@ internal class SettingsViewModel(
     private val authManagerProvider: AuthManagerProvider,
     private val appSynchronizer: AppSynchronizer,
     private val snowFallUseCase: SnowFallUseCase,
+    private val rateAppManager: RateAppManager,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -156,6 +158,10 @@ internal class SettingsViewModel(
                 copy(synchronization = false)
             }
         }
+    }
+
+    fun resetRateApp() {
+        rateAppManager.resetForDebug()
     }
 
     private inline fun updateState(block: SettingsState.() -> SettingsState) {

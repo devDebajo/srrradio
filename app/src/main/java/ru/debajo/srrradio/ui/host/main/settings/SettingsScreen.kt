@@ -214,6 +214,35 @@ private fun SettingsList(bottomPadding: Dp) {
                 text = stringResource(R.string.settings_app_version, BuildConfig.VERSION_NAME)
             )
         }
+
+        if (BuildConfig.DEBUG) {
+            Spacer(Modifier.height(12.dp))
+            DebugGroup(
+                expandedGroup = expandedGroup,
+                groupIndex = 4,
+                viewModel = viewModel,
+            )
+        }
+    }
+}
+
+@Composable
+@Suppress("SameParameterValue")
+private fun DebugGroup(
+    expandedGroup: MutableState<Int>,
+    groupIndex: Int,
+    viewModel: SettingsViewModel,
+) {
+    SettingsGroup(
+        title = "Debug",
+        state = calculateGroupState(expandedGroup, groupIndex),
+        onHeaderClick = { expandedGroup.onGroupHeaderClick(groupIndex) }
+    ) {
+        SettingsText(
+            text = "Сбросить оценку приложения"
+        ) {
+            viewModel.resetRateApp()
+        }
     }
 }
 
