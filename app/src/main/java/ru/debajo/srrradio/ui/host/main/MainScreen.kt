@@ -232,6 +232,8 @@ private fun RadioScreenContent() {
             sheetContent = {
                 if (showBottomSheet) {
                     PlayerBottomSheetContent(scaffoldState = scaffoldState)
+                } else {
+                    Box(Modifier.fillMaxWidth())
                 }
             },
         )
