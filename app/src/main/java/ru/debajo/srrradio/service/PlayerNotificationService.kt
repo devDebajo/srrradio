@@ -136,44 +136,58 @@ class PlayerNotificationService : Service(), CoroutineScope {
                 HostActivity.createIntent(this)
                     .toPending(this, 0, PendingIntentType.ACTIVITY)
             )
-            .apply {
-                if (mediaState.hasPreviousStation) {
-                    addAction(
-                        R.drawable.ic_skip_previous,
-                        R.string.accessibility_previous_station,
-                        PlaybackBroadcastReceiver.previousIntent(this@PlayerNotificationService)
-                    )
-                } else {
-                    addAction(R.drawable.ic_skip_previous, R.string.accessibility_previous_station)
-                }
-            }
-            .run {
-                when {
-                    mediaState.playing -> addAction(
-                        R.drawable.ic_pause,
-                        R.string.accessibility_pause,
-                        PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
-                    )
-                    mediaState.paused -> addAction(
-                        R.drawable.ic_play,
-                        R.string.accessibility_play,
-                        PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
-                    )
-                    else -> addAction(R.drawable.ic_play, R.string.accessibility_play)
-                }
-            }
-            .apply {
-                if (mediaState.hasNextStation) {
-                    addAction(
-                        R.drawable.ic_skip_next,
-                        R.string.accessibility_next_station,
-                        PlaybackBroadcastReceiver.nextIntent(this@PlayerNotificationService)
-                    )
-                } else {
-                    addAction(R.drawable.ic_skip_next, R.string.accessibility_next_station)
-                }
-            }
+            .addChangeStationAction(next = false, active = mediaState.hasPreviousStation)
+            .addPlayPauseAction(
+                playing = mediaState.playing,
+                paused = mediaState.paused,
+            )
+            .setAllowSystemGeneratedContextualActions(false)
+            .addChangeStationAction(next = true, active = mediaState.hasNextStation)
             .build()
+    }
+
+    private fun NotificationCompat.Builder.addPlayPauseAction(playing: Boolean, paused: Boolean): NotificationCompat.Builder {
+        if (playing) {
+            return addAction(
+                icon = R.drawable.ic_pause,
+                title = R.string.accessibility_pause,
+                intent = PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
+            )
+        }
+
+        if (paused) {
+            return addAction(
+                R.drawable.ic_play,
+                R.string.accessibility_play,
+                PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
+            )
+        }
+
+        return addAction(R.drawable.ic_launcher_foreground, R.string.accessibility_play)
+    }
+
+    private fun NotificationCompat.Builder.addChangeStationAction(next: Boolean, active: Boolean): NotificationCompat.Builder {
+        return if (next) {
+            addAction(
+                icon = R.drawable.ic_skip_next,
+                title = R.string.accessibility_next_station,
+                intent = if (active) {
+                    PlaybackBroadcastReceiver.nextIntent(this@PlayerNotificationService)
+                } else {
+                    null
+                }
+            )
+        } else {
+            addAction(
+                icon = R.drawable.ic_skip_previous,
+                title = R.string.accessibility_previous_station,
+                intent = if (active) {
+                    PlaybackBroadcastReceiver.previousIntent(this@PlayerNotificationService)
+                } else {
+                    null
+                }
+            )
+        }
     }
 
     private fun NotificationCompat.Builder.addAction(icon: Int, title: Int, intent: PendingIntent? = null): NotificationCompat.Builder {
