@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -29,8 +30,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffoldState
+import androidx.compose.material.BottomSheetState
 import androidx.compose.material.BottomSheetValue
-import androidx.compose.material.SwipeProgress
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
@@ -104,90 +105,63 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 val PlayerBottomSheetPeekHeight = 60.dp
 
-val SwipeProgress<BottomSheetValue>.normalizedFraction: Float
+val BottomSheetState.normalizedFraction: Float
     get() {
-        return when {
-            from == BottomSheetValue.Collapsed && to == BottomSheetValue.Collapsed -> 0f
-            from == BottomSheetValue.Expanded && to == BottomSheetValue.Expanded -> 1f
-            from == BottomSheetValue.Expanded && to == BottomSheetValue.Collapsed -> 1f - fraction
-            else -> fraction
+        if (progress == 0f) {
+            return when (currentValue) {
+                BottomSheetValue.Collapsed -> 0f
+                BottomSheetValue.Expanded -> 1f
+            }
+        }
+
+        if (progress == 1f) {
+            return when (currentValue) {
+                BottomSheetValue.Collapsed -> 1f
+                BottomSheetValue.Expanded -> 0f
+            }
+        }
+
+        return when (currentValue) {
+            BottomSheetValue.Collapsed -> progress
+            BottomSheetValue.Expanded -> progress
         }
     }
 
 @Composable
 @OptIn(ExperimentalPagerApi::class, FlowPreview::class)
-fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
+fun PlayerBottomSheetContent(
+    scaffoldState: BottomSheetScaffoldState
+) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val sleepTimerViewModel = SleepTimerViewModel.Local.current
     val state: PlayerBottomSheetState by viewModel.state.collectAsState()
 
     val coroutineScope = rememberCoroutineScope()
-    var contentAlpha by remember { mutableStateOf(0f) }
-    LaunchedEffect(scaffoldState) {
-        snapshotFlow { scaffoldState.bottomSheetState.progress }
-            .collect {
-                contentAlpha = it.normalizedFraction
-            }
-    }
+
     BackHandler(enabled = scaffoldState.bottomSheetState.isExpanded) {
         coroutineScope.launch {
-            scaffoldState.bottomSheetState.animateTo(BottomSheetValue.Collapsed)
+            scaffoldState.bottomSheetState.collapse()
         }
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(PlayerBottomSheetPeekHeight)
-            .padding(horizontal = 16.dp)
-            .alpha(1f - contentAlpha)
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() },
-            ) {
-                coroutineScope.launch {
-                    scaffoldState.bottomSheetState.animateTo(BottomSheetValue.Expanded)
-                }
-            },
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        PlayingIndicator(
-            modifier = Modifier
-                .width(20.dp)
-                .height(10.dp),
-            playing = state.playingState == UiStationPlayingState.PLAYING,
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Column(
-            modifier = Modifier.weight(1f),
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = state.currentStationNameOrEmpty,
-                fontSize = 16.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
 
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = state.title ?: stringResource(R.string.no_track),
-                fontSize = 10.sp,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-            )
-        }
-
-        PlayPauseButton(state = state.playingState) {
-            if (contentAlpha < 1f) {
-                viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
+    BottomSheetHeader(
+        state = state,
+        visible = scaffoldState.bottomSheetState.isCollapsed,
+        onClick = {
+            coroutineScope.launch {
+                scaffoldState.bottomSheetState.expand()
             }
+        },
+        onPlayPauseClick = {
+            viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
         }
-    }
+    )
 
     Column(
-        Modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .alpha(contentAlpha)
+            .padding(),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Spacer(modifier = Modifier.height(10.dp))
 
@@ -251,18 +225,13 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
         }
         Spacer(modifier = Modifier.height(8.dp))
         TickerTextView(
-            modifier = Modifier
-                .width(itemSize)
-                .align(Alignment.CenterHorizontally),
+            modifier = Modifier.width(itemSize),
             text = state.title ?: stringResource(R.string.no_track),
             textSize = 13.sp,
             textColor = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(20.dp))
-        Row(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             PlayBackButton(
                 visible = state.hasPreviousStation,
                 size = 46.dp,
@@ -357,7 +326,76 @@ fun PlayerBottomSheetContent(scaffoldState: BottomSheetScaffoldState) {
                 }
             }
         }
-        Spacer(modifier = Modifier.height(70.dp))
+        Spacer(modifier = Modifier.height(PlayerBottomSheetPeekHeight + 35.dp))
+    }
+}
+
+@Composable
+private fun BottomSheetHeader(
+    modifier: Modifier = Modifier,
+    visible: Boolean = true,
+    state: PlayerBottomSheetState,
+    onClick: () -> Unit,
+    onPlayPauseClick: () -> Unit
+) {
+    val visibleAsState = rememberUpdatedState(visible) 
+    var alpha by remember { mutableStateOf(if (visible) 1f else 0f) }
+    LaunchedEffect(Unit) {
+        snapshotFlow { visibleAsState.value }.collect {
+            val targetAlpha = if (it) 1f else 0f
+            animate(
+                initialValue = alpha,
+                targetValue = targetAlpha,
+                block = { value, _ -> alpha = value }
+            )
+        }
+    }
+
+    Row(
+        modifier = modifier
+            .alpha(alpha)
+            .fillMaxWidth()
+            .height(PlayerBottomSheetPeekHeight)
+            .padding(horizontal = 16.dp)
+            .clickable(
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() },
+                onClick = onClick
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        PlayingIndicator(
+            modifier = Modifier
+                .width(20.dp)
+                .height(10.dp),
+            playing = state.playingState == UiStationPlayingState.PLAYING,
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Column(
+            modifier = Modifier.weight(1f),
+        ) {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = state.currentStationNameOrEmpty,
+                fontSize = 16.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = state.title ?: stringResource(R.string.no_track),
+                fontSize = 10.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+
+        PlayPauseButton(state = state.playingState) {
+            if (visible) {
+                onPlayPauseClick()
+            }
+        }
     }
 }
 

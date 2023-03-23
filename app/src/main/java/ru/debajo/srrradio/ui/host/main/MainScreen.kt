@@ -64,7 +64,6 @@ import ru.debajo.srrradio.ui.host.main.list.StationsList
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetContent
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
-import ru.debajo.srrradio.ui.host.main.player.normalizedFraction
 import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistScreen
 import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistScreenStrategy
 import ru.debajo.srrradio.ui.host.main.settings.SettingsScreen
@@ -157,12 +156,20 @@ private fun RadioScreenContent() {
     var navigationHeight by remember { mutableStateOf(0) }
     var navigationOffset by remember { mutableStateOf(0f) }
 
-    LaunchedEffect(bottomSheetScaffoldState) {
-        snapshotFlow { bottomSheetScaffoldState.progress }.collect {
-            val fraction = it.normalizedFraction
-            navigationOffset = navigationHeight * fraction
-        }
-    }
+//    LaunchedEffect(bottomSheetScaffoldState) {
+//        snapshotFlow { bottomSheetScaffoldState.currentValue }.collect {
+//            val targetOffset = when (it) {
+//                BottomSheetValue.Collapsed -> 0f
+//                BottomSheetValue.Expanded -> 1f
+//            }
+//            animate(
+//                initialValue = navigationOffset,
+//                targetValue = targetOffset * navigationHeight,
+//                animationSpec = tween(200),
+//                block = { value, _ -> navigationOffset = value }
+//            )
+//        }
+//    }
 
     val density = LocalDensity.current
     val listBottomPadding by remember {
@@ -185,9 +192,9 @@ private fun RadioScreenContent() {
                         navigation(startDestination = navTree.main.radio.root.route, route = navTree.main.radio.route) {
                             composable(navTree.main.radio.root.route) {
                                 StationsList(listBottomPadding) {
-                                    if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isAnimationRunning) {
+                                    if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isCollapsed) {
                                         coroutineScope.launch {
-                                            bottomSheetScaffoldState.animateTo(BottomSheetValue.Collapsed)
+                                            bottomSheetScaffoldState.collapse()
                                         }
                                     }
                                 }
