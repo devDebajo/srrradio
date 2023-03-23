@@ -238,7 +238,10 @@ private fun RadioScreenContent() {
             sheetPeekHeight = if (showBottomSheet) PlayerBottomSheetPeekHeight + navigationHeight.toDp() else 0.dp,
             sheetContent = {
                 if (showBottomSheet) {
-                    PlayerBottomSheetContent(scaffoldState = scaffoldState)
+                    PlayerBottomSheetContent(
+                        scaffoldState = scaffoldState,
+                        navigationHeight = navigationHeight.toDp(),
+                    )
                 } else {
                     Box(Modifier.fillMaxWidth())
                 }

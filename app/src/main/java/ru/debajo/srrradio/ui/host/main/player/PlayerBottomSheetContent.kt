@@ -30,8 +30,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffoldState
-import androidx.compose.material.BottomSheetState
-import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
@@ -105,32 +103,11 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 val PlayerBottomSheetPeekHeight = 60.dp
 
-val BottomSheetState.normalizedFraction: Float
-    get() {
-        if (progress == 0f) {
-            return when (currentValue) {
-                BottomSheetValue.Collapsed -> 0f
-                BottomSheetValue.Expanded -> 1f
-            }
-        }
-
-        if (progress == 1f) {
-            return when (currentValue) {
-                BottomSheetValue.Collapsed -> 1f
-                BottomSheetValue.Expanded -> 0f
-            }
-        }
-
-        return when (currentValue) {
-            BottomSheetValue.Collapsed -> progress
-            BottomSheetValue.Expanded -> progress
-        }
-    }
-
 @Composable
 @OptIn(ExperimentalPagerApi::class, FlowPreview::class)
 fun PlayerBottomSheetContent(
-    scaffoldState: BottomSheetScaffoldState
+    scaffoldState: BottomSheetScaffoldState,
+    navigationHeight: Dp,
 ) {
     val viewModel = PlayerBottomSheetViewModel.Local.current
     val sleepTimerViewModel = SleepTimerViewModel.Local.current
@@ -326,7 +303,7 @@ fun PlayerBottomSheetContent(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(PlayerBottomSheetPeekHeight + 35.dp))
+        Spacer(modifier = Modifier.height(navigationHeight + 20.dp))
     }
 }
 
@@ -338,7 +315,7 @@ private fun BottomSheetHeader(
     onClick: () -> Unit,
     onPlayPauseClick: () -> Unit
 ) {
-    val visibleAsState = rememberUpdatedState(visible) 
+    val visibleAsState = rememberUpdatedState(visible)
     var alpha by remember { mutableStateOf(if (visible) 1f else 0f) }
     LaunchedEffect(Unit) {
         snapshotFlow { visibleAsState.value }.collect {
