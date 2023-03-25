@@ -14,6 +14,8 @@ interface FavoriteStationsStateUseCase {
     fun observe(): Flow<List<Station>>
 
     suspend fun get(): List<Station>
+
+    suspend fun reorder(from: Int, to: Int)
 }
 
 internal class FavoriteStationsStateUseCaseImpl(
@@ -42,5 +44,9 @@ internal class FavoriteStationsStateUseCaseImpl(
 
     override suspend fun get(): List<Station> {
         return repository.getFavoriteStations()
+    }
+
+    override suspend fun reorder(from: Int, to: Int) {
+        repository.reorder(from, to)
     }
 }

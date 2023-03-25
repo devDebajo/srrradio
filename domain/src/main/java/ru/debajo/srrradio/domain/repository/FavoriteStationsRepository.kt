@@ -11,4 +11,6 @@ interface FavoriteStationsRepository {
     suspend fun getFavoriteStations(): List<Station>
 
     suspend fun save(stations: List<Station>)
+
+    suspend fun reorder(from: Int, to: Int)
 }

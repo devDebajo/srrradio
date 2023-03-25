@@ -82,6 +82,12 @@ class DefaultPlaylistViewModel(
         stateMutable.value = state.copy(items = mutableList.toList())
     }
 
+    fun commitReorder(from: Int, to: Int) {
+        viewModelScope.launch {
+            favoriteStationsStateUseCase.reorder(from, to)
+        }
+    }
+
     private fun loadInternal(strategy: DefaultPlaylistScreenStrategy): Flow<List<Station>> {
         return when (strategy) {
             DefaultPlaylistScreenStrategy.NEW -> asFlow { searchStationsUseCase.searchNew(LIMIT) }

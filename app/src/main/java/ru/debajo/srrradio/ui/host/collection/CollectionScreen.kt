@@ -56,6 +56,7 @@ fun <T> ListScreen(
     items: List<T>,
     key: (item: T) -> Any,
     onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
+    onCommitReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
     canReorder: Boolean = false,
     contentType: (item: T) -> Any = { "same_type" },
     emptyItemsContent: @Composable BoxScope.() -> Unit = {},
@@ -78,7 +79,8 @@ fun <T> ListScreen(
                 } else {
                     val state = rememberReorderableLazyListState(
                         listState = lazyColumnState,
-                        onMove = { from, to -> onReorder(from.index, to.index) }
+                        onMove = { from, to -> onReorder(from.index, to.index) },
+                        onDragEnd = { from, to -> onCommitReorder(from, to) }
                     )
                     LazyColumn(
                         modifier = Modifier

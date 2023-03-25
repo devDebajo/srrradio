@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.data.repository
 
+import java.util.Collections
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.debajo.srrradio.data.db.dao.DbFavoriteStationDao
@@ -18,7 +19,8 @@ internal class FavoriteStationsRepositoryImpl(
     override suspend fun updateFavoriteState(station: Station, inFavorite: Boolean) {
         if (inFavorite) {
             dbStationDao.insert(station.toDb())
-            dbFavoriteStationDao.insert(DbFavoriteStation(station.id))
+            val newOrder = (dbFavoriteStationDao.getMaxOrder() ?: -1) + 1
+            dbFavoriteStationDao.insert(DbFavoriteStation(station.id, newOrder))
         } else {
             dbFavoriteStationDao.delete(station.id)
         }
@@ -36,6 +38,20 @@ internal class FavoriteStationsRepositoryImpl(
 
     override suspend fun save(stations: List<Station>) {
         dbStationDao.insert(stations.map { it.toDb() })
-        dbFavoriteStationDao.insert(stations.map { DbFavoriteStation(it.id) })
+        val maxOrder = (dbFavoriteStationDao.getMaxOrder() ?: -1) + 1
+        dbFavoriteStationDao.insert(stations.mapIndexed { index, station ->
+            DbFavoriteStation(station.id, maxOrder + index)
+        })
+    }
+
+    override suspend fun reorder(from: Int, to: Int) {
+        val realFavoriteOrder = dbFavoriteStationDao.getStations().toMutableList()
+        if (realFavoriteOrder.isEmpty()) {
+            return
+        }
+        Collections.swap(realFavoriteOrder, from, to)
+        print(realFavoriteOrder)
+        val toPersist = realFavoriteOrder.mapIndexed { index, dbStation -> DbFavoriteStation(dbStation.id, index) }
+        dbFavoriteStationDao.replace(toPersist)
     }
 }

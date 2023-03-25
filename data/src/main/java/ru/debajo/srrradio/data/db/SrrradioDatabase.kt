@@ -23,7 +23,7 @@ import ru.debajo.srrradio.data.model.DbTrackCollectionItem
         DbFavoriteStation::class,
         DbTrackCollectionItem::class,
     ],
-    version = 3,
+    version = 4,
 )
 @TypeConverters(SrrradioDbConverter::class)
 internal abstract class SrrradioDatabase : RoomDatabase() {

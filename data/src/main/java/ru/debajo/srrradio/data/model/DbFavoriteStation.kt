@@ -8,5 +8,8 @@ import androidx.room.PrimaryKey
 internal data class DbFavoriteStation(
     @PrimaryKey
     @ColumnInfo("stationId")
-    val stationId: String
+    val stationId: String,
+
+    @ColumnInfo("order")
+    val order: Int,
 )
