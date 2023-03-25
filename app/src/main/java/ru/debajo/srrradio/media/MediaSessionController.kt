@@ -54,12 +54,21 @@ class MediaSessionController(private val context: Context) {
             mediaSession.isActive = isActive
             mediaSession.setMetadata(metadata)
 
+            var actions: Long
             val playState = when (playbackState) {
-                RadioPlayer.PlaybackState.BUFFERING -> PlaybackStateCompat.STATE_BUFFERING
-                RadioPlayer.PlaybackState.PLAYING -> PlaybackStateCompat.STATE_PLAYING
-                else -> PlaybackStateCompat.STATE_PAUSED
+                RadioPlayer.PlaybackState.BUFFERING -> {
+                    actions = PlaybackStateCompat.ACTION_PLAY
+                    PlaybackStateCompat.STATE_BUFFERING
+                }
+                RadioPlayer.PlaybackState.PLAYING -> {
+                    actions = PlaybackStateCompat.ACTION_PAUSE
+                    PlaybackStateCompat.STATE_PLAYING
+                }
+                else -> {
+                    actions = PlaybackStateCompat.ACTION_PLAY
+                    PlaybackStateCompat.STATE_PAUSED
+                }
             }
-            var actions = 0L
             if (hasNext) {
                 actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
             }

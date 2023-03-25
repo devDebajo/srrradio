@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.media
 
+import android.support.v4.media.session.MediaSessionCompat
 import java.util.UUID
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,10 +22,14 @@ class MediaController(
     private val lastStationUseCase: LastStationUseCase,
     private val loadPlaylistUseCase: LoadPlaylistUseCase,
     private val mediaSessionController: MediaSessionController,
-) : MediaActions, CoroutineScope by ProcessScopeImmediate {
+) : MediaActions, CoroutineScope by ProcessScopeImmediate, MediaSessionCompat.Callback() {
 
     private val stateMutable: MutableStateFlow<MediaState> = MutableStateFlow(MediaState.None)
     val state: StateFlow<MediaState> = stateMutable.asStateFlow()
+
+    init {
+        mediaSessionController.mediaSession.setCallback(this)
+    }
 
     suspend fun prepare() {
         if (stateMutable.value !is MediaState.None) {
@@ -53,6 +58,22 @@ class MediaController(
 
     override fun toggle() {
         player.toggle()
+    }
+
+    override fun onPlay() {
+        play()
+    }
+
+    override fun onPause() {
+        pause()
+    }
+
+    override fun onSkipToNext() {
+        next()
+    }
+
+    override fun onSkipToPrevious() {
+        previous()
     }
 
     override fun next() {

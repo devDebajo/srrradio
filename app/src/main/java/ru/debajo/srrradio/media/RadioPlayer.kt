@@ -9,7 +9,6 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.upstream.DefaultDataSource
 import java.util.concurrent.TimeUnit
@@ -44,7 +43,7 @@ class RadioPlayer(
     }
 
     private val exoPlayer: ExoPlayer by lazy {
-        val player = ExoPlayer.Builder(context)
+        ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
             .build()
@@ -59,10 +58,6 @@ class RadioPlayer(
                     }
                 })
             }
-        MediaSessionConnector(mediaSessionController.mediaSession)
-            .apply { setMediaButtonEventHandler(MediaButtonHandler()) }
-            .setPlayer(player)
-        player
     }
 
     private val mediaSourceFactory: ProgressiveMediaSource.Factory by lazy {

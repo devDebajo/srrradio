@@ -5,10 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
@@ -38,7 +36,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
     private val notificationManager: NotificationManager by inject()
     private val mediaController: MediaController by inject()
     private val mediaSessionController: MediaSessionController by inject()
-    private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
     private val coroutineScope: CoroutineScope by ProcessScope
     private val sleepTimer: SleepTimer by inject()
 
@@ -63,7 +60,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
                     updateNotification(notification)
                 }
         }
-        registerReceiver()
     }
 
     private var pauseTask: Job? = null
@@ -82,14 +78,9 @@ class PlayerNotificationService : Service(), CoroutineScope {
         }
     }
 
-    private fun registerReceiver() {
-        registerReceiver(receiver, PlaybackBroadcastReceiver.intentFilter())
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         cancel()
-        unregisterReceiver(receiver)
     }
 
     private fun observeNotification(mediaState: MediaState): Flow<Notification> {
@@ -106,7 +97,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
             is MediaState.Empty,
             is MediaState.Loading,
             is MediaState.None -> buildEmptyNotification()
-            is MediaState.Loaded -> buildLoadedNotification(mediaState, token)
+            is MediaState.Loaded -> buildLoadedNotification(token)
         }
     }
 
@@ -124,7 +115,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
             .build()
     }
 
-    private fun buildLoadedNotification(mediaState: MediaState.Loaded, token: MediaSessionCompat.Token): Notification {
+    private fun buildLoadedNotification(token: MediaSessionCompat.Token): Notification {
         val style = androidx.media.app.NotificationCompat.MediaStyle()
         style.setMediaSession(token)
         style.setShowActionsInCompactView(0, 1, 2)
@@ -136,62 +127,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
                 HostActivity.createIntent(this)
                     .toPending(this, 0, PendingIntentType.ACTIVITY)
             )
-            .addChangeStationAction(next = false, active = mediaState.hasPreviousStation)
-            .addPlayPauseAction(
-                playing = mediaState.playing,
-                paused = mediaState.paused,
-            )
-            .setAllowSystemGeneratedContextualActions(false)
-            .addChangeStationAction(next = true, active = mediaState.hasNextStation)
             .build()
-    }
-
-    private fun NotificationCompat.Builder.addPlayPauseAction(playing: Boolean, paused: Boolean): NotificationCompat.Builder {
-        if (playing) {
-            return addAction(
-                icon = R.drawable.ic_pause,
-                title = R.string.accessibility_pause,
-                intent = PlaybackBroadcastReceiver.pauseIntent(this@PlayerNotificationService)
-            )
-        }
-
-        if (paused) {
-            return addAction(
-                R.drawable.ic_play,
-                R.string.accessibility_play,
-                PlaybackBroadcastReceiver.resumeIntent(this@PlayerNotificationService)
-            )
-        }
-
-        return addAction(R.drawable.ic_launcher_foreground, R.string.accessibility_play)
-    }
-
-    private fun NotificationCompat.Builder.addChangeStationAction(next: Boolean, active: Boolean): NotificationCompat.Builder {
-        return if (next) {
-            addAction(
-                icon = R.drawable.ic_skip_next,
-                title = R.string.accessibility_next_station,
-                intent = if (active) {
-                    PlaybackBroadcastReceiver.nextIntent(this@PlayerNotificationService)
-                } else {
-                    null
-                }
-            )
-        } else {
-            addAction(
-                icon = R.drawable.ic_skip_previous,
-                title = R.string.accessibility_previous_station,
-                intent = if (active) {
-                    PlaybackBroadcastReceiver.previousIntent(this@PlayerNotificationService)
-                } else {
-                    null
-                }
-            )
-        }
-    }
-
-    private fun NotificationCompat.Builder.addAction(icon: Int, title: Int, intent: PendingIntent? = null): NotificationCompat.Builder {
-        return addAction(icon, getString(title), intent)
     }
 
     private fun prepareChannel() {
@@ -218,60 +154,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
     private fun updateNotification(notification: Notification) {
         notificationManager.notify(ID, notification)
-    }
-
-    class PlaybackBroadcastReceiver(
-        private val mediaController: MediaController,
-    ) : BroadcastReceiver() {
-
-        override fun onReceive(context: Context, intent: Intent) {
-            when (intent.action) {
-                ACTION_PAUSE -> mediaController.pause()
-                ACTION_RESUME -> mediaController.play()
-                ACTION_NEXT -> mediaController.next()
-                ACTION_PREVIOUS -> mediaController.previous()
-            }
-        }
-
-        companion object {
-            fun nextIntent(context: Context): PendingIntent {
-                return Intent(ACTION_NEXT)
-                    .setPackage(context.packageName)
-                    .toPending(context, 0, PendingIntentType.BROADCAST)
-            }
-
-            fun previousIntent(context: Context): PendingIntent {
-                return Intent(ACTION_PREVIOUS)
-                    .setPackage(context.packageName)
-                    .toPending(context, 1, PendingIntentType.BROADCAST)
-            }
-
-            fun pauseIntent(context: Context): PendingIntent {
-                return Intent(ACTION_PAUSE)
-                    .setPackage(context.packageName)
-                    .toPending(context, 2, PendingIntentType.BROADCAST)
-            }
-
-            fun resumeIntent(context: Context): PendingIntent {
-                return Intent(ACTION_RESUME)
-                    .setPackage(context.packageName)
-                    .toPending(context, 2, PendingIntentType.BROADCAST)
-            }
-
-            fun intentFilter(): IntentFilter {
-                return IntentFilter().apply {
-                    addAction(ACTION_PAUSE)
-                    addAction(ACTION_RESUME)
-                    addAction(ACTION_PREVIOUS)
-                    addAction(ACTION_NEXT)
-                }
-            }
-
-            private const val ACTION_PAUSE = "ru.debajo.srrradio.ACTION_PAUSE"
-            private const val ACTION_RESUME = "ru.debajo.srrradio.ACTION_RESUME"
-            private const val ACTION_PREVIOUS = "ru.debajo.srrradio.ACTION_PREVIOUS"
-            private const val ACTION_NEXT = "ru.debajo.srrradio.ACTION_NEXT"
-        }
     }
 
     companion object {
