@@ -64,6 +64,8 @@ fun DefaultPlaylistScreen(
                 )
             }
         },
+        canReorder = strategy == DefaultPlaylistScreenStrategy.FAVORITE,
+        onReorder = { from, to -> viewModel.reorder(from, to) },
         items = state.items,
         key = { it.id },
         contentType = { "UiStationElement" },

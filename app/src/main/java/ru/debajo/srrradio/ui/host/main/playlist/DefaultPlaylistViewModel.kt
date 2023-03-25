@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import java.util.Collections
 import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -72,6 +73,13 @@ class DefaultPlaylistViewModel(
         viewModelScope.launch {
             updateFavoriteStationStateUseCase.update(station.toDomain(), favorite)
         }
+    }
+
+    fun reorder(from: Int, to: Int) {
+        val state = stateMutable.value as? DefaultPlaylistState.Loaded ?: return
+        val mutableList = state.items.toMutableList()
+        Collections.swap(mutableList, from, to)
+        stateMutable.value = state.copy(items = mutableList.toList())
     }
 
     private fun loadInternal(strategy: DefaultPlaylistScreenStrategy): Flow<List<Station>> {

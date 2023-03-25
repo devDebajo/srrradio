@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffold
@@ -154,22 +153,6 @@ private fun RadioScreenContent() {
     val scaffoldState = rememberBottomSheetScaffoldState(bottomSheetState = bottomSheetScaffoldState)
     val coroutineScope = rememberCoroutineScope()
     var navigationHeight by remember { mutableStateOf(0) }
-    var navigationOffset by remember { mutableStateOf(0f) }
-
-//    LaunchedEffect(bottomSheetScaffoldState) {
-//        snapshotFlow { bottomSheetScaffoldState.currentValue }.collect {
-//            val targetOffset = when (it) {
-//                BottomSheetValue.Collapsed -> 0f
-//                BottomSheetValue.Expanded -> 1f
-//            }
-//            animate(
-//                initialValue = navigationOffset,
-//                targetValue = targetOffset * navigationHeight,
-//                animationSpec = tween(200),
-//                block = { value, _ -> navigationOffset = value }
-//            )
-//        }
-//    }
 
     val density = LocalDensity.current
     val listBottomPadding by remember {
@@ -251,8 +234,7 @@ private fun RadioScreenContent() {
         Navigation(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .onGloballyPositioned { navigationHeight = it.size.height }
-                .offset(y = navigationOffset.toDp()),
+                .onGloballyPositioned { navigationHeight = it.size.height },
             navigationController = navTree.main.navController
         )
     }

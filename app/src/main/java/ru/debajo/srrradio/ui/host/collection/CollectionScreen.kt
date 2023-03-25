@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.host.collection
 
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -15,7 +16,7 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.Icon
@@ -28,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -36,6 +38,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.diViewModel
 import ru.debajo.srrradio.ui.common.AppCard
@@ -48,18 +54,21 @@ fun <T> ListScreen(
     title: String,
     listBottomPadding: Dp = 0.dp,
     items: List<T>,
-    key: ((item: T) -> Any)? = null,
-    contentType: (item: T) -> Any? = { null },
+    key: (item: T) -> Any,
+    onReorder: (from: Int, to: Int) -> Unit = { _, _ -> },
+    canReorder: Boolean = false,
+    contentType: (item: T) -> Any = { "same_type" },
     emptyItemsContent: @Composable BoxScope.() -> Unit = {},
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
+    val lazyColumnState = rememberLazyListState()
     Surface(
         modifier = Modifier
             .fillMaxSize()
             .systemBarsPadding()
     ) {
         Column(
-            Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier.padding(horizontal = 16.dp)
         ) {
             AppScreenTitle(text = title)
             Spacer(modifier = Modifier.height(16.dp))
@@ -67,16 +76,37 @@ fun <T> ListScreen(
                 if (items.isEmpty()) {
                     emptyItemsContent()
                 } else {
+                    val state = rememberReorderableLazyListState(
+                        listState = lazyColumnState,
+                        onMove = { from, to -> onReorder(from.index, to.index) }
+                    )
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .run {
+                                if (canReorder) {
+                                    reorderable(state).detectReorderAfterLongPress(state)
+                                } else {
+                                    this
+                                }
+                            },
+                        state = lazyColumnState,
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         contentPadding = PaddingValues(bottom = listBottomPadding)
                     ) {
                         items(
-                            items = items,
-                            key = key,
-                            contentType = contentType,
-                            itemContent = itemContent
+                            count = items.size,
+                            key = { index -> key(items[index]) },
+                            contentType = { index -> contentType(items[index]) },
+                            itemContent = { index ->
+                                val item = items[index]
+                                ReorderableItem(state, key = key(item)) { isDragging ->
+                                    val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
+                                    Box(modifier = Modifier.shadow(elevation.value)) {
+                                        itemContent(item)
+                                    }
+                                }
+                            }
                         )
                     }
                 }
