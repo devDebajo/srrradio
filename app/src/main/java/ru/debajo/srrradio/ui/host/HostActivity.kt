@@ -152,22 +152,24 @@ class HostActivity : ComponentActivity() {
 
     private fun handleRateApp() {
         rateAppManager.hostActivityCreated()
-        val actions = rateAppManager.getRateActions()
-        if (actions.size != 2) {
-            return
+        lifecycleScope.launch {
+            val actions = rateAppManager.getRateActions()
+            if (actions.size != 2) {
+                return@launch
+            }
+
+            val cancelAction = actions[0]
+            val confirmAction = actions[1]
+
+            alertDialogState.alert(
+                title = R.string.rate_app_title,
+                content = R.string.rate_app_message,
+                confirm = confirmAction.res,
+                dismiss = cancelAction.res,
+                onDismiss = { rateAppManager.onRateAction(this@HostActivity, cancelAction) },
+                onConfirm = { rateAppManager.onRateAction(this@HostActivity, confirmAction) },
+            )
         }
-
-        val cancelAction = actions[0]
-        val confirmAction = actions[1]
-
-        alertDialogState.alert(
-            title = R.string.rate_app_title,
-            content = R.string.rate_app_message,
-            confirm = confirmAction.res,
-            dismiss = cancelAction.res,
-            onDismiss = { rateAppManager.onRateAction(this, cancelAction) },
-            onConfirm = { rateAppManager.onRateAction(this, confirmAction) },
-        )
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

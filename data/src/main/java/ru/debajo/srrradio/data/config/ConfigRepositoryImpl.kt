@@ -13,6 +13,7 @@ import ru.debajo.srrradio.data.BuildConfig
 import ru.debajo.srrradio.data.R
 import ru.debajo.srrradio.domain.model.Config
 import ru.debajo.srrradio.domain.repository.ConfigRepository
+import timber.log.Timber
 
 internal class ConfigRepositoryImpl(
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
@@ -54,8 +55,12 @@ internal class ConfigRepositoryImpl(
             Config(
                 authEnabled = firebaseRemoteConfig.getBoolean("auth_enabled"),
                 snowFallEnabled = firebaseRemoteConfig.getBoolean("snow_fall_toggle_visible"),
+                rateAppEnabled = firebaseRemoteConfig.getBoolean("rate_app_enabled"),
             )
         }
+            .onSuccess {
+                Timber.tag("ConfigRepositoryImpl").d("Remote config fetch success: $it")
+            }
             .toTimber()
             .getOrElse { Config() }
     }

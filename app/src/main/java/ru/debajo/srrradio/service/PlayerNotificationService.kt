@@ -118,7 +118,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
     private fun buildLoadedNotification(token: MediaSessionCompat.Token): Notification {
         val style = androidx.media.app.NotificationCompat.MediaStyle()
         style.setMediaSession(token)
-        style.setShowActionsInCompactView(0, 1, 2)
         return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentTitle(getString(R.string.app_name))

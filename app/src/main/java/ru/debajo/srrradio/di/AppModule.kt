@@ -3,6 +3,7 @@ package ru.debajo.srrradio.di
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.error.SendingErrorsManager
@@ -67,7 +68,7 @@ val AppModule: Module = module {
     single { SrrradioThemeManager(get()) }
     factory { AppIconManager(get(), get()) }
 
-    single { RateAppManager(get(), get(), get()) }
+    singleOf(::RateAppManager)
     single { GoogleServicesUtils(get()) }
     single { MediaSessionController(get()) }
     single {

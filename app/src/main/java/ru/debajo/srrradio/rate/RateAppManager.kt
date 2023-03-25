@@ -4,19 +4,22 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 import timber.log.Timber
 
 class RateAppManager(
+    private val configRepository: ConfigRepository,
     private val googleServicesUtils: GoogleServicesUtils,
     private val rateAppStatePreference: RateAppStatePreference,
     private val hostActivityCreateCountPreference: HostActivityCreateCountPreference,
 ) {
 
-    fun getRateActions(): List<RateAction> {
-        if (!googleServicesUtils.googlePlayAppInstalled) {
+    suspend fun getRateActions(): List<RateAction> {
+        if (!googleServicesUtils.googlePlayAppInstalled || !configRepository.provide().rateAppEnabled) {
             return emptyList()
         }
         val count = hostActivityCreateCountPreference.get()
+        Timber.tag("RateAppManager").d("App open count: $count")
         if (count < TARGET_COUNT) {
             return emptyList()
         }
