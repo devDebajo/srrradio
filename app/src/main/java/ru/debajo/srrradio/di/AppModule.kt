@@ -73,7 +73,7 @@ val AppModule: Module = module {
     single { MediaSessionController(get()) }
     single {
         val player = RadioPlayer(get(), get(), get())
-        MediaController(player, get(), get(), get())
+        MediaController(get(), player, get(), get(), get())
     }
 
     factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }

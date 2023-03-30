@@ -258,7 +258,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
                 ACTION_RESUME -> mediaController.play()
                 ACTION_NEXT -> mediaController.next()
                 ACTION_PREVIOUS -> mediaController.previous()
-                ACTION_CLOSE -> exitProcess(0)
+                ACTION_CLOSE -> KillAppHelper.kill(context)
             }
         }
 
@@ -344,5 +344,12 @@ private fun Intent.toPending(context: Context, requestCode: Int, type: PendingIn
     return when (type) {
         PendingIntentType.BROADCAST -> PendingIntent.getBroadcast(context, requestCode, this, flags)
         PendingIntentType.ACTIVITY -> PendingIntent.getActivity(context, requestCode, this, flags)
+    }
+}
+
+object KillAppHelper {
+    fun kill(context: Context) {
+        PlayerNotificationService.stop(context)
+        exitProcess(0)
     }
 }

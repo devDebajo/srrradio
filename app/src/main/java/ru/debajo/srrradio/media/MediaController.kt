@@ -1,9 +1,9 @@
 package ru.debajo.srrradio.media
 
+import android.content.Context
 import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import java.util.UUID
-import kotlin.system.exitProcess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,12 +14,14 @@ import ru.debajo.srrradio.domain.LoadPlaylistUseCase
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.media.model.MediaStationInfo
 import ru.debajo.srrradio.media.model.asLoaded
+import ru.debajo.srrradio.service.KillAppHelper
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.model.toUi
 
 class MediaController(
+    private val context: Context,
     private val player: RadioPlayer,
     private val lastStationUseCase: LastStationUseCase,
     private val loadPlaylistUseCase: LoadPlaylistUseCase,
@@ -80,7 +82,7 @@ class MediaController(
 
     override fun onCustomAction(action: String?, extras: Bundle?) {
         if (action == MediaSessionController.ACTION_CLOSE) {
-            exitProcess(0)
+            KillAppHelper.kill(context)
         } else {
             super.onCustomAction(action, extras)
         }
