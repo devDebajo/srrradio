@@ -96,6 +96,7 @@
     <string name="accessibility_previous_station">Previous station</string>
     <string name="accessibility_play">Play</string>
     <string name="accessibility_pause">Pause</string>
+    <string name="accessibility_close">Close</string>
     <string name="accessibility_clear_search">Clear search</string>
     <string name="accessibility_add_favorite">Add station to favorites</string>
     <string name="accessibility_remove_favorite">Delete station from favorites</string>
