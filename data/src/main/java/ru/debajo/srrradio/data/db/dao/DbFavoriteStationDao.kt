@@ -37,4 +37,15 @@ internal interface DbFavoriteStationDao {
         clear()
         insert(items)
     }
+
+    @Transaction
+    suspend fun insertWithOrder(stationId: String) {
+        val maxOrder = getMaxOrder() ?: -1
+        insert(DbFavoriteStation(stationId, maxOrder + 1))
+    }
 }
+
+// крестик в нотификации
+// обновить ссылку на политику конфиденциальности
+// пермишн на нотификации
+// на апи меньше 33 надо по старому добавлять кнопки в нотификацию

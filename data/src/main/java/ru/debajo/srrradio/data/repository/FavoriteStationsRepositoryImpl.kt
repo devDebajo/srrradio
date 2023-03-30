@@ -19,8 +19,7 @@ internal class FavoriteStationsRepositoryImpl(
     override suspend fun updateFavoriteState(station: Station, inFavorite: Boolean) {
         if (inFavorite) {
             dbStationDao.insert(station.toDb())
-            val newOrder = (dbFavoriteStationDao.getMaxOrder() ?: -1) + 1
-            dbFavoriteStationDao.insert(DbFavoriteStation(station.id, newOrder))
+            dbFavoriteStationDao.insertWithOrder(station.id)
         } else {
             dbFavoriteStationDao.delete(station.id)
         }

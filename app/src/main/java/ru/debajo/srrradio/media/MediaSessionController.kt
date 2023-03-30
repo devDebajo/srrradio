@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
+import ru.debajo.srrradio.R
 
 class MediaSessionController(private val context: Context) {
 
@@ -69,16 +70,13 @@ class MediaSessionController(private val context: Context) {
                     PlaybackStateCompat.STATE_PAUSED
                 }
             }
-            if (hasNext) {
-                actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
-            }
-            if (hasPrevious) {
-                actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
-            }
+            actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+            actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
             mediaSession.setPlaybackState(
                 PlaybackStateCompat.Builder()
                     .setState(playState, 0L, 1f)
                     .setActions(actions)
+                    .addCustomAction(ACTION_CLOSE, "force close", R.drawable.ic_close)
                     .build()
             )
         }
@@ -99,5 +97,9 @@ class MediaSessionController(private val context: Context) {
 
             return builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, -1).build()
         }
+    }
+
+    companion object {
+        const val ACTION_CLOSE = "ru.debajo.srrradio.media.MediaSessionController.CLOSE"
     }
 }

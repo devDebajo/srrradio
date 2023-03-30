@@ -1,7 +1,9 @@
 package ru.debajo.srrradio.media
 
+import android.os.Bundle
 import android.support.v4.media.session.MediaSessionCompat
 import java.util.UUID
+import kotlin.system.exitProcess
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -74,6 +76,14 @@ class MediaController(
 
     override fun onSkipToPrevious() {
         previous()
+    }
+
+    override fun onCustomAction(action: String?, extras: Bundle?) {
+        if (action == MediaSessionController.ACTION_CLOSE) {
+            exitProcess(0)
+        } else {
+            super.onCustomAction(action, extras)
+        }
     }
 
     override fun next() {
