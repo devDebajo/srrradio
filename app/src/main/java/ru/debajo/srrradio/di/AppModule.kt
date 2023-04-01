@@ -19,6 +19,7 @@ import ru.debajo.srrradio.rate.GoogleServicesUtils
 import ru.debajo.srrradio.rate.HostActivityCreateCountPreference
 import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.rate.RateAppStatePreference
+import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
 import ru.debajo.srrradio.service.SrrradioNotificationManager
 import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
 import ru.debajo.srrradio.sync.AppStateSnapshotMerger
@@ -53,6 +54,7 @@ import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
 import ru.debajo.srrradio.ui.processor.interactor.UserStationsInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 import ru.debajo.srrradio.ui.theme.SrrradioThemePreference
+import ru.debajo.srrradio.widget.PlayerWidgetManager
 
 val AppModule: Module = module {
     single { FirebaseCrashlytics.getInstance() }
@@ -115,4 +117,7 @@ val AppModule: Module = module {
     factory { AddTrackToCollectionProcessor(get()) }
     factory { SaveCustomStationProcessor(get()) }
     factory { SrrradioNotificationManager(get(), get()) }
+    factory { PlaybackBroadcastReceiver(get()) }
+
+    factoryOf(::PlayerWidgetManager)
 }

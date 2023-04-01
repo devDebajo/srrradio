@@ -21,7 +21,9 @@ import ru.debajo.srrradio.error.OnlyErrorsTree
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
+import ru.debajo.srrradio.widget.PlayerWidgetManager
 import timber.log.Timber
 
 class SrrradioApp : Application() {
@@ -31,6 +33,8 @@ class SrrradioApp : Application() {
     private val sendingErrorsManager: SendingErrorsManager by inject()
     private val appIconManager: AppIconManager by inject()
     private val themeManager: SrrradioThemeManager by inject()
+    private val widgetManager: PlayerWidgetManager by inject()
+    private val receiver: PlaybackBroadcastReceiver by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -38,6 +42,7 @@ class SrrradioApp : Application() {
         initDi()
         initLogs()
         initFatalErrors()
+        registerReceiver(receiver, PlaybackBroadcastReceiver.intentFilter())
 
         val processLifecycle = ProcessLifecycleOwner.get().lifecycle
         val processScope = processLifecycle.coroutineScope
@@ -55,6 +60,10 @@ class SrrradioApp : Application() {
 
             launch(Main) {
                 mediaController.prepare()
+            }
+
+            launch {
+                widgetManager.listen()
             }
         }
     }
