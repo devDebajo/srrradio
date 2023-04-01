@@ -80,7 +80,7 @@ fun AppScreenTitle(
         text = text,
         color = MaterialTheme.colorScheme.onSurface,
         fontWeight = FontWeight.Bold,
-        fontSize = 36.sp,
+        fontSize = 30.sp,
         lineHeight = 44.sp,
     )
 }
