@@ -15,7 +15,7 @@ interface FavoriteStationsStateUseCase {
 
     suspend fun get(): List<Station>
 
-    suspend fun reorder(from: Int, to: Int)
+    suspend fun updateStations(stationIds: List<String>)
 }
 
 internal class FavoriteStationsStateUseCaseImpl(
@@ -46,7 +46,7 @@ internal class FavoriteStationsStateUseCaseImpl(
         return repository.getFavoriteStations()
     }
 
-    override suspend fun reorder(from: Int, to: Int) {
-        repository.reorder(from, to)
+    override suspend fun updateStations(stationIds: List<String>) {
+        repository.updateStations(stationIds)
     }
 }

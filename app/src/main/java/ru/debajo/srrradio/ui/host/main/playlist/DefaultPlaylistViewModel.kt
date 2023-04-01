@@ -83,8 +83,10 @@ class DefaultPlaylistViewModel(
     }
 
     fun commitReorder(from: Int, to: Int) {
+        val state = stateMutable.value as? DefaultPlaylistState.Loaded ?: return
         viewModelScope.launch {
-            favoriteStationsStateUseCase.reorder(from, to)
+            val newStationsOrder = state.items.map { it.station.id }
+            favoriteStationsStateUseCase.updateStations(newStationsOrder)
         }
     }
 

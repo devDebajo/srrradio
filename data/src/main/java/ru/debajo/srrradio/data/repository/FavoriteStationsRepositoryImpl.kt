@@ -1,6 +1,5 @@
 package ru.debajo.srrradio.data.repository
 
-import java.util.Collections
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.debajo.srrradio.data.db.dao.DbFavoriteStationDao
@@ -43,14 +42,8 @@ internal class FavoriteStationsRepositoryImpl(
         })
     }
 
-    override suspend fun reorder(from: Int, to: Int) {
-        val realFavoriteOrder = dbFavoriteStationDao.getStations().toMutableList()
-        if (realFavoriteOrder.isEmpty()) {
-            return
-        }
-        Collections.swap(realFavoriteOrder, from, to)
-        print(realFavoriteOrder)
-        val toPersist = realFavoriteOrder.mapIndexed { index, dbStation -> DbFavoriteStation(dbStation.id, index) }
+    override suspend fun updateStations(stationIds: List<String>) {
+        val toPersist = stationIds.mapIndexed { index, stationId -> DbFavoriteStation(stationId, index) }
         dbFavoriteStationDao.replace(toPersist)
     }
 }

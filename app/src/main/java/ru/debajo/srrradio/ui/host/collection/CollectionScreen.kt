@@ -1,6 +1,6 @@
 package ru.debajo.srrradio.ui.host.collection
 
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -29,7 +29,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -48,6 +49,7 @@ import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
+import timber.log.Timber
 
 @Composable
 fun <T> ListScreen(
@@ -63,6 +65,7 @@ fun <T> ListScreen(
     itemContent: @Composable LazyItemScope.(item: T) -> Unit
 ) {
     val lazyColumnState = rememberLazyListState()
+    val haptic = LocalHapticFeedback.current
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -79,8 +82,15 @@ fun <T> ListScreen(
                 } else {
                     val state = rememberReorderableLazyListState(
                         listState = lazyColumnState,
-                        onMove = { from, to -> onReorder(from.index, to.index) },
-                        onDragEnd = { from, to -> onCommitReorder(from, to) }
+                        onMove = { from, to ->
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onReorder(from.index, to.index)
+                            Timber.d("yopta onMove from ${from.index} to ${to.index}")
+                        },
+                        onDragEnd = { from, to ->
+                            Timber.d("yopta onDragEnd from ${from} to ${to}")
+                            onCommitReorder(from, to)
+                        }
                     )
                     LazyColumn(
                         modifier = Modifier
@@ -103,8 +113,8 @@ fun <T> ListScreen(
                             itemContent = { index ->
                                 val item = items[index]
                                 ReorderableItem(state, key = key(item)) { isDragging ->
-                                    val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
-                                    Box(modifier = Modifier.shadow(elevation.value)) {
+                                    val scale = animateFloatAsState(targetValue = if (isDragging) 1.05f else 1f)
+                                    Box(modifier = Modifier.scale(scale.value)) {
                                         itemContent(item)
                                     }
                                 }

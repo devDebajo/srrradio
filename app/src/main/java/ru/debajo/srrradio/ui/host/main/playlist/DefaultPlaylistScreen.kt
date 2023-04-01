@@ -66,7 +66,7 @@ fun DefaultPlaylistScreen(
         },
         canReorder = strategy == DefaultPlaylistScreenStrategy.FAVORITE,
         onReorder = { from, to -> viewModel.reorder(from, to) },
-        onCommitReorder = { from, to  -> viewModel.commitReorder(from, to) },
+        onCommitReorder = { from, to -> viewModel.commitReorder(from, to) },
         items = state.items,
         key = { it.id },
         contentType = { "UiStationElement" },
