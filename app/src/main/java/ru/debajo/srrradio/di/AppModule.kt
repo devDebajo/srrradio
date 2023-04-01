@@ -18,6 +18,7 @@ import ru.debajo.srrradio.rate.GoogleServicesUtils
 import ru.debajo.srrradio.rate.HostActivityCreateCountPreference
 import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.rate.RateAppStatePreference
+import ru.debajo.srrradio.service.SrrradioNotificationManager
 import ru.debajo.srrradio.sync.AppStateSnapshotExtractor
 import ru.debajo.srrradio.sync.AppStateSnapshotMerger
 import ru.debajo.srrradio.sync.AppSynchronizer
@@ -112,4 +113,5 @@ val AppModule: Module = module {
     factory { SleepTimerListenerProcessor(get()) }
     factory { AddTrackToCollectionProcessor(get()) }
     factory { SaveCustomStationProcessor(get()) }
+    factory { SrrradioNotificationManager(get(), get()) }
 }

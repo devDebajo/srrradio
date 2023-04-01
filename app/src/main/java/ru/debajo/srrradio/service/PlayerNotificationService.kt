@@ -1,8 +1,6 @@
 package ru.debajo.srrradio.service
 
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.BroadcastReceiver
@@ -36,7 +34,7 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 
 class PlayerNotificationService : Service(), CoroutineScope {
 
-    private val notificationManager: NotificationManager by inject()
+    private val notificationManager: SrrradioNotificationManager by inject()
     private val mediaController: MediaController by inject()
     private val mediaSessionController: MediaSessionController by inject()
     private val receiver: PlaybackBroadcastReceiver by lazy { PlaybackBroadcastReceiver(mediaController) }
@@ -52,7 +50,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
     override fun onCreate() {
         super.onCreate()
-        prepareChannel()
+        notificationManager.ensureChannelCreated(SrrradioNotificationChannel.MediaControls)
         startForeground(buildEmptyNotification())
         launch(Main) {
             mediaController.state
@@ -126,7 +124,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
     private fun buildEmptyNotification(): Notification {
         val style = androidx.media.app.NotificationCompat.MediaStyle()
         style.setMediaSession(null)
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        return notificationManager.newNotificationBuilder(SrrradioNotificationChannel.MediaControls)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentTitle(getString(R.string.app_name))
             .setStyle(style)
@@ -143,7 +141,7 @@ class PlayerNotificationService : Service(), CoroutineScope {
         if (supportedActionsInNotification) {
             style.setShowActionsInCompactView(0, 1, 2)
         }
-        return NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+        return notificationManager.newNotificationBuilder(SrrradioNotificationChannel.MediaControls)
             .setSmallIcon(R.drawable.ic_radio)
             .setContentTitle(getString(R.string.app_name))
             .setStyle(style)
@@ -220,20 +218,6 @@ class PlayerNotificationService : Service(), CoroutineScope {
             return this
         }
         return addAction(icon, getString(title), intent)
-    }
-
-    private fun prepareChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val importance = NotificationManager.IMPORTANCE_LOW
-            val systemChannel = NotificationChannel(
-                NOTIFICATION_CHANNEL_ID,
-                getString(R.string.notification_channel_name),
-                importance
-            ).apply {
-                this.description = getString(R.string.notification_channel_description)
-            }
-            notificationManager.createNotificationChannel(systemChannel)
-        }
     }
 
     private fun startForeground(notification: Notification) {
@@ -313,9 +297,12 @@ class PlayerNotificationService : Service(), CoroutineScope {
 
     companion object {
         private const val ID = 45463725
-        private const val NOTIFICATION_CHANNEL_ID = "SRRRADIO_MEDIA_PLAYBACK_NOTIFICATION"
 
         fun show(context: Context) {
+            if (!SrrradioNotificationManager.hasNotificationPermission(context)) {
+                return
+            }
+
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(createIntent(context))
             } else {

@@ -46,6 +46,7 @@ import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.di.diViewModels
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.rate.RateAppManager
+import ru.debajo.srrradio.service.SrrradioNotificationManager
 import ru.debajo.srrradio.ui.common.SnowFall
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.common.alert.AlertDialogHost
@@ -79,6 +80,7 @@ class HostActivity : ComponentActivity() {
     private val snowFallUseCase: SnowFallUseCase by inject()
     private val rateAppManager: RateAppManager by inject()
     private val alertDialogState: AlertDialogState by lazy { AlertDialogState(this@HostActivity) }
+    private val notificationManager: SrrradioNotificationManager by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -103,6 +105,7 @@ class HostActivity : ComponentActivity() {
         window.navigationBarColor = AndroidColor.TRANSPARENT
 
         setContent {
+            notificationManager.RequestPermission()
             CompositionLocalProvider(
                 StationsListViewModel.Local provides stationsListViewModel,
                 PlayerBottomSheetViewModel.Local provides playerBottomSheetViewModel,

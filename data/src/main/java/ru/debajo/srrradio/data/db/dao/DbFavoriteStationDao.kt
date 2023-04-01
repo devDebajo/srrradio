@@ -46,4 +46,3 @@ internal interface DbFavoriteStationDao {
 }
 
 // обновить ссылку на политику конфиденциальности
-// пермишн на нотификации
