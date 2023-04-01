@@ -29,6 +29,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
@@ -37,6 +38,8 @@ import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.diViewModel
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
+import ru.debajo.srrradio.ui.ext.Empty
+import ru.debajo.srrradio.ui.ext.isNotEmpty
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationEvent
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationNews
 import ru.debajo.srrradio.ui.navigation.NavTree
@@ -80,7 +83,7 @@ fun AddCustomStationScreen() {
             onValueChange = { viewModel.onEvent(AddCustomStationEvent.OnStreamChanged(it)) },
             trailingIcon = {
                 if (state.stream.isNotEmpty()) {
-                    IconButton(onClick = { viewModel.onEvent(AddCustomStationEvent.OnStreamChanged("")) }) {
+                    IconButton(onClick = { viewModel.onEvent(AddCustomStationEvent.OnStreamChanged(TextFieldValue.Empty)) }) {
                         Icon(
                             imageVector = Icons.Rounded.Clear,
                             tint = MaterialTheme.colorScheme.primary,
@@ -108,7 +111,7 @@ fun AddCustomStationScreen() {
                         strokeWidth = 1.dp,
                     )
                 } else if (state.name.isNotEmpty()) {
-                    IconButton(onClick = { viewModel.onEvent(AddCustomStationEvent.OnNameChanged("")) }) {
+                    IconButton(onClick = { viewModel.onEvent(AddCustomStationEvent.OnNameChanged(TextFieldValue.Empty)) }) {
                         Icon(
                             imageVector = Icons.Rounded.Clear,
                             tint = MaterialTheme.colorScheme.primary,

@@ -1,8 +1,10 @@
 package ru.debajo.srrradio.ui.host.main.list.model
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.ui.text.input.TextFieldValue
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.media.model.asLoaded
+import ru.debajo.srrradio.ui.ext.Empty
 import ru.debajo.srrradio.ui.host.main.list.reduktor.buildUiElements
 import ru.debajo.srrradio.ui.model.UiElement
 import ru.debajo.srrradio.ui.model.UiPlaylist
@@ -40,7 +42,7 @@ sealed interface StationsListState {
 
     @Immutable
     data class InSearchMode(
-        val searchQuery: String = "",
+        val searchQuery: TextFieldValue = TextFieldValue.Empty,
         val stations: List<UiStation> = emptyList(),
         val idleState: Idle = Idle(),
         val searchPlaylist: UiPlaylist? = null
@@ -79,9 +81,9 @@ val StationsListState.collectionEmpty: Boolean
         is StationsListState.InSearchMode -> idleState.collectionEmpty
     }
 
-val StationsListState.searchQuery: String
+val StationsListState.searchQuery: TextFieldValue
     get() = when (this) {
-        is StationsListState.Idle -> ""
+        is StationsListState.Idle -> TextFieldValue.Empty
         is StationsListState.InSearchMode -> searchQuery
     }
 

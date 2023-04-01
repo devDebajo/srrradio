@@ -1,8 +1,11 @@
 package ru.debajo.srrradio.ui.host.add
 
+import androidx.compose.ui.text.input.TextFieldValue
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.Reduktor
+import ru.debajo.srrradio.ui.ext.Empty
+import ru.debajo.srrradio.ui.ext.isNotEmpty
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationEvent
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationNews
 import ru.debajo.srrradio.ui.host.add.model.AddCustomStationState
@@ -24,10 +27,10 @@ class AddCustomStationReduktor : Reduktor<AddCustomStationState, AddCustomStatio
         event: AddCustomStationEvent.OnStreamChanged
     ): Akt<AddCustomStationState, AddCustomStationNews> {
         val commands = mutableListOf<Command>()
-        var newState = state.copy(stream = event.stream, name = "")
+        var newState = state.copy(stream = event.stream, name = TextFieldValue.Empty)
         if (event.stream.isNotEmpty()) {
             newState = newState.copy(searching = true)
-            commands.add(SearchStationsCommandProcessor.Action.SearchByUrl(event.stream))
+            commands.add(SearchStationsCommandProcessor.Action.SearchByUrl(event.stream.text.trim()))
         }
         return Akt(state = newState, commands = commands)
     }
@@ -49,6 +52,6 @@ class AddCustomStationReduktor : Reduktor<AddCustomStationState, AddCustomStatio
             return Akt()
         }
 
-        return Akt(commands = listOf(SaveCustomStationProcessor.Save(state.stream.trim(), state.name.trim())))
+        return Akt(commands = listOf(SaveCustomStationProcessor.Save(state.stream.text.trim(), state.name.text.trim())))
     }
 }

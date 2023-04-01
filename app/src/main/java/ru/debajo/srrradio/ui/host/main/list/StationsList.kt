@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +42,8 @@ import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.AppTextButton
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
+import ru.debajo.srrradio.ui.ext.Empty
+import ru.debajo.srrradio.ui.ext.isNotEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.DefaultPlaylists
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
@@ -95,7 +98,7 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
                     colors = outlinedTextFieldColors(),
                     trailingIcon = {
                         if (state.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged("")) }) {
+                            IconButton(onClick = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(TextFieldValue.Empty)) }) {
                                 Icon(
                                     imageVector = Icons.Rounded.Clear,
                                     tint = MaterialTheme.colorScheme.primary,

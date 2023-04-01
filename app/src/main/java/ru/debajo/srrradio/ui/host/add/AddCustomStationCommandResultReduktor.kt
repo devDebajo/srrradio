@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.host.add
 
+import androidx.compose.ui.text.input.TextFieldValue
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
@@ -24,7 +25,7 @@ class AddCustomStationCommandResultReduktor : Reduktor<AddCustomStationState, Co
         return Akt(
             state = state.copy(
                 searching = false,
-                name = event.stations.firstOrNull()?.name.orEmpty()
+                name = TextFieldValue(event.stations.firstOrNull()?.name.orEmpty())
             )
         )
     }

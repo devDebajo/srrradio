@@ -4,6 +4,7 @@ import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.domain.LastStationUseCase
+import ru.debajo.srrradio.ui.ext.isEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
@@ -54,7 +55,7 @@ class StationsListReduktor(
             newState = newState.toIdle()
             commands.add(SearchStationsCommandProcessor.Action.Cancel)
         } else {
-            commands.add(SearchStationsCommandProcessor.Action.Search(event.query))
+            commands.add(SearchStationsCommandProcessor.Action.Search(event.query.text.trim()))
         }
 
         return Akt(
