@@ -11,12 +11,18 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import ru.debajo.srrradio.common.LazySuspend
 import ru.debajo.srrradio.common.lazySuspend
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 
-class ApiHostDiscovery {
+class ApiHostDiscovery(
+    private val configRepository: ConfigRepository,
+) {
 
-    private val host = lazySuspend { runCatchingNonCancellation { findServers().first() }.getOrNull() ?: DEFAULT_HOST }
+    private val host: LazySuspend<String> = lazySuspend {
+        runCatchingNonCancellation { findServers().first() }.getOrNull() ?: configRepository.provide().defaultApiHost
+    }
 
     suspend fun discover() {
         supervisorScope {
@@ -32,15 +38,12 @@ class ApiHostDiscovery {
     private fun findServers(): Flow<String> {
         return flow {
             val addresses = try {
-                InetAddress.getAllByName("all.api.radio-browser.info")
+                val discoverHost = configRepository.provide().discoverApiHost
+                InetAddress.getAllByName(discoverHost)
             } catch (_: UnknownHostException) {
                 emptyArray()
             }
             emitAll(addresses.asFlow().mapNotNull { it.canonicalHostName })
         }
-    }
-
-    private companion object {
-        const val DEFAULT_HOST = "de1.api.radio-browser.info"
     }
 }

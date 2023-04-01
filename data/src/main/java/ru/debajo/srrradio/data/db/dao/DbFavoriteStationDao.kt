@@ -44,5 +44,3 @@ internal interface DbFavoriteStationDao {
         insert(DbFavoriteStation(stationId, maxOrder + 1))
     }
 }
-
-// обновить ссылку на политику конфиденциальности

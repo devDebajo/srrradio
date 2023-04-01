@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="default_config_database_home_page" translatable="false">https://www.radio-browser.info/</string>
+    <string name="default_config_privacy_policy" translatable="false">http://88.210.12.13/srrradio_privacy_policy.html</string>
+    <string name="default_config_default_api_host" translatable="false">de1.api.radio-browser.info</string>
+    <string name="default_config_discover_api_host" translatable="false">all.api.radio-browser.info</string>
+</resources>

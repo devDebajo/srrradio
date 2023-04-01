@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.data.config
 
+import android.content.Context
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import java.util.concurrent.TimeUnit
@@ -16,6 +17,7 @@ import ru.debajo.srrradio.domain.repository.ConfigRepository
 import timber.log.Timber
 
 internal class ConfigRepositoryImpl(
+    private val context: Context,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
 ) : ConfigRepository {
 
@@ -53,6 +55,10 @@ internal class ConfigRepositoryImpl(
         return runCatchingNonCancellation {
             firebaseRemoteConfig.fetchAndActivate().await()
             Config(
+                databaseHomepage = firebaseRemoteConfig.getString("database_home_page"),
+                privacyPolicy = firebaseRemoteConfig.getString("privacy_policy"),
+                defaultApiHost = firebaseRemoteConfig.getString("default_api_host"),
+                discoverApiHost = firebaseRemoteConfig.getString("discover_api_host"),
                 authEnabled = firebaseRemoteConfig.getBoolean("auth_enabled"),
                 snowFallEnabled = firebaseRemoteConfig.getBoolean("snow_fall_toggle_visible"),
                 rateAppEnabled = firebaseRemoteConfig.getBoolean("rate_app_enabled"),
@@ -62,6 +68,18 @@ internal class ConfigRepositoryImpl(
                 Timber.tag("ConfigRepositoryImpl").d("Remote config fetch success: $it")
             }
             .toTimber()
-            .getOrElse { Config() }
+            .getOrElse { defaultConfig() }
+    }
+
+    private fun defaultConfig(): Config {
+        return Config(
+            databaseHomepage = context.getString(R.string.default_config_database_home_page),
+            privacyPolicy = context.getString(R.string.default_config_privacy_policy),
+            defaultApiHost = context.getString(R.string.default_config_default_api_host),
+            discoverApiHost = context.getString(R.string.default_config_discover_api_host),
+            authEnabled = false,
+            snowFallEnabled = false,
+            rateAppEnabled = false,
+        )
     }
 }

@@ -8,6 +8,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.data.BuildConfig
 import ru.debajo.srrradio.data.config.ConfigRepositoryImpl
@@ -72,7 +73,7 @@ val DataModule: Module = module {
     single { Gson() }
     single<SearchStationsRepository> { SearchStationsRepositoryImpl(get()) }
     single<FavoriteStationsRepository> { FavoriteStationsRepositoryImpl(get(), get()) }
-    single { ApiHostDiscovery() }
+    singleOf(::ApiHostDiscovery)
 
     factory { LastPlaylistIdPreference(get()) }
     factory { LastStationIdPreference(get()) }
@@ -82,5 +83,5 @@ val DataModule: Module = module {
     factory<ParseM3uUseCase> { ParseM3uUseCaseImpl(get()) }
     factory<TracksCollectionRepository> { TracksCollectionRepositoryImpl(get()) }
     factory<SyncUseCase> { SyncRepositoryImpl(get(), get()) }
-    single<ConfigRepository> { ConfigRepositoryImpl(get()) }
+    single<ConfigRepository> { ConfigRepositoryImpl(get(), get()) }
 }

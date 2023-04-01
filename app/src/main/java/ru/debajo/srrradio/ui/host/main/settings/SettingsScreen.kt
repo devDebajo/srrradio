@@ -58,6 +58,7 @@ import ru.debajo.srrradio.ui.common.alert.LocalAlertDialogState
 import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
+import ru.debajo.srrradio.ui.host.main.settings.model.SettingsNews
 
 @Composable
 fun SettingsScreen(bottomPadding: Dp) {
@@ -81,6 +82,15 @@ private fun SettingsList(bottomPadding: Dp) {
     val state by viewModel.state.collectAsState()
     val expandedGroup = rememberSaveable { mutableStateOf(-1) }
     SettingsBackPress(expandedGroup)
+
+    val context = LocalContext.current
+    LaunchedEffect(viewModel, context) {
+        viewModel.news.collect { news ->
+            when (news) {
+                is SettingsNews.OpenUrl -> context.openUrl(news.url)
+            }
+        }
+    }
 
     Column(
         Modifier
@@ -197,17 +207,16 @@ private fun SettingsList(bottomPadding: Dp) {
                 )
             }
 
-            val context = LocalContext.current
             SettingsText(
                 text = stringResource(R.string.settings_privacy_policy)
             ) {
-                context.openUrl(BuildConfig.PRIVACY_POLICY)
+                viewModel.openPrivacyPolicy()
             }
 
             SettingsText(
                 text = stringResource(R.string.settings_data_source)
             ) {
-                context.openUrl(BuildConfig.DATABASE_HOMEPAGE)
+                viewModel.openDatabaseHomepage()
             }
 
             SettingsText(

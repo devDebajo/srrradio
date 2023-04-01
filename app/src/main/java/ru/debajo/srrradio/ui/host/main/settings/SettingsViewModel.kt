@@ -5,8 +5,11 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.onStart
@@ -14,12 +17,14 @@ import kotlinx.coroutines.launch
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.sync.AppSynchronizer
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
+import ru.debajo.srrradio.ui.host.main.settings.model.SettingsNews
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsState
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
@@ -34,10 +39,13 @@ internal class SettingsViewModel(
     private val appSynchronizer: AppSynchronizer,
     private val snowFallUseCase: SnowFallUseCase,
     private val rateAppManager: RateAppManager,
+    private val configRepository: ConfigRepository,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
+    private val newsMutable: MutableSharedFlow<SettingsNews> = MutableSharedFlow()
     val state: StateFlow<SettingsState> = stateMutable.asStateFlow()
+    val news: Flow<SettingsNews> = newsMutable.asSharedFlow()
 
     init {
         updateState {
@@ -162,6 +170,20 @@ internal class SettingsViewModel(
 
     fun resetRateApp() {
         rateAppManager.resetForDebug()
+    }
+
+    fun openPrivacyPolicy() {
+        viewModelScope.launch {
+            val privacyPolicy = configRepository.provide().privacyPolicy
+            newsMutable.emit(SettingsNews.OpenUrl(privacyPolicy))
+        }
+    }
+
+    fun openDatabaseHomepage() {
+        viewModelScope.launch {
+            val databaseHomepage = configRepository.provide().databaseHomepage
+            newsMutable.emit(SettingsNews.OpenUrl(databaseHomepage))
+        }
     }
 
     private inline fun updateState(block: SettingsState.() -> SettingsState) {

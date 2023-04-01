@@ -3,6 +3,7 @@ package ru.debajo.srrradio.di
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.auth.AuthManagerProvider
@@ -77,13 +78,13 @@ val AppModule: Module = module {
         MediaController(get(), player, get(), get(), get())
     }
 
-    factory { PlayerBottomSheetViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    factory { SleepTimerViewModel(get()) }
-    factory { SettingsViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
-    factory { AddCustomStationViewModel(get(), get(), get(), get()) }
-    factory { CollectionViewModel(get()) }
-    factory { DefaultPlaylistViewModel(get(), get(), get(), get(), get(), get()) }
-    factory { StationsListViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factoryOf(::PlayerBottomSheetViewModel)
+    factoryOf(::SleepTimerViewModel)
+    factoryOf(::SettingsViewModel)
+    factoryOf(::AddCustomStationViewModel)
+    factoryOf(::CollectionViewModel)
+    factoryOf(::DefaultPlaylistViewModel)
+    factoryOf(::StationsListViewModel)
 
     factory { SendingErrorsPreference(get()) }
     factory { SrrradioThemePreference(get()) }

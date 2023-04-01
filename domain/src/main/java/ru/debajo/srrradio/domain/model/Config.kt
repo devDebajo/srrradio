@@ -1,7 +1,11 @@
 package ru.debajo.srrradio.domain.model
 
 data class Config(
-    val authEnabled: Boolean = false,
-    val snowFallEnabled: Boolean = false,
-    val rateAppEnabled: Boolean = false,
+    val databaseHomepage: String,
+    val privacyPolicy: String,
+    val defaultApiHost: String,
+    val discoverApiHost: String,
+    val authEnabled: Boolean,
+    val snowFallEnabled: Boolean,
+    val rateAppEnabled: Boolean,
 )
