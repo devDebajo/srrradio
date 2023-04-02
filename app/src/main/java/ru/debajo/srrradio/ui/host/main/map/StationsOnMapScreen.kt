@@ -4,37 +4,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.view.updatePadding
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
-import java.lang.ref.WeakReference
-import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
-import org.osmdroid.api.IMapController
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import ru.debajo.srrradio.di.diViewModel
 import ru.debajo.srrradio.domain.LOCATION_PERMISSION
+import ru.debajo.srrradio.ui.common.RequestPermission
 import ru.debajo.srrradio.ui.model.UiStation
 
 @Composable
-@OptIn(ExperimentalPermissionsApi::class)
-fun StationsOnMapScreen(listBottomPadding: Dp) {
+fun StationsOnMapScreen() {
     val viewModel: StationsOnMapViewModel = diViewModel()
-    InitMapLifecycle()
-    val permissionState = rememberPermissionState(permission = LOCATION_PERMISSION) { granted ->
-        if (granted) {
-            viewModel.loadCurrentLocation()
-        }
-    }
+    val mapController = rememberMapController()
+    RequestPermission(
+        permission = LOCATION_PERMISSION,
+        key = viewModel,
+        onGrant = { viewModel.loadCurrentLocation() },
+    )
     val stations by viewModel.stations.collectAsState()
-    val mapController = remember { MapController() }
     LaunchedEffect(viewModel) {
         launch {
             viewModel.moveToLocationRequest.collect {
@@ -42,15 +31,8 @@ fun StationsOnMapScreen(listBottomPadding: Dp) {
             }
         }
 
-        if (permissionState.status.isGranted) {
-            viewModel.loadCurrentLocation()
-        } else {
-            permissionState.launchPermissionRequest()
-        }
-
         viewModel.load()
     }
-    val listBottomPaddingPx = with(LocalDensity.current) { listBottomPadding.toPx() }
 
     AndroidView(
         factory = { context ->
@@ -60,7 +42,6 @@ fun StationsOnMapScreen(listBottomPadding: Dp) {
             }
         },
         update = { mapView ->
-            mapView.updatePadding(bottom = listBottomPaddingPx.roundToInt())
             mapView.addStations(stations) { station -> viewModel.startPlaying(station) }
         }
     )
@@ -87,23 +68,4 @@ private fun MapView.addStations(stations: List<UiStation>, onStationClick: (UiSt
         overlays.add(marker)
     }
     invalidate()
-}
-
-private class MapController {
-
-    private var libraryController: WeakReference<IMapController>? = null
-
-    fun attach(controller: IMapController) {
-        libraryController = WeakReference(controller)
-    }
-
-    fun moveTo(latitude: Double, longitude: Double, animated: Boolean) {
-        val libraryController = libraryController?.get() ?: return
-        if (animated) {
-            libraryController.animateTo(GeoPoint(latitude, longitude), 15.0, 1200L)
-        } else {
-            libraryController.setCenter(GeoPoint(latitude, longitude))
-            libraryController.setZoom(15.0)
-        }
-    }
 }

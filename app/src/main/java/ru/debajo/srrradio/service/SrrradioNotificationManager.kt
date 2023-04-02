@@ -8,11 +8,7 @@ import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.core.app.NotificationCompat
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.common.utils.hasPermission
 
@@ -24,18 +20,15 @@ class SrrradioNotificationManager(
         get() = hasNotificationPermission(context)
 
     @Composable
-    @OptIn(ExperimentalPermissionsApi::class)
     fun RequestPermission() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return
         }
 
-        val permissionState = rememberPermissionState(permission = Manifest.permission.POST_NOTIFICATIONS)
-        LaunchedEffect(permissionState) {
-            if (!permissionState.status.isGranted) {
-                permissionState.launchPermissionRequest()
-            }
-        }
+        ru.debajo.srrradio.ui.common.RequestPermission(
+            permission = Manifest.permission.POST_NOTIFICATIONS,
+            key = this
+        )
     }
 
     fun notify(id: Int, notification: Notification) {

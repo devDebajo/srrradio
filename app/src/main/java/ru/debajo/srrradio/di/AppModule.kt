@@ -31,7 +31,7 @@ import ru.debajo.srrradio.ui.host.collection.CollectionViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
-import ru.debajo.srrradio.ui.host.main.map.MapLifecycleHelper
+import ru.debajo.srrradio.ui.host.main.map.MapController
 import ru.debajo.srrradio.ui.host.main.map.StationsOnMapViewModel
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.player.reduktor.PlayerBottomSheetCommandResultReduktor
@@ -119,5 +119,5 @@ val AppModule: Module = module {
     factory { PlaybackBroadcastReceiver(get()) }
 
     factoryOf(::PlayerWidgetManager)
-    factoryOf(::MapLifecycleHelper)
+    factoryOf(::MapController)
 }

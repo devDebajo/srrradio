@@ -9,15 +9,34 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import java.lang.ref.WeakReference
+import org.osmdroid.api.IMapController
 import org.osmdroid.config.Configuration
 import org.osmdroid.config.IConfigurationProvider
+import org.osmdroid.util.GeoPoint
 import ru.debajo.srrradio.common.utils.getFromDi
 
-class MapLifecycleHelper(
+class MapController(
     private val context: Context,
     private val sharedPreferences: SharedPreferences
 ) {
+
     private val configuration: IConfigurationProvider by lazy { Configuration.getInstance() }
+    private var libraryController: WeakReference<IMapController>? = null
+
+    fun attach(controller: IMapController) {
+        libraryController = WeakReference(controller)
+    }
+
+    fun moveTo(latitude: Double, longitude: Double, animated: Boolean) {
+        val libraryController = libraryController?.get() ?: return
+        if (animated) {
+            libraryController.animateTo(GeoPoint(latitude, longitude), 15.0, 1200L)
+        } else {
+            libraryController.setCenter(GeoPoint(latitude, longitude))
+            libraryController.setZoom(15.0)
+        }
+    }
 
     fun load() {
         configuration.load(context, sharedPreferences)
@@ -29,26 +48,28 @@ class MapLifecycleHelper(
 }
 
 @Composable
-fun InitMapLifecycle() {
+fun rememberMapController(): MapController {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val mapHelper = remember { getFromDi<MapLifecycleHelper>() }
-    LaunchedEffect(mapHelper) {
-        mapHelper.load()
+    val mapController = remember { getFromDi<MapController>() }
+    LaunchedEffect(mapController) {
+        mapController.load()
     }
-    DisposableEffect(mapHelper, lifecycleOwner) {
+    DisposableEffect(mapController, lifecycleOwner) {
         val lifecycle = lifecycleOwner.lifecycle
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_CREATE -> mapHelper.load()
-                Lifecycle.Event.ON_RESUME -> mapHelper.load()
-                Lifecycle.Event.ON_PAUSE -> mapHelper.save()
+                Lifecycle.Event.ON_CREATE -> mapController.load()
+                Lifecycle.Event.ON_RESUME -> mapController.load()
+                Lifecycle.Event.ON_PAUSE -> mapController.save()
                 else -> Unit
             }
         }
         lifecycle.addObserver(observer)
         onDispose {
-            mapHelper.save()
+            mapController.save()
             lifecycle.removeObserver(observer)
         }
     }
+
+    return mapController
 }

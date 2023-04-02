@@ -49,7 +49,6 @@ import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.ext.longPress
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
-import timber.log.Timber
 
 @Composable
 fun <T> ListScreen(
@@ -85,12 +84,8 @@ fun <T> ListScreen(
                         onMove = { from, to ->
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             onReorder(from.index, to.index)
-                            Timber.d("yopta onMove from ${from.index} to ${to.index}")
                         },
-                        onDragEnd = { from, to ->
-                            Timber.d("yopta onDragEnd from ${from} to ${to}")
-                            onCommitReorder(from, to)
-                        }
+                        onDragEnd = { from, to -> onCommitReorder(from, to) }
                     )
                     LazyColumn(
                         modifier = Modifier

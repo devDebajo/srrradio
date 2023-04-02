@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UserLocationUseCase
@@ -51,6 +52,7 @@ class StationsOnMapViewModel(
 
     fun loadCurrentLocation() {
         viewModelScope.launch {
+            _moveToLocationRequest.subscriptionCount.first { it > 0 }
             val lastCachedLocation = locationUseCase.getLastCachedLocation()
             if (lastCachedLocation != null) {
                 _moveToLocationRequest.emit(

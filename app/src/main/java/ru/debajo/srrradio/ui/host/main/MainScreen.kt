@@ -206,7 +206,7 @@ private fun RadioScreenContent() {
                             }
 
                             composable(navTree.main.radio.stationsOnMap.route) {
-                                StationsOnMapScreen(listBottomPadding = listBottomPadding)
+                                StationsOnMapScreen()
                             }
                         }
 
