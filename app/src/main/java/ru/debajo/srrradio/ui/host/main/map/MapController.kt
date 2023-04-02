@@ -15,6 +15,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.config.IConfigurationProvider
 import org.osmdroid.util.GeoPoint
 import ru.debajo.srrradio.common.utils.getFromDi
+import ru.debajo.srrradio.domain.model.LatLng
 
 class MapController(
     private val context: Context,
@@ -28,12 +29,12 @@ class MapController(
         libraryController = WeakReference(controller)
     }
 
-    fun moveTo(latitude: Double, longitude: Double, animated: Boolean) {
+    fun moveTo(location: LatLng, animated: Boolean) {
         val libraryController = libraryController?.get() ?: return
         if (animated) {
-            libraryController.animateTo(GeoPoint(latitude, longitude), 15.0, 1200L)
+            libraryController.animateTo(GeoPoint(location.latitude, location.longitude), 15.0, 1200L)
         } else {
-            libraryController.setCenter(GeoPoint(latitude, longitude))
+            libraryController.setCenter(GeoPoint(location.latitude, location.longitude))
             libraryController.setZoom(15.0)
         }
     }

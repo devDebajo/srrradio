@@ -7,6 +7,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.viewinterop.AndroidView
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.CustomZoomButtonsController
+import org.osmdroid.views.CustomZoomButtonsDisplay
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
 import ru.debajo.srrradio.di.diViewModel
@@ -27,7 +29,7 @@ fun StationsOnMapScreen() {
     LaunchedEffect(viewModel) {
         launch {
             viewModel.moveToLocationRequest.collect {
-                mapController.moveTo(it.latitude, it.longitude, it.animated)
+                mapController.moveTo(it.location, it.animated)
             }
         }
 
@@ -38,6 +40,16 @@ fun StationsOnMapScreen() {
         factory = { context ->
             MapView(context).also { mapView ->
                 mapView.setMultiTouchControls(true)
+                mapView.zoomController.setVisibility(CustomZoomButtonsController.Visibility.ALWAYS)
+                mapView.zoomController.display.setPositions(
+                    false,
+                    CustomZoomButtonsDisplay.HorizontalPosition.RIGHT,
+                    CustomZoomButtonsDisplay.VerticalPosition.CENTER
+                )
+
+                mapView.isVerticalMapRepetitionEnabled = false
+                mapView.isHorizontalMapRepetitionEnabled = false
+
                 mapController.attach(mapView.controller)
             }
         },

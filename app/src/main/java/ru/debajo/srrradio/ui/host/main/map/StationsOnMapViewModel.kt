@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UserLocationUseCase
+import ru.debajo.srrradio.domain.model.LatLng
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiStation
@@ -57,8 +58,7 @@ class StationsOnMapViewModel(
             if (lastCachedLocation != null) {
                 _moveToLocationRequest.emit(
                     MoveToLocationRequest(
-                        latitude = lastCachedLocation.first,
-                        longitude = lastCachedLocation.second,
+                        location = lastCachedLocation,
                         animated = false
                     )
                 )
@@ -68,8 +68,7 @@ class StationsOnMapViewModel(
             if (location != null) {
                 _moveToLocationRequest.emit(
                     MoveToLocationRequest(
-                        latitude = location.first,
-                        longitude = location.second,
+                        location = location,
                         animated = true
                     )
                 )
@@ -78,8 +77,7 @@ class StationsOnMapViewModel(
     }
 
     class MoveToLocationRequest(
-        val latitude: Double,
-        val longitude: Double,
+        val location: LatLng,
         val animated: Boolean,
     )
 }

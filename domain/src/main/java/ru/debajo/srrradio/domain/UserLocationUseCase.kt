@@ -13,16 +13,20 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withTimeout
 import ru.debajo.srrradio.common.utils.hasPermission
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.domain.model.LatLng
 import timber.log.Timber
 
 interface UserLocationUseCase {
-    suspend fun getCurrentLocation(): Pair<Double, Double>?
+    suspend fun getCurrentLocation(): LatLng?
 
-    fun getLastCachedLocation(): Pair<Double, Double>?
+    fun observeLocation(): Flow<LatLng>
+
+    fun getLastCachedLocation(): LatLng?
 }
 
 internal class UserLocationUseCaseImpl(
@@ -31,7 +35,7 @@ internal class UserLocationUseCaseImpl(
 ) : UserLocationUseCase {
 
     @SuppressLint("MissingPermission")
-    override suspend fun getCurrentLocation(): Pair<Double, Double>? {
+    override suspend fun getCurrentLocation(): LatLng? {
         if (!context.hasPermission(LOCATION_PERMISSION)) {
             return null
         }
@@ -46,7 +50,16 @@ internal class UserLocationUseCaseImpl(
     }
 
     @SuppressLint("MissingPermission")
-    override fun getLastCachedLocation(): Pair<Double, Double>? {
+    override fun observeLocation(): Flow<LatLng> {
+        if (!context.hasPermission(LOCATION_PERMISSION)) {
+            return emptyFlow()
+        }
+
+        return observeLocationInternal()
+    }
+
+    @SuppressLint("MissingPermission")
+    override fun getLastCachedLocation(): LatLng? {
         if (!context.hasPermission(LOCATION_PERMISSION)) {
             return null
         }
@@ -55,12 +68,12 @@ internal class UserLocationUseCaseImpl(
     }
 
     @RequiresPermission(LOCATION_PERMISSION)
-    private fun lastCachedLocation(): Pair<Double, Double>? {
+    private fun lastCachedLocation(): LatLng? {
         return locationManager.getLastKnownLocation(PROVIDER)?.convert()
     }
 
     @RequiresPermission(LOCATION_PERMISSION)
-    private fun observeLocation(): Flow<Pair<Double, Double>> {
+    private fun observeLocationInternal(): Flow<LatLng> {
         return callbackFlow {
             val listener = LocationListener {
                 trySend(it.convert())
@@ -85,7 +98,7 @@ internal class UserLocationUseCaseImpl(
         }
     }
 
-    private fun Location.convert(): Pair<Double, Double> = latitude to longitude
+    private fun Location.convert(): LatLng = LatLng(latitude, longitude)
 
     private companion object {
         val PROVIDER = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
