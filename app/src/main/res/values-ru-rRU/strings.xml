@@ -8,6 +8,8 @@
     <string name="favorite">Избранное</string>
     <string name="no_track">Неизвестный трек</string>
 
+    <string name="playlist_recommendations">Рекомендации</string>
+    <string name="playlist_recommendations_empty">Не удалось найти рекомендованные станции. Добавьте больше станций в избранное</string>
     <string name="playlist_new">Новые</string>
     <string name="playlist_new_empty">Не нашли новые станций</string>
     <string name="playlist_popular">Популярные</string>

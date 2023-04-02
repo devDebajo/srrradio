@@ -205,6 +205,13 @@ private fun RadioScreenContent() {
                                 )
                             }
 
+                            composable(navTree.main.radio.recommendedStations.route) {
+                                DefaultPlaylistScreen(
+                                    listBottomPadding = listBottomPadding,
+                                    strategy = DefaultPlaylistScreenStrategy.RECOMMENDATIONS
+                                )
+                            }
+
                             composable(navTree.main.radio.stationsOnMap.route) {
                                 StationsOnMapScreen()
                             }

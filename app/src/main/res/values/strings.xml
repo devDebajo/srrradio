@@ -10,6 +10,8 @@
     <string name="favorite">Favorite</string>
     <string name="no_track">Unknown track</string>
 
+    <string name="playlist_recommendations">Recommendations</string>
+    <string name="playlist_recommendations_empty">Recommendations not found. Add more favorites stations</string>
     <string name="playlist_new">New</string>
     <string name="playlist_new_empty">There no new stations</string>
     <string name="playlist_popular">Popular</string>

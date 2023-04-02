@@ -9,27 +9,33 @@ class RecommendationsUseCase internal constructor(
     private val serviceHolder: ServiceHolder,
     private val favoriteStationsStateUseCase: FavoriteStationsStateUseCase,
 ) {
-    suspend operator fun invoke(): List<Station> {
-        val targetTags = favoriteStationsStateUseCase.get()
+    suspend operator fun invoke(limit: Int): List<Station> {
+        val favoriteStations = favoriteStationsStateUseCase.get()
+        if (favoriteStations.isEmpty()) {
+            return emptyList()
+        }
+        val targetTags = favoriteStations
             .asSequence()
             .flatMap { it.tags }
             .groupBy { it }
             .asSequence()
             .map { it.key to it.value.size }
             .sortedByDescending { it.second }
-            .take(3)
+            .take(1)
             .map { it.first }
             .toList()
-
-        return serviceHolder.createService().search(
+        val favoriteIds = favoriteStations.map { it.id }.toSet()
+        val remoteStations = serviceHolder.createService().search(
             hideBroken = true,
             tagList = targetTags.joinToString(separator = ","),
             order = "votes",
             reverse = true,
-            limit = 10,
+            limit = 100,
         )
+        return remoteStations
             .asSequence()
-            .filter { it.health == 1 }
+            .filter { it.health == 1 && it.id !in favoriteIds }
+            .take(limit)
             .map { it.toDomain() }
             .toList()
     }

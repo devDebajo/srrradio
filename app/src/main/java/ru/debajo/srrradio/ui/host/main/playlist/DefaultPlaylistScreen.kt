@@ -27,6 +27,7 @@ enum class DefaultPlaylistScreenStrategy(
     POPULAR(R.string.playlist_popular, R.string.playlist_popular_empty),
     FAVORITE(R.string.playlist_favorite, R.string.playlist_favorite_empty),
     NEW(R.string.playlist_new, R.string.playlist_new_empty),
+    RECOMMENDATIONS(R.string.playlist_recommendations, R.string.playlist_recommendations_empty),
 }
 
 @Composable

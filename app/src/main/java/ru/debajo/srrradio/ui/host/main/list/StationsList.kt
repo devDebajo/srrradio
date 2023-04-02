@@ -201,6 +201,10 @@ private fun navigateToPlaylist(navTree: NavTree, playlist: UiPlaylistIcon) {
         DefaultPlaylists.StationsOnMap -> {
             navTree.main.radio.stationsOnMap.navigate()
         }
+
+        DefaultPlaylists.RecommendedStations -> {
+            navTree.main.radio.recommendedStations.navigate()
+        }
     }
 }
 

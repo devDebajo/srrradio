@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import ru.debajo.srrradio.data.usecase.RecommendationsUseCase
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
@@ -36,6 +37,7 @@ class DefaultPlaylistViewModel(
     private val favoriteStationsStateUseCase: FavoriteStationsStateUseCase,
     private val updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase,
     private val mediaController: MediaController,
+    private val recommendationsUseCase: RecommendationsUseCase,
 ) : ViewModel() {
 
     private var job: Job? = null
@@ -95,6 +97,8 @@ class DefaultPlaylistViewModel(
             DefaultPlaylistScreenStrategy.POPULAR -> asFlow { searchStationsUseCase.searchPopular(LIMIT) }
 
             DefaultPlaylistScreenStrategy.FAVORITE -> favoriteStationsStateUseCase.observe()
+
+            DefaultPlaylistScreenStrategy.RECOMMENDATIONS -> asFlow { recommendationsUseCase(LIMIT) }
         }
     }
 

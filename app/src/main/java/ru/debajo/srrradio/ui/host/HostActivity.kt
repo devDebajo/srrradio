@@ -37,14 +37,12 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
-import ru.debajo.srrradio.data.usecase.RecommendationsUseCase
 import ru.debajo.srrradio.di.diViewModels
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.rate.RateAppManager
@@ -70,7 +68,6 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.navigation.SrrradioNavigationHost
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
-import timber.log.Timber
 
 class HostActivity : ComponentActivity() {
 
@@ -84,7 +81,6 @@ class HostActivity : ComponentActivity() {
     private val rateAppManager: RateAppManager by inject()
     private val alertDialogState: AlertDialogState by lazy { AlertDialogState(this@HostActivity) }
     private val notificationManager: SrrradioNotificationManager by inject()
-    private val recommendationsUseCase: RecommendationsUseCase by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -107,11 +103,6 @@ class HostActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = AndroidColor.TRANSPARENT
         window.navigationBarColor = AndroidColor.TRANSPARENT
-
-        lifecycleScope.launch(IO) {
-            val recommended = recommendationsUseCase()
-            Timber.d("yopta recommended ${recommended.size}")
-        }
 
         setContent {
             notificationManager.RequestPermission()
