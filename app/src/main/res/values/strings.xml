@@ -108,4 +108,6 @@
 
     <string name="accessibility_clear_stream">Clear stream url</string>
     <string name="accessibility_clear_stream_name">Clear stream name</string>
+
+    <string name="widget_loading">Widget loading</string>
 </resources>

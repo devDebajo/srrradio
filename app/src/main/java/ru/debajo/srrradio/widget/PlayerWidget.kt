@@ -1,7 +1,9 @@
 package ru.debajo.srrradio.widget
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -10,10 +12,12 @@ import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
 import androidx.glance.LocalContext
+import androidx.glance.LocalGlanceId
 import androidx.glance.action.Action
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.CircularProgressIndicator
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionSendBroadcast
 import androidx.glance.appwidget.action.actionStartActivity
@@ -33,6 +37,7 @@ import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
+import kotlinx.coroutines.runBlocking
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
 import ru.debajo.srrradio.ui.host.HostActivity
@@ -42,6 +47,20 @@ class PlayerWidget : GlanceAppWidget() {
 
     @Composable
     override fun Content() {
+        val padding = 4.dp
+        val context = LocalContext.current
+        val glanceId = LocalGlanceId.current
+        val buttonSize = remember(context, glanceId) {
+            val height = runBlocking {
+                GlanceAppWidgetManager(context).getAppWidgetSizes(glanceId).firstOrNull()
+            }?.height
+            if (height != null) {
+                (height - (padding * 2)) * 0.45f
+            } else {
+                35.dp
+            }
+        }
+
         val prefs: Preferences = currentState()
         val state = PlayerWidgetManager.extractState(prefs)
         Box(
@@ -52,24 +71,40 @@ class PlayerWidget : GlanceAppWidget() {
                     night = Color.DarkGray.copy(alpha = 0.5f)
                 )
                 .cornerRadius(16.dp)
-                .padding(8.dp)
+                .padding(padding),
+            contentAlignment = Alignment.Center,
         ) {
-            PlayerWidgetContent(
-                modifier = GlanceModifier.fillMaxSize(),
-                state = state
-            )
+            when (state) {
+                is PlayerWidgetManager.WidgetState.NoData -> {
+                    GlanceText(
+                        text = context.getString(R.string.widget_loading),
+                        color = Color.White,
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                    )
+                }
+                is PlayerWidgetManager.WidgetState.HasData -> {
+                    PlayerWidgetContent(
+                        modifier = GlanceModifier.fillMaxSize(),
+                        state = state,
+                        buttonSize = buttonSize
+                    )
+                }
+            }
         }
     }
 
     @Composable
     private fun PlayerWidgetContent(
         modifier: GlanceModifier = GlanceModifier,
-        state: PlayerWidgetManager.WidgetState,
+        state: PlayerWidgetManager.WidgetState.HasData,
+        buttonSize: Dp,
     ) {
         val context = LocalContext.current
         Column(
             modifier = modifier.clickable(actionStartActivity(HostActivity.createIntent(context))),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             GlanceText(
                 text = state.stationName,
@@ -78,12 +113,11 @@ class PlayerWidget : GlanceAppWidget() {
                 maxLines = 1,
             )
             GlanceText(
-                text = state.playingTitle.orEmpty(),
-                color = Color.White.copy(alpha = 0.2f),
+                text = state.playingTitle ?: context.getString(R.string.no_track),
+                color = Color.White.copy(alpha = 0.5f),
                 fontSize = 12.sp,
                 maxLines = 1,
             )
-            val buttonSize = 50.dp
             Spacer(GlanceModifier.height(8.dp))
             Row {
                 if (state.hasPreviousStation) {

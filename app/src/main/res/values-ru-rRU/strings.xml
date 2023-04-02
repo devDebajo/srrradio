@@ -100,4 +100,6 @@
 
     <string name="accessibility_clear_stream">Очистить ссылку на радио-поток</string>
     <string name="accessibility_clear_stream_name">Очистить название радио-потока</string>
+
+    <string name="widget_loading">Виджет загружается</string>
 </resources>

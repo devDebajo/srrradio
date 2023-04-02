@@ -24,7 +24,11 @@ class PlayerWidgetManager(
             when (it) {
                 MediaState.Empty,
                 MediaState.Loading,
-                MediaState.None -> Unit
+                MediaState.None -> {
+                    updateAllWidgets {
+                        this[PREFERENCES_KEY_NO_DATA] = true
+                    }
+                }
                 is MediaState.Loaded -> applyNewState(it)
             }
         }
@@ -32,6 +36,7 @@ class PlayerWidgetManager(
 
     private suspend fun applyNewState(currentState: MediaState.Loaded) {
         updateAllWidgets {
+            this[PREFERENCES_KEY_NO_DATA] = false
             this[PREFERENCES_KEY_HAS_PREVIOUS_STATION] = currentState.hasPreviousStation
             this[PREFERENCES_KEY_HAS_NEXT_STATION] = currentState.hasNextStation
             this[PREFERENCES_KEY_IS_PLAYING] = currentState.playing
@@ -57,15 +62,20 @@ class PlayerWidgetManager(
     }
 
 
-    data class WidgetState(
-        val hasPreviousStation: Boolean,
-        val hasNextStation: Boolean,
-        val playingState: UiStationPlayingState,
-        val stationName: String,
-        val playingTitle: String?,
-    )
+    sealed interface WidgetState {
+        object NoData : WidgetState
+
+        data class HasData(
+            val hasPreviousStation: Boolean,
+            val hasNextStation: Boolean,
+            val playingState: UiStationPlayingState,
+            val stationName: String,
+            val playingTitle: String?,
+        ) : WidgetState
+    }
 
     companion object {
+        private val PREFERENCES_KEY_NO_DATA = booleanPreferencesKey("no_data")
         private val PREFERENCES_KEY_HAS_PREVIOUS_STATION = booleanPreferencesKey("has_prev")
         private val PREFERENCES_KEY_HAS_NEXT_STATION = booleanPreferencesKey("has_next")
         private val PREFERENCES_KEY_IS_PLAYING = booleanPreferencesKey("is_playing")
@@ -74,6 +84,9 @@ class PlayerWidgetManager(
         private val PREFERENCES_KEY_TRACK_NAME = stringPreferencesKey("track_name")
 
         fun extractState(preferences: Preferences): WidgetState {
+            if (preferences[PREFERENCES_KEY_NO_DATA] == true) {
+                return WidgetState.NoData
+            }
             val playing = preferences[PREFERENCES_KEY_IS_PLAYING] == true
             val buffering = preferences[PREFERENCES_KEY_IS_BUFFERING] == true
             val playingState = when {
@@ -81,7 +94,7 @@ class PlayerWidgetManager(
                 playing -> UiStationPlayingState.PLAYING
                 else -> UiStationPlayingState.NONE
             }
-            return WidgetState(
+            return WidgetState.HasData(
                 hasPreviousStation = preferences[PREFERENCES_KEY_HAS_PREVIOUS_STATION] == true,
                 hasNextStation = preferences[PREFERENCES_KEY_HAS_NEXT_STATION] == true,
                 playingState = playingState,
