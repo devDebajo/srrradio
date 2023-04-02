@@ -46,10 +46,8 @@ fun StationsOnMapScreen() {
                     CustomZoomButtonsDisplay.HorizontalPosition.RIGHT,
                     CustomZoomButtonsDisplay.VerticalPosition.CENTER
                 )
-
-                mapView.isVerticalMapRepetitionEnabled = false
-                mapView.isHorizontalMapRepetitionEnabled = false
-
+                mapView.minZoomLevel = 3.0
+                mapView.maxZoomLevel = 17.0
                 mapController.attach(mapView.controller)
             }
         },
