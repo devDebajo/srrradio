@@ -26,7 +26,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -61,6 +60,7 @@ import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.toDp
 import ru.debajo.srrradio.ui.host.main.list.StationsList
+import ru.debajo.srrradio.ui.host.main.map.StationsOnMapScreen
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetContent
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
@@ -206,7 +206,7 @@ private fun RadioScreenContent() {
                             }
 
                             composable(navTree.main.radio.stationsOnMap.route) {
-                                Text("Map")
+                                StationsOnMapScreen(listBottomPadding = listBottomPadding)
                             }
                         }
 

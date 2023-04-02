@@ -6,6 +6,7 @@ import android.content.Context
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresPermission
 import kotlinx.coroutines.cancel
@@ -20,6 +21,8 @@ import timber.log.Timber
 
 interface UserLocationUseCase {
     suspend fun getCurrentLocation(): Pair<Double, Double>?
+
+    fun getLastCachedLocation(): Pair<Double, Double>?
 }
 
 internal class UserLocationUseCaseImpl(
@@ -42,6 +45,15 @@ internal class UserLocationUseCaseImpl(
             .getOrNull()
     }
 
+    @SuppressLint("MissingPermission")
+    override fun getLastCachedLocation(): Pair<Double, Double>? {
+        if (!context.hasPermission(LOCATION_PERMISSION)) {
+            return null
+        }
+
+        return lastCachedLocation()
+    }
+
     @RequiresPermission(LOCATION_PERMISSION)
     private fun lastCachedLocation(): Pair<Double, Double>? {
         return locationManager.getLastKnownLocation(PROVIDER)?.convert()
@@ -50,7 +62,9 @@ internal class UserLocationUseCaseImpl(
     @RequiresPermission(LOCATION_PERMISSION)
     private fun observeLocation(): Flow<Pair<Double, Double>> {
         return callbackFlow {
-            val listener = LocationListener { trySend(it.convert()) }
+            val listener = LocationListener {
+                trySend(it.convert())
+            }
 
             runCatching {
                 locationManager.requestLocationUpdates(
@@ -74,7 +88,11 @@ internal class UserLocationUseCaseImpl(
     private fun Location.convert(): Pair<Double, Double> = latitude to longitude
 
     private companion object {
-        const val PROVIDER = LocationManager.GPS_PROVIDER
+        val PROVIDER = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            LocationManager.FUSED_PROVIDER
+        } else {
+            LocationManager.PASSIVE_PROVIDER
+        }
     }
 }
 
