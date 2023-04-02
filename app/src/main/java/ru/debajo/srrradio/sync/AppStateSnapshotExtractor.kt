@@ -7,14 +7,12 @@ import ru.debajo.srrradio.domain.model.Timestamped
 import ru.debajo.srrradio.domain.preference.BasePreference
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
-import ru.debajo.srrradio.icon.DynamicIconPreference
 import ru.debajo.srrradio.ui.common.SnowFallPreference
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 import ru.debajo.srrradio.ui.theme.SrrradioThemePreference
 
 internal class AppStateSnapshotExtractor(
-    private val dynamicIconPreference: DynamicIconPreference,
     private val themeManager: SrrradioThemeManager,
     private val themePreference: SrrradioThemePreference,
     private val sendingErrorsPreference: SendingErrorsPreference,
@@ -26,7 +24,6 @@ internal class AppStateSnapshotExtractor(
 ) {
     suspend fun extract(): AppStateSnapshot {
         return AppStateSnapshot(
-            dynamicIcon = dynamicIconPreference.toTimestamped(),
             themeCode = themePreference.toTimestamped(),
             autoSendErrors = sendingErrorsPreference.toTimestamped(),
             snowFall = snowFallPreference.toTimestamped(),
@@ -37,7 +34,6 @@ internal class AppStateSnapshotExtractor(
     }
 
     suspend fun applyNewSnapshot(snapshot: AppStateSnapshot) {
-        dynamicIconPreference.set(snapshot.dynamicIcon.value)
         val themeCode = snapshot.themeCode.value
         if (!themeCode.isNullOrEmpty()) {
             themeManager.select(themeCode)

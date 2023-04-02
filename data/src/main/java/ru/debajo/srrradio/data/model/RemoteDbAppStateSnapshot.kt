@@ -4,9 +4,6 @@ import com.google.gson.annotations.SerializedName
 import org.joda.time.DateTime
 
 internal data class RemoteDbAppStateSnapshot(
-    @SerializedName("dynamicIcon")
-    val dynamicIcon: Boolean = true,
-
     @SerializedName("themeCode")
     val themeCode: String? = null,
 

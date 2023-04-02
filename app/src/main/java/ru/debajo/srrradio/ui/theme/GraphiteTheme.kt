@@ -4,13 +4,11 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.icon.AppIcon
 
 internal val GraphiteTheme: AppTheme = AppTheme(
     code = "GraphiteTheme",
     nameRes = R.string.theme_graphite,
     colors = { GraphiteColors },
-    icon = AppIcon.GRAPHITE,
 )
 
 private val GraphiteColors: ColorScheme = darkColorScheme(

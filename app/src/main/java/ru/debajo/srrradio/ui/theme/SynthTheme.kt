@@ -4,13 +4,11 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.icon.AppIcon
 
 internal val SynthTheme: AppTheme = AppTheme(
     code = "SynthTheme",
     nameRes = R.string.theme_synthwave,
     colors = { SynthColors },
-    icon = AppIcon.NEON,
 )
 
 private val SynthColors: ColorScheme = darkColorScheme(

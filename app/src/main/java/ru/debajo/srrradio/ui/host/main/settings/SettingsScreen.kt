@@ -114,13 +114,6 @@ private fun SettingsList(bottomPadding: Dp) {
                     viewModel.selectTheme(theme.theme.code)
                 }
             }
-
-            SettingsSwitch(
-                text = stringResource(R.string.settings_dynamic_app_icon),
-                checked = state.dynamicIcon,
-            ) {
-                viewModel.onDynamicIconClick()
-            }
         }
 
         Spacer(Modifier.height(12.dp))

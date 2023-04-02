@@ -77,7 +77,6 @@ internal class SyncRepositoryImpl(
     private fun RemoteDbAppStateSnapshot.toDomain(): AppStateSnapshot {
         val timestamp = DateTime.parse(createTimestamp)
         return AppStateSnapshot(
-            dynamicIcon = dynamicIcon.timestampedAt(timestamp),
             themeCode = themeCode.timestampedAt(timestamp),
             autoSendErrors = autoSendErrors.timestampedAt(timestamp),
             snowFall = snowFall.timestampedAt(timestamp),
@@ -90,7 +89,6 @@ internal class SyncRepositoryImpl(
     private fun AppStateSnapshot.toRemote(): RemoteDbAppStateSnapshot {
         val now = DateTime.now()
         return RemoteDbAppStateSnapshot(
-            dynamicIcon = dynamicIcon.value,
             themeCode = themeCode.value,
             autoSendErrors = autoSendErrors.value,
             snowFall = snowFall.value,

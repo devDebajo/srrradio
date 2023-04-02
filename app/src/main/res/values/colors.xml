@@ -1,9 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="ic_launcher_graphite_background">#4D5190</color>
-    <color name="ic_launcher_dynamic_background">#1D1D1D</color>
-    <color name="ic_launcher_neon_background">#3F0947</color>
-    <color name="ic_launcher_mint_background">#005142</color>
-    <color name="ic_launcher_sand_background">#554700</color>
-    <color name="ic_launcher_wave_background">#004D61</color>
 </resources>

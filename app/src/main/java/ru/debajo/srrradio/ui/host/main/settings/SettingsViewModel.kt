@@ -19,7 +19,6 @@ import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
-import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.sync.AppSynchronizer
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
@@ -34,7 +33,6 @@ internal class SettingsViewModel(
     private val themeManager: SrrradioThemeManager,
     private val loadM3uInteractor: LoadM3uInteractor,
     private val sendingErrorsManager: SendingErrorsManager,
-    private val appIconManager: AppIconManager,
     private val authManagerProvider: AuthManagerProvider,
     private val appSynchronizer: AppSynchronizer,
     private val snowFallUseCase: SnowFallUseCase,
@@ -51,7 +49,6 @@ internal class SettingsViewModel(
         updateState {
             copy(
                 autoSendErrors = sendingErrorsManager.isEnabled,
-                dynamicIcon = appIconManager.dynamicIcon
             )
         }
 
@@ -121,13 +118,6 @@ internal class SettingsViewModel(
         }
     }
 
-    fun onDynamicIconClick() {
-        updateState {
-            appIconManager.dynamicIcon = !dynamicIcon
-            copy(dynamicIcon = !dynamicIcon)
-        }
-    }
-
     fun login() {
         viewModelScope.launch {
             authManagerProvider().signIn()
@@ -159,7 +149,6 @@ internal class SettingsViewModel(
             updateState {
                 copy(
                     autoSendErrors = sendingErrorsManager.isEnabled,
-                    dynamicIcon = appIconManager.dynamicIcon
                 )
             }
             updateState {

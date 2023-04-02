@@ -5,7 +5,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.ui.platform.LocalContext
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.icon.AppIcon
 
 internal val DynamicThemeOptional: AppTheme?
     get() {
@@ -21,5 +20,4 @@ internal val DynamicTheme: AppTheme = AppTheme(
     code = "DynamicTheme",
     nameRes = R.string.theme_dynamic,
     colors = { dynamicDarkColorScheme(LocalContext.current) },
-    icon = AppIcon.DYNAMIC,
 )

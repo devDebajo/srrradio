@@ -9,8 +9,6 @@ import org.koin.dsl.module
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
-import ru.debajo.srrradio.icon.AppIconManager
-import ru.debajo.srrradio.icon.DynamicIconPreference
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.RadioPlayer
@@ -63,14 +61,13 @@ val AppModule: Module = module {
     single { AuthManagerProvider(get(), get(), get(), get()) }
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
-    factory { AppStateSnapshotExtractor(get(), get(), get(), get(), get(), get(), get(), get(), get()) }
+    factoryOf(::AppStateSnapshotExtractor)
 
     single { StationCoverLoader(get()) }
     single { SleepTimer() }
     factory { SendingErrorsManager(get(), get()) }
 
     single { SrrradioThemeManager(get()) }
-    factory { AppIconManager(get(), get()) }
 
     singleOf(::RateAppManager)
     single { GoogleServicesUtils(get()) }
@@ -90,7 +87,6 @@ val AppModule: Module = module {
 
     factory { SendingErrorsPreference(get()) }
     factory { SrrradioThemePreference(get()) }
-    factory { DynamicIconPreference(get()) }
     factory { SnowFallPreference(get()) }
     factory { RateAppStatePreference(get()) }
     factory { HostActivityCreateCountPreference(get()) }

@@ -6,7 +6,6 @@ import ru.debajo.srrradio.domain.model.Timestamped
 internal class AppStateSnapshotMerger {
     fun merge(local: AppStateSnapshot, forSync: AppStateSnapshot): AppStateSnapshot {
         return AppStateSnapshot(
-            dynamicIcon = local.dynamicIcon mergeWith forSync.dynamicIcon,
             themeCode = local.themeCode mergeWith forSync.themeCode,
             autoSendErrors = local.autoSendErrors mergeWith forSync.autoSendErrors,
             snowFall = local.snowFall mergeWith forSync.snowFall,

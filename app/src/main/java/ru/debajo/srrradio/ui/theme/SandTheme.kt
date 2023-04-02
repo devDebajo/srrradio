@@ -4,13 +4,11 @@ import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.icon.AppIcon
 
 internal val SandTheme: AppTheme = AppTheme(
     code = "SandTheme",
     nameRes = R.string.theme_sand,
     colors = { SandColors },
-    icon = AppIcon.SAND,
 )
 
 private val SandColors: ColorScheme = darkColorScheme(

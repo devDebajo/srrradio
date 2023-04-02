@@ -2,9 +2,7 @@ package ru.debajo.srrradio
 
 import android.app.Application
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleCoroutineScope
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -19,7 +17,6 @@ import ru.debajo.srrradio.di.AppModule
 import ru.debajo.srrradio.domain.di.DomainModule
 import ru.debajo.srrradio.error.OnlyErrorsTree
 import ru.debajo.srrradio.error.SendingErrorsManager
-import ru.debajo.srrradio.icon.AppIconManager
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
@@ -31,7 +28,6 @@ class SrrradioApp : Application() {
     private val mediaController: MediaController by inject()
     private val apiHostDiscovery: ApiHostDiscovery by inject()
     private val sendingErrorsManager: SendingErrorsManager by inject()
-    private val appIconManager: AppIconManager by inject()
     private val themeManager: SrrradioThemeManager by inject()
     private val widgetManager: PlayerWidgetManager by inject()
     private val receiver: PlaybackBroadcastReceiver by inject()
@@ -46,12 +42,6 @@ class SrrradioApp : Application() {
 
         val processLifecycle = ProcessLifecycleOwner.get().lifecycle
         val processScope = processLifecycle.coroutineScope
-
-        processLifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStop(owner: LifecycleOwner) {
-                appIconManager.enable(themeManager.currentTheme.value.icon)
-            }
-        })
 
         with(processScope) {
             launch {
