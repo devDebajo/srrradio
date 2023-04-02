@@ -28,4 +28,10 @@ internal val MIGRATIONS: Array<Migration> = arrayOf(
             database.execSQL("ALTER TABLE `DbStation` ADD COLUMN `alive` INTEGER NOT NULL DEFAULT 1")
         }
     },
+
+    object : Migration(5, 6) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `DbStation` ADD COLUMN `tags` TEXT NOT NULL DEFAULT ''")
+        }
+    },
 )

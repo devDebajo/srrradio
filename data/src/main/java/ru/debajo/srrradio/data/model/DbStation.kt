@@ -29,6 +29,9 @@ internal data class DbStation(
 
     @ColumnInfo(name = "alive")
     val alive: Boolean,
+
+    @ColumnInfo(name = "tags")
+    val tags: List<String>,
 )
 
 internal fun Station.toDb(): DbStation {
@@ -40,6 +43,7 @@ internal fun Station.toDb(): DbStation {
         latitude = location?.latitude,
         longitude = location?.longitude,
         alive = alive,
+        tags = tags,
     )
 }
 
@@ -52,6 +56,7 @@ internal fun RemoteStation.toDb(): DbStation {
         latitude = latitude,
         longitude = longitude,
         alive = health == 1,
+        tags = tagsList,
     )
 }
 
@@ -63,5 +68,6 @@ internal fun DbStation.toDomain(): Station {
         image = image,
         location = LatLng.from(latitude, longitude),
         alive = alive,
+        tags = tags,
     )
 }

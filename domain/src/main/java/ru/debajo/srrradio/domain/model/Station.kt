@@ -7,4 +7,8 @@ data class Station(
     val image: String?,
     val location: LatLng?,
     val alive: Boolean,
-)
+    val tags: List<String>,
+) {
+    val joinedTags: String
+        get() = tags.joinToString(separator = ",")
+}

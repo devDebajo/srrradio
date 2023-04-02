@@ -17,6 +17,12 @@ internal class SrrradioDbConverter {
 
     @TypeConverter
     fun fromString(input: String): List<String> {
-        return json.decodeFromString(ListSerializer(String.serializer()), input)
+        if (input.isEmpty()) {
+            return emptyList()
+        }
+
+        return runCatching {
+            json.decodeFromString(ListSerializer(String.serializer()), input)
+        }.getOrElse { emptyList() }
     }
 }

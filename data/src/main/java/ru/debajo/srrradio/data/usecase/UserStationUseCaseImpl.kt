@@ -20,7 +20,8 @@ internal class UserStationUseCaseImpl(
             image = poster,
             latitude = null,
             longitude = null,
-            alive = true
+            alive = true,
+            tags = emptyList()
         )
 
         stationDao.insert(dbStation)

@@ -117,6 +117,7 @@ internal class SyncRepositoryImpl(
             latitude = location?.latitude,
             longitude = location?.longitude,
             alive = alive,
+            tags = joinedTags,
         )
     }
 
@@ -135,7 +136,8 @@ internal class SyncRepositoryImpl(
             stream = stream ?: return null,
             image = image,
             location = LatLng.from(latitude, longitude),
-            alive = alive
+            alive = alive,
+            tags = tagsList,
         )
     }
 

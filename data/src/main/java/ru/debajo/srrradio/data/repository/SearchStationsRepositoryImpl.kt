@@ -8,7 +8,6 @@ import ru.debajo.srrradio.data.model.RemoteStation
 import ru.debajo.srrradio.data.model.toDb
 import ru.debajo.srrradio.data.model.toDomain
 import ru.debajo.srrradio.data.service.ServiceHolder
-import ru.debajo.srrradio.domain.model.LatLng
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.domain.repository.SearchStationsRepository
 
@@ -83,16 +82,7 @@ internal class SearchStationsRepositoryImpl(
     }
 
     private fun Sequence<RemoteStation>.convert(): Sequence<Station> {
-        return map { station ->
-            Station(
-                id = station.id,
-                name = station.name.trim(),
-                stream = station.stream,
-                image = station.image,
-                location = LatLng.from(station.latitude, station.longitude),
-                alive = station.health == 1,
-            )
-        }
+        return map { station -> station.toDomain() }
     }
 
     private companion object {

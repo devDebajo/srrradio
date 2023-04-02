@@ -9,6 +9,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.data.BuildConfig
@@ -27,6 +28,7 @@ import ru.debajo.srrradio.data.usecase.LastStationIdPreference
 import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
 import ru.debajo.srrradio.data.usecase.LoadPlaylistUseCaseImpl
 import ru.debajo.srrradio.data.usecase.ParseM3uUseCaseImpl
+import ru.debajo.srrradio.data.usecase.RecommendationsUseCase
 import ru.debajo.srrradio.data.usecase.UserStationUseCaseImpl
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.domain.LoadPlaylistUseCase
@@ -87,6 +89,7 @@ val DataModule: Module = module {
     factory<LoadPlaylistUseCase> { LoadPlaylistUseCaseImpl(get(), get(), get()) }
     factory<UserStationUseCase> { UserStationUseCaseImpl(get()) }
     factory<ParseM3uUseCase> { ParseM3uUseCaseImpl(get()) }
+    factoryOf(::RecommendationsUseCase)
     factory<TracksCollectionRepository> { TracksCollectionRepositoryImpl(get()) }
     factory<SyncUseCase> { SyncRepositoryImpl(get(), get()) }
     single<ConfigRepository> { ConfigRepositoryImpl(get(), get()) }

@@ -9,7 +9,11 @@ internal interface RadioBrowserService {
     suspend fun search(
         @Query("name") query: String? = null,
         @Query("has_geo_info") hasGeoInfo: Boolean? = null,
+        @Query("tagList") tagList: String? = null,
         @Query("hidebroken") hideBroken: Boolean? = null,
+        @Query("limit") limit: Int? = null,
+        @Query("order") order: String? = null,
+        @Query("reverse") reverse: Boolean? = null,
     ): List<RemoteStation>
 
     @GET("/json/stations/byurl")
