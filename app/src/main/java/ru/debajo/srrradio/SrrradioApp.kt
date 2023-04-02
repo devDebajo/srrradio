@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.coroutineScope
+import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
@@ -14,12 +15,12 @@ import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.data.di.DataModule
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.di.AppModule
+import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.di.DomainModule
 import ru.debajo.srrradio.error.OnlyErrorsTree
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
-import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 import ru.debajo.srrradio.widget.PlayerWidgetManager
 import timber.log.Timber
 
@@ -28,9 +29,9 @@ class SrrradioApp : Application() {
     private val mediaController: MediaController by inject()
     private val apiHostDiscovery: ApiHostDiscovery by inject()
     private val sendingErrorsManager: SendingErrorsManager by inject()
-    private val themeManager: SrrradioThemeManager by inject()
     private val widgetManager: PlayerWidgetManager by inject()
     private val receiver: PlaybackBroadcastReceiver by inject()
+    private val searchStationsUseCase: SearchStationsUseCase by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -54,6 +55,10 @@ class SrrradioApp : Application() {
 
             launch {
                 widgetManager.listen()
+            }
+
+            launch(IO) {
+                searchStationsUseCase.warmUpStationsIfNeed()
             }
         }
     }

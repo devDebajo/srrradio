@@ -16,8 +16,7 @@
     <string name="playlist_popular_empty">There no popular stations</string>
     <string name="playlist_favorite">Favorite</string>
     <string name="playlist_favorite_empty">There no favorite stations</string>
-    <string name="playlist_near">Near</string>
-    <string name="playlist_near_empty">There no near stations with you</string>
+    <string name="playlist_on_map">On map</string>
 
     <string name="station_added_to_favorite">Station added to favorites</string>
     <string name="station_removed_from_favorite">Station removed from favorites</string>

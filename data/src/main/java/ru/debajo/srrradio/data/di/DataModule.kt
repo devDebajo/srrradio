@@ -4,6 +4,7 @@ import androidx.room.Room
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.gson.Gson
+import java.util.concurrent.TimeUnit
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -16,6 +17,7 @@ import ru.debajo.srrradio.data.db.MIGRATIONS
 import ru.debajo.srrradio.data.db.SrrradioDatabase
 import ru.debajo.srrradio.data.repository.FavoriteStationsRepositoryImpl
 import ru.debajo.srrradio.data.repository.SearchStationsRepositoryImpl
+import ru.debajo.srrradio.data.repository.StationsForMapLastUpdatePreference
 import ru.debajo.srrradio.data.repository.TracksCollectionRepositoryImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
@@ -39,6 +41,9 @@ import ru.debajo.srrradio.domain.repository.TracksCollectionRepository
 val DataModule: Module = module {
     single {
         OkHttpClient.Builder()
+            .callTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
             .addInterceptor(
                 HttpLoggingInterceptor().apply {
                     level = if (BuildConfig.DEBUG) {
@@ -71,12 +76,13 @@ val DataModule: Module = module {
         }
     }
     single { Gson() }
-    single<SearchStationsRepository> { SearchStationsRepositoryImpl(get()) }
+    single<SearchStationsRepository> { SearchStationsRepositoryImpl(get(), get(), get()) }
     single<FavoriteStationsRepository> { FavoriteStationsRepositoryImpl(get(), get()) }
     singleOf(::ApiHostDiscovery)
 
     factory { LastPlaylistIdPreference(get()) }
     factory { LastStationIdPreference(get()) }
+    factory { StationsForMapLastUpdatePreference(get()) }
     factory<LastStationUseCase> { LastStationUseCaseImpl(get(), get()) }
     factory<LoadPlaylistUseCase> { LoadPlaylistUseCaseImpl(get(), get(), get()) }
     factory<UserStationUseCase> { UserStationUseCaseImpl(get()) }

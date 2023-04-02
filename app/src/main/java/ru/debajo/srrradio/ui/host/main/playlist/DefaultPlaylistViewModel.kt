@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 import ru.debajo.srrradio.domain.FavoriteStationsStateUseCase
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.UpdateFavoriteStationStateUseCase
-import ru.debajo.srrradio.domain.UserLocationUseCase
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.model.MediaState
@@ -34,7 +33,6 @@ import ru.debajo.srrradio.ui.model.toUi
 class DefaultPlaylistViewModel(
     private val context: Context,
     private val searchStationsUseCase: SearchStationsUseCase,
-    private val userLocationUseCase: UserLocationUseCase,
     private val favoriteStationsStateUseCase: FavoriteStationsStateUseCase,
     private val updateFavoriteStationStateUseCase: UpdateFavoriteStationStateUseCase,
     private val mediaController: MediaController,
@@ -97,15 +95,6 @@ class DefaultPlaylistViewModel(
             DefaultPlaylistScreenStrategy.POPULAR -> asFlow { searchStationsUseCase.searchPopular(LIMIT) }
 
             DefaultPlaylistScreenStrategy.FAVORITE -> favoriteStationsStateUseCase.observe()
-
-            DefaultPlaylistScreenStrategy.NEAR -> asFlow {
-                val location = userLocationUseCase.getCurrentLocation()
-                if (location == null) {
-                    emptyList()
-                } else {
-                    searchStationsUseCase.searchByLocation(location.first, location.second, RADIUS_METERS)
-                }
-            }
         }
     }
 
@@ -144,6 +133,5 @@ class DefaultPlaylistViewModel(
 
     private companion object {
         const val LIMIT = 20
-        const val RADIUS_METERS = 50_000f
     }
 }

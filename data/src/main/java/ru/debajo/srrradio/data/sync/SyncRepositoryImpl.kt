@@ -116,6 +116,7 @@ internal class SyncRepositoryImpl(
             image = image?.takeIf { it.isNotEmpty() },
             latitude = location?.latitude,
             longitude = location?.longitude,
+            alive = alive,
         )
     }
 
@@ -133,7 +134,8 @@ internal class SyncRepositoryImpl(
             name = name ?: return null,
             stream = stream ?: return null,
             image = image,
-            location = LatLng.from(latitude, longitude)
+            location = LatLng.from(latitude, longitude),
+            alive = alive
         )
     }
 

@@ -11,6 +11,7 @@ data class UiStation(
     val stream: String,
     val image: String?,
     val location: LatLng?,
+    val alive: Boolean,
 )
 
 internal fun Station.toUi(): UiStation {
@@ -20,6 +21,7 @@ internal fun Station.toUi(): UiStation {
         stream = stream,
         image = image,
         location = location,
+        alive = alive,
     )
 }
 
@@ -30,5 +32,6 @@ internal fun UiStation.toDomain(): Station {
         stream = stream,
         image = image,
         location = location,
+        alive = alive
     )
 }

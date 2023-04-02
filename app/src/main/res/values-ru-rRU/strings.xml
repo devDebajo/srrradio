@@ -14,8 +14,7 @@
     <string name="playlist_popular_empty">Не нашли популярные станции</string>
     <string name="playlist_favorite">Избранные</string>
     <string name="playlist_favorite_empty">Нет избранных станций</string>
-    <string name="playlist_near">Неподалеку</string>
-    <string name="playlist_near_empty">Неподалеку от вас не вещают станции</string>
+    <string name="playlist_on_map">На карте</string>
 
     <string name="station_added_to_favorite">Станция добавлена в избранные</string>
     <string name="station_removed_from_favorite">Станция удалена из избранных</string>

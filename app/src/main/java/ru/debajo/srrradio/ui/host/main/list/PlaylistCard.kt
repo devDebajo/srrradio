@@ -18,28 +18,8 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import ru.debajo.srrradio.domain.LOCATION_PERMISSION
 import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.model.UiPlaylistIcon
-
-@Composable
-fun NearPlaylistCard(
-    modifier: Modifier = Modifier,
-    item: UiPlaylistIcon,
-    onClick: (UiPlaylistIcon) -> Unit,
-) {
-    PermissionClickable(
-        modifier = modifier,
-        permission = LOCATION_PERMISSION,
-        onClick = { onClick(item) }
-    ) { innerListener ->
-        PlaylistCard(
-            modifier = Modifier.fillMaxSize(),
-            item = item,
-            onClick = { innerListener() }
-        )
-    }
-}
 
 @Composable
 fun PlaylistCard(
@@ -76,6 +56,7 @@ fun PlaylistCard(
 @Composable
 @Suppress("SameParameterValue")
 @OptIn(ExperimentalPermissionsApi::class)
+@Deprecated("not used")
 private fun PermissionClickable(
     modifier: Modifier = Modifier,
     permission: String,

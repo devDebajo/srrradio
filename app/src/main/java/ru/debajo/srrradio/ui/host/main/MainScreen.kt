@@ -26,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -204,11 +205,8 @@ private fun RadioScreenContent() {
                                 )
                             }
 
-                            composable(navTree.main.radio.nearStations.route) {
-                                DefaultPlaylistScreen(
-                                    listBottomPadding = listBottomPadding,
-                                    strategy = DefaultPlaylistScreenStrategy.NEAR
-                                )
+                            composable(navTree.main.radio.stationsOnMap.route) {
+                                Text("Map")
                             }
                         }
 

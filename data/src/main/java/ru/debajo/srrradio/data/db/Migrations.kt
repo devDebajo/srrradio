@@ -22,4 +22,10 @@ internal val MIGRATIONS: Array<Migration> = arrayOf(
             database.execSQL("ALTER TABLE `DbFavoriteStation` ADD COLUMN `order` INTEGER NOT NULL DEFAULT -1")
         }
     },
+
+    object : Migration(4, 5) {
+        override fun migrate(database: SupportSQLiteDatabase) {
+            database.execSQL("ALTER TABLE `DbStation` ADD COLUMN `alive` INTEGER NOT NULL DEFAULT 1")
+        }
+    },
 )

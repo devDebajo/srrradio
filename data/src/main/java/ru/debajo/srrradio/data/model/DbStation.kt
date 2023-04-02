@@ -26,6 +26,9 @@ internal data class DbStation(
 
     @ColumnInfo(name = "longitude")
     val longitude: Double?,
+
+    @ColumnInfo(name = "alive")
+    val alive: Boolean,
 )
 
 internal fun Station.toDb(): DbStation {
@@ -36,6 +39,19 @@ internal fun Station.toDb(): DbStation {
         image = image,
         latitude = location?.latitude,
         longitude = location?.longitude,
+        alive = alive,
+    )
+}
+
+internal fun RemoteStation.toDb(): DbStation {
+    return DbStation(
+        id = id,
+        name = name,
+        stream = stream,
+        image = image,
+        latitude = latitude,
+        longitude = longitude,
+        alive = health == 1,
     )
 }
 
@@ -46,5 +62,6 @@ internal fun DbStation.toDomain(): Station {
         stream = stream,
         image = image,
         location = LatLng.from(latitude, longitude),
+        alive = alive,
     )
 }

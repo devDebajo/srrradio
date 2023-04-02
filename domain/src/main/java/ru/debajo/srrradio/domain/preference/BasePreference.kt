@@ -83,6 +83,13 @@ fun SharedPreferences.getIntOrThrow(key: String): Int {
     throwValueNotExist(key)
 }
 
+fun SharedPreferences.getLongOrThrow(key: String): Long {
+    if (key in this) {
+        return getLong(key, 0L)
+    }
+    throwValueNotExist(key)
+}
+
 private fun throwValueNotExist(key: String): Nothing {
     throw IllegalStateException("Value with key $key does not exist in preferences")
 }

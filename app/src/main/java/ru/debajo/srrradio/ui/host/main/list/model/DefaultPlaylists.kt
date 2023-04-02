@@ -2,7 +2,7 @@ package ru.debajo.srrradio.ui.host.main.list.model
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FavoriteBorder
-import androidx.compose.material.icons.rounded.LocationOn
+import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.ShowChart
 import androidx.compose.material.icons.rounded.Update
 import ru.debajo.srrradio.R
@@ -24,15 +24,15 @@ object DefaultPlaylists {
         icon = Icons.Rounded.FavoriteBorder,
     )
 
-    val NearStations = UiPlaylistIcon(
-        title = R.string.playlist_near,
-        icon = Icons.Rounded.LocationOn,
+    val StationsOnMap = UiPlaylistIcon(
+        title = R.string.playlist_on_map,
+        icon = Icons.Rounded.Map,
     )
 
     val all: List<UiPlaylistIcon> = listOf(
         NewStations,
         PopularStations,
         FavoriteStations,
-        NearStations,
+        StationsOnMap,
     )
 }

@@ -7,8 +7,9 @@ import ru.debajo.srrradio.data.model.RemoteStation
 internal interface RadioBrowserService {
     @GET("/json/stations/search")
     suspend fun search(
-        @Query("name") query: String?,
-        @Query("has_geo_info") hasGeoInfo: Boolean?,
+        @Query("name") query: String? = null,
+        @Query("has_geo_info") hasGeoInfo: Boolean? = null,
+        @Query("hidebroken") hideBroken: Boolean? = null,
     ): List<RemoteStation>
 
     @GET("/json/stations/byurl")

@@ -198,8 +198,8 @@ private fun navigateToPlaylist(navTree: NavTree, playlist: UiPlaylistIcon) {
             navTree.main.radio.favoriteStations.navigate()
         }
 
-        DefaultPlaylists.NearStations -> {
-            navTree.main.radio.nearStations.navigate()
+        DefaultPlaylists.StationsOnMap -> {
+            navTree.main.radio.stationsOnMap.navigate()
         }
     }
 }
@@ -218,11 +218,7 @@ private fun Playlists(
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         for (item in items) {
-            if (item === DefaultPlaylists.NearStations) {
-                NearPlaylistCard(item = item, onClick = onClick)
-            } else {
-                PlaylistCard(item = item, onClick = onClick)
-            }
+            PlaylistCard(item = item, onClick = onClick)
         }
     }
 }

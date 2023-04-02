@@ -20,4 +20,7 @@ internal data class RemoteDbStation(
 
     @SerializedName("lon")
     val longitude: Double? = null,
+
+    @SerializedName("alive")
+    val alive: Boolean = true
 )

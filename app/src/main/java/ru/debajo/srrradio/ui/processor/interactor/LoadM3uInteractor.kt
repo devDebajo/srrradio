@@ -55,6 +55,7 @@ class LoadM3uInteractor(
             stream = parsedStation.stream,
             image = parsedStation.poster ?: station.image,
             location = station.location,
+            alive = station.alive
         )
     }
 }

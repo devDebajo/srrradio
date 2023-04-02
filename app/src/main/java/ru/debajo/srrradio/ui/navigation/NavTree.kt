@@ -52,13 +52,13 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         val newStations: Screen = childScreen(route = "newStations")
         val popularStations: Screen = childScreen(route = "popularStations")
         val favoriteStations: Screen = childScreen(route = "favoriteStations")
-        val nearStations: Screen = childScreen(route = "nearStations")
+        val stationsOnMap: Screen = childScreen(route = "stationsOnMap")
 
         override val nestedScreens: List<Screen> = listOf(
             newStations,
             popularStations,
             favoriteStations,
-            nearStations,
+            stationsOnMap,
         )
     }
 

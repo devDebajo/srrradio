@@ -6,4 +6,5 @@ data class Station(
     val stream: String,
     val image: String?,
     val location: LatLng?,
+    val alive: Boolean,
 )

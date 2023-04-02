@@ -19,4 +19,7 @@ internal interface DbStationDao {
 
     @Query("SELECT * FROM dbstation WHERE stream=:url")
     suspend fun getByUrl(url: String): DbStation?
+
+    @Query("SELECT * FROM dbstation WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND alive=true")
+    suspend fun getAllWithLocation(): List<DbStation>
 }
