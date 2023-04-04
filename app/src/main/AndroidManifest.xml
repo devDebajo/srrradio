@@ -22,7 +22,6 @@
             android:icon="@mipmap/ic_launcher_graphite"
             android:launchMode="singleInstance"
             android:roundIcon="@mipmap/ic_launcher_graphite_round"
-            android:screenOrientation="portrait"
             android:theme="@style/Theme.Srrradio">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

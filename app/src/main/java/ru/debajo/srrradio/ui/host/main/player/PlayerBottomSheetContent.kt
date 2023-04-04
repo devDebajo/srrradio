@@ -1,7 +1,6 @@
 package ru.debajo.srrradio.ui.host.main.player
 
-import android.text.TextUtils
-import android.widget.TextView
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.StartOffset
@@ -11,6 +10,7 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -60,22 +60,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
-import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -88,7 +86,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.ui.ext.colorInt
 import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
@@ -160,7 +157,7 @@ fun PlayerBottomSheetContent(
             }
         }
 
-        val itemSize = 270.dp
+        val itemSize = if (isHorizontalOrientation()) 100.dp else 270.dp
         HorizontalPager(
             count = state.stations.size,
             state = pagerState,
@@ -192,20 +189,20 @@ fun PlayerBottomSheetContent(
                     url = station.image,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
-                TickerTextView(
-                    modifier = Modifier.width(itemSize),
+                Text(
+                    modifier = Modifier.width(itemSize).basicMarquee(),
                     text = station.name,
-                    textSize = 18.sp,
-                    textColor = MaterialTheme.colorScheme.onSurface
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        TickerTextView(
-            modifier = Modifier.width(itemSize),
+        Text(
+            modifier = Modifier.width(itemSize).basicMarquee(),
             text = state.title ?: stringResource(R.string.no_track),
-            textSize = 13.sp,
-            textColor = MaterialTheme.colorScheme.onSurface
+            fontSize = 13.sp,
+            color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(20.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -402,34 +399,6 @@ private fun ActionsBar(
 }
 
 @Composable
-private fun TickerTextView(
-    modifier: Modifier = Modifier,
-    text: String,
-    textSize: TextUnit = 14.sp,
-    textColor: Color = Color.Black,
-) {
-    val textColorInt = textColor.colorInt
-    AndroidView(
-        modifier = modifier,
-        factory = {
-            TextView(it).apply {
-                isSingleLine = true
-                ellipsize = TextUtils.TruncateAt.MARQUEE
-                marqueeRepeatLimit = -1
-                isSelected = true
-                isFocusableInTouchMode = true
-
-            }
-        },
-        update = {
-            it.textSize = textSize.value
-            it.setTextColor(textColorInt)
-            it.text = text
-        }
-    )
-}
-
-@Composable
 private fun RowScope.ActionButton(
     icon: ImageVector,
     contentDescription: String,
@@ -611,4 +580,12 @@ private fun PlayingIndicatorBar(
             .height(if (playing) (maxHeight * fraction).coerceAtLeast(1.dp) else 1.dp)
             .background(MaterialTheme.colorScheme.primary)
     )
+}
+
+@Composable
+fun isHorizontalOrientation(): Boolean {
+    val context = LocalContext.current
+    return remember(context) {
+        context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    }
 }
