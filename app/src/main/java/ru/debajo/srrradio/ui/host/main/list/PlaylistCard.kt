@@ -14,13 +14,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import ru.debajo.srrradio.ui.common.AppCard
-import ru.debajo.srrradio.ui.model.UiPlaylistIcon
+import ru.debajo.srrradio.ui.model.UiMainTile
 
 @Composable
 fun PlaylistCard(
     modifier: Modifier = Modifier,
-    item: UiPlaylistIcon,
-    onClick: (UiPlaylistIcon) -> Unit,
+    item: UiMainTile,
+    onClick: (UiMainTile) -> Unit,
 ) {
     AppCard(
         modifier = modifier.size(100.dp),

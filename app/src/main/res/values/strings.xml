@@ -21,6 +21,10 @@
     <string name="playlist_favorite_empty">There no favorite stations</string>
     <string name="playlist_on_map">On map</string>
 
+    <string name="update_downloading">Downloading application update</string>
+    <string name="update_failed">Failed to update application</string>
+    <string name="update_success">Application update downloaded</string>
+
     <string name="station_added_to_favorite">Station added to favorites</string>
     <string name="station_removed_from_favorite">Station removed from favorites</string>
     <string name="track_added_to_collection">Track added to collection</string>

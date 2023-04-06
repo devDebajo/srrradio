@@ -1,5 +1,7 @@
 package ru.debajo.srrradio.di
 
+import android.app.DownloadManager
+import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.module.Module
@@ -55,6 +57,7 @@ import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
 import ru.debajo.srrradio.ui.processor.interactor.UserStationsInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 import ru.debajo.srrradio.ui.theme.SrrradioThemePreference
+import ru.debajo.srrradio.update.AppUpdateFlowHelper
 import ru.debajo.srrradio.widget.PlayerWidgetManager
 
 val AppModule: Module = module {
@@ -66,6 +69,7 @@ val AppModule: Module = module {
     single { AppSynchronizer(get(), get(), get(), get()) }
     factoryOf(::AppStateSnapshotExtractor)
 
+    single { get<Context>().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager }
     single { StationCoverLoader(get()) }
     single { SleepTimer() }
     factory { SendingErrorsManager(get(), get()) }
@@ -122,4 +126,5 @@ val AppModule: Module = module {
 
     factoryOf(::PlayerWidgetManager)
     factoryOf(::MapController)
+    factoryOf(::AppUpdateFlowHelper)
 }

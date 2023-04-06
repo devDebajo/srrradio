@@ -26,7 +26,7 @@ sealed interface StationsListState {
         val hasAppUpdate: Boolean = false,
     ) : StationsListState {
         override val uiElements: List<UiElement> = buildList {
-            add(UiPlaylistsElement(DefaultPlaylists.getTiles(hasAppUpdate)))
+            add(UiPlaylistsElement(DefaultMainTiles.getTiles(hasAppUpdate)))
 
             val playlist = (mediaState as? MediaState.Loaded)?.playlist ?: fallBackPlaylist
             if (playlist != null) {

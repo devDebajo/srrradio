@@ -1,3 +1,5 @@
 package ru.debajo.srrradio.ui.host.main.list.model
 
-class StationsListNews
+sealed interface StationsListNews {
+    class ShowToast(val stringRes: Int) : StationsListNews
+}

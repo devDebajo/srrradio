@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
@@ -61,6 +62,7 @@ import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.MainScreen
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
+import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
 import ru.debajo.srrradio.ui.host.main.rememberSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.settings.SettingsViewModel
@@ -81,6 +83,7 @@ class HostActivity : ComponentActivity() {
     private val rateAppManager: RateAppManager by inject()
     private val alertDialogState: AlertDialogState by lazy { AlertDialogState(this@HostActivity) }
     private val notificationManager: SrrradioNotificationManager by inject()
+    private var currentToast: Toast? = null
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -104,6 +107,7 @@ class HostActivity : ComponentActivity() {
         window.statusBarColor = AndroidColor.TRANSPARENT
         window.navigationBarColor = AndroidColor.TRANSPARENT
 
+        subscribeToNews()
         setContent {
             notificationManager.RequestPermission()
             CompositionLocalProvider(
@@ -147,6 +151,19 @@ class HostActivity : ComponentActivity() {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun subscribeToNews() {
+        lifecycleScope.launch {
+            stationsListViewModel.news.collect { news ->
+                when (news) {
+                    is StationsListNews.ShowToast -> {
+                        currentToast?.cancel()
+                        currentToast = Toast.makeText(this@HostActivity, news.stringRes, Toast.LENGTH_SHORT).also { it.show() }
                     }
                 }
             }

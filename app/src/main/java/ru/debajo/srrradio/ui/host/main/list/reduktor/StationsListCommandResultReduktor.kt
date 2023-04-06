@@ -113,8 +113,18 @@ class StationsListCommandResultReduktor(
     ): Akt<StationsListState, StationsListNews> {
         return when (event) {
             is AppUpdateProcessor.Result.HasUpdate -> {
+                Akt(state = state.updateIdle { copy(hasAppUpdate = true) })
+            }
+            is AppUpdateProcessor.Result.UpdateSuccess -> {
                 Akt(
-                    state = state.updateIdle { copy(hasAppUpdate = true) }
+                    state = state.updateIdle { copy(hasAppUpdate = false) },
+                    news = listOf(StationsListNews.ShowToast(R.string.update_success))
+                )
+            }
+            is AppUpdateProcessor.Result.UpdateFailed -> {
+                Akt(
+                    state = state.updateIdle { copy(hasAppUpdate = true) },
+                    news = listOf(StationsListNews.ShowToast(R.string.update_failed))
                 )
             }
         }

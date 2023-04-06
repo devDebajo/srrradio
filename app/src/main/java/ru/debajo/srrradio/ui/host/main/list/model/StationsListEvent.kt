@@ -9,4 +9,5 @@ sealed interface StationsListEvent {
     class OnSearchQueryChanged(val query: TextFieldValue) : StationsListEvent
     class OnPlayPauseStation(val station: UiStation, val playingState: UiStationPlayingState) : StationsListEvent
     class ChangeFavorite(val station: UiStation, val favorite: Boolean) : StationsListEvent
+    object UpdateApp : StationsListEvent
 }

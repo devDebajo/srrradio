@@ -7,9 +7,11 @@ import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.srrradio.data.usecase.CheckAppUpdateUseCase
+import ru.debajo.srrradio.update.AppUpdateFlowHelper
 
 class AppUpdateProcessor(
     private val checkAppUpdateUseCase: CheckAppUpdateUseCase,
+    private val appUpdateFlowHelper: AppUpdateFlowHelper,
 ) : CommandProcessor {
 
     override fun invoke(commands: Flow<Command>): Flow<CommandResult> {
@@ -26,14 +28,25 @@ class AppUpdateProcessor(
                     CommandResult.EMPTY
                 }
             }
+            is Task.UpdateFlow -> {
+                val success = appUpdateFlowHelper.updateApp()
+                if (success) {
+                    Result.UpdateSuccess
+                } else {
+                    Result.UpdateFailed
+                }
+            }
         }
     }
 
     sealed interface Task : Command {
         object CheckUpdate : Task
+        object UpdateFlow : Task
     }
 
     sealed interface Result : CommandResult {
         object HasUpdate : Result
+        object UpdateSuccess : Result
+        object UpdateFailed : Result
     }
 }

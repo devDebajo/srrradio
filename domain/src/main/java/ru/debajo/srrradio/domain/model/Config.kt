@@ -9,4 +9,5 @@ data class Config(
     val snowFallEnabled: Boolean,
     val rateAppEnabled: Boolean,
     val lastVersionNumber: Int,
+    val updateFileUrl: String?
 )

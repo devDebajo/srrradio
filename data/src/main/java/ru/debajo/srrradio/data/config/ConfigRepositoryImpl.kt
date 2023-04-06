@@ -65,6 +65,7 @@ internal class ConfigRepositoryImpl(
                 snowFallEnabled = firebaseRemoteConfig.getBoolean("snow_fall_toggle_visible"),
                 rateAppEnabled = firebaseRemoteConfig.getBoolean("rate_app_enabled"),
                 lastVersionNumber = firebaseRemoteConfig.getLong("last_version_number").toInt(),
+                updateFileUrl = firebaseRemoteConfig.getString("update_url"),
             )
         }
             .onSuccess {
@@ -84,6 +85,7 @@ internal class ConfigRepositoryImpl(
             snowFallEnabled = false,
             rateAppEnabled = false,
             lastVersionNumber = appVersion.number,
+            updateFileUrl = null,
         )
     }
 }

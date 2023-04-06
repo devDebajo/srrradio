@@ -8,40 +8,40 @@ import androidx.compose.material.icons.rounded.ShowChart
 import androidx.compose.material.icons.rounded.Update
 import androidx.compose.material.icons.rounded.Upgrade
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.ui.model.UiPlaylistIcon
+import ru.debajo.srrradio.ui.model.UiMainTile
 
-object DefaultPlaylists {
-    val UpdateApp = UiPlaylistIcon(
+object DefaultMainTiles {
+    val UpdateApp = UiMainTile(
         title = R.string.tile_has_update,
         icon = Icons.Rounded.Upgrade,
     )
 
-    val RecommendedStations = UiPlaylistIcon(
+    val RecommendedStations = UiMainTile(
         title = R.string.playlist_recommendations,
         icon = Icons.Rounded.Recommend,
     )
 
-    val NewStations = UiPlaylistIcon(
+    val NewStations = UiMainTile(
         title = R.string.playlist_new,
         icon = Icons.Rounded.Update,
     )
 
-    val PopularStations = UiPlaylistIcon(
+    val PopularStations = UiMainTile(
         title = R.string.playlist_popular,
         icon = Icons.Rounded.ShowChart,
     )
 
-    val FavoriteStations = UiPlaylistIcon(
+    val FavoriteStations = UiMainTile(
         title = R.string.playlist_favorite,
         icon = Icons.Rounded.FavoriteBorder,
     )
 
-    val StationsOnMap = UiPlaylistIcon(
+    val StationsOnMap = UiMainTile(
         title = R.string.playlist_on_map,
         icon = Icons.Rounded.Map,
     )
 
-    fun getTiles(hasAppUpdate: Boolean): List<UiPlaylistIcon> {
+    fun getTiles(hasAppUpdate: Boolean): List<UiMainTile> {
         return listOfNotNull(
             UpdateApp.takeIf { hasAppUpdate },
             NewStations,

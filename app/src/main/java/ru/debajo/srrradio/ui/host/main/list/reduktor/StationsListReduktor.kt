@@ -3,6 +3,7 @@ package ru.debajo.srrradio.ui.host.main.list.reduktor
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.Reduktor
+import ru.debajo.srrradio.R
 import ru.debajo.srrradio.domain.LastStationUseCase
 import ru.debajo.srrradio.ui.ext.isEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
@@ -11,6 +12,7 @@ import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.list.model.playlist
 import ru.debajo.srrradio.ui.host.main.list.model.toIdle
 import ru.debajo.srrradio.ui.host.main.list.model.toSearch
+import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
@@ -32,6 +34,7 @@ class StationsListReduktor(
             is StationsListEvent.OnSearchQueryChanged -> reduceOnSearchQueryChanged(state, event)
             is StationsListEvent.OnPlayPauseStation -> reduceOnPlayPauseClick(state, event)
             is StationsListEvent.ChangeFavorite -> reduceChangeFavorite(event)
+            is StationsListEvent.UpdateApp -> reduceUpdateApp(state)
         }
     }
 
@@ -85,6 +88,14 @@ class StationsListReduktor(
     private fun reduceChangeFavorite(event: StationsListEvent.ChangeFavorite): Akt<StationsListState, StationsListNews> {
         return Akt(
             commands = listOf(AddFavoriteStationProcessor.Update(event.station.toDomain(), event.favorite))
+        )
+    }
+
+    private fun reduceUpdateApp(state: StationsListState): Akt<StationsListState, StationsListNews> {
+        return Akt(
+            state = state.updateIdle { copy(hasAppUpdate = false) },
+            commands = listOf(AppUpdateProcessor.Task.UpdateFlow),
+            news = listOf(StationsListNews.ShowToast(R.string.update_downloading))
         )
     }
 }

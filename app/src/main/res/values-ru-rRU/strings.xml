@@ -19,6 +19,10 @@
     <string name="playlist_favorite_empty">Нет избранных станций</string>
     <string name="playlist_on_map">На карте</string>
 
+    <string name="update_downloading">Загрузка обновления</string>
+    <string name="update_failed">Не удалось обновить приложение</string>
+    <string name="update_success">Обновление приложения загружено</string>
+
     <string name="station_added_to_favorite">Станция добавлена в избранные</string>
     <string name="station_removed_from_favorite">Станция удалена из избранных</string>
     <string name="track_added_to_collection">Трек добавлен в коллекцию</string>

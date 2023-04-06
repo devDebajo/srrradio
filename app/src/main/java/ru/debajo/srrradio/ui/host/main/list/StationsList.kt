@@ -44,12 +44,12 @@ import ru.debajo.srrradio.ui.common.AppTextButton
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
 import ru.debajo.srrradio.ui.ext.Empty
 import ru.debajo.srrradio.ui.ext.isNotEmpty
-import ru.debajo.srrradio.ui.host.main.list.model.DefaultPlaylists
+import ru.debajo.srrradio.ui.host.main.list.model.DefaultMainTiles
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.list.model.collectionEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.searchQuery
-import ru.debajo.srrradio.ui.model.UiPlaylistIcon
+import ru.debajo.srrradio.ui.model.UiMainTile
 import ru.debajo.srrradio.ui.model.UiPlaylistsElement
 import ru.debajo.srrradio.ui.model.UiStationElement
 import ru.debajo.srrradio.ui.model.UiTextElement
@@ -175,7 +175,7 @@ private fun ListContent(
                             modifier = Modifier.animateItemPlacement(),
                             items = element.list,
                         ) {
-                            navigateToPlaylist(navTree, it)
+                            navigateToTile(navTree, it) { event -> viewModel.onEvent(event) }
                         }
                     }
                 }
@@ -184,35 +184,22 @@ private fun ListContent(
     }
 }
 
-private fun navigateToPlaylist(navTree: NavTree, playlist: UiPlaylistIcon) {
-    when (playlist) {
-        DefaultPlaylists.NewStations -> {
-            navTree.main.radio.newStations.navigate()
-        }
-
-        DefaultPlaylists.PopularStations -> {
-            navTree.main.radio.popularStations.navigate()
-        }
-
-        DefaultPlaylists.FavoriteStations -> {
-            navTree.main.radio.favoriteStations.navigate()
-        }
-
-        DefaultPlaylists.StationsOnMap -> {
-            navTree.main.radio.stationsOnMap.navigate()
-        }
-
-        DefaultPlaylists.RecommendedStations -> {
-            navTree.main.radio.recommendedStations.navigate()
-        }
+private fun navigateToTile(navTree: NavTree, tile: UiMainTile, eventProducer: (StationsListEvent) -> Unit) {
+    when (tile) {
+        DefaultMainTiles.NewStations -> navTree.main.radio.newStations.navigate()
+        DefaultMainTiles.PopularStations -> navTree.main.radio.popularStations.navigate()
+        DefaultMainTiles.FavoriteStations -> navTree.main.radio.favoriteStations.navigate()
+        DefaultMainTiles.StationsOnMap -> navTree.main.radio.stationsOnMap.navigate()
+        DefaultMainTiles.RecommendedStations -> navTree.main.radio.recommendedStations.navigate()
+        DefaultMainTiles.UpdateApp -> eventProducer(StationsListEvent.UpdateApp)
     }
 }
 
 @Composable
 private fun Playlists(
     modifier: Modifier = Modifier,
-    items: List<UiPlaylistIcon>,
-    onClick: (UiPlaylistIcon) -> Unit
+    items: List<UiMainTile>,
+    onClick: (UiMainTile) -> Unit
 ) {
     val state = rememberScrollState()
     Row(
