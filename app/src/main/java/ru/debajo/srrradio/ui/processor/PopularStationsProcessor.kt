@@ -30,3 +30,4 @@ class PopularStationsProcessor(
 
     class Loaded(val stations: List<UiStation>) : CommandResult
 }
+

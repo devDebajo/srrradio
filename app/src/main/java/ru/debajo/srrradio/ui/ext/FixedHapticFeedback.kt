@@ -20,7 +20,7 @@ private class FixedHapticFeedback(private val view: View) : HapticFeedback {
             else -> HapticFeedbackConstants.CLOCK_TICK
         }
 
-        view.performHapticFeedback(feedbackConstant, HapticFeedbackConstants.FLAG_IGNORE_GLOBAL_SETTING)
+        view.performHapticFeedback(feedbackConstant)
     }
 }
 

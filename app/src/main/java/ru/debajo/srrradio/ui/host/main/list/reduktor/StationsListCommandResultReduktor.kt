@@ -12,6 +12,7 @@ import ru.debajo.srrradio.ui.host.main.list.model.playlist
 import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.toPlaylist
+import ru.debajo.srrradio.ui.processor.AppUpdateProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
@@ -29,6 +30,7 @@ class StationsListCommandResultReduktor(
             is ListenFavoriteStationsProcessor.Result -> reduceNewFavoriteStations(state, event)
             is TrackCollectionListener.TrackCollectionChanged -> reduceTrackCollectionChanged(state, event)
             is PopularStationsProcessor.Loaded -> reducePopularStationsLoaded(state, event)
+            is AppUpdateProcessor.Result -> reduceAppUpdateProcessorResult(state, event)
             else -> Akt()
         }
     }
@@ -103,5 +105,18 @@ class StationsListCommandResultReduktor(
                 )
             }
         )
+    }
+
+    private fun reduceAppUpdateProcessorResult(
+        state: StationsListState,
+        event: AppUpdateProcessor.Result
+    ): Akt<StationsListState, StationsListNews> {
+        return when (event) {
+            is AppUpdateProcessor.Result.HasUpdate -> {
+                Akt(
+                    state = state.updateIdle { copy(hasAppUpdate = true) }
+                )
+            }
+        }
     }
 }

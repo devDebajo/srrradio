@@ -10,6 +10,7 @@ import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import ru.debajo.srrradio.common.AppVersion
 import ru.debajo.srrradio.common.di.CommonModule
 import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.data.di.DataModule
@@ -85,6 +86,12 @@ class SrrradioApp : Application() {
             modules(
                 module {
                     single<Context> { this@SrrradioApp }
+                    single {
+                        AppVersion(
+                            versionName = BuildConfig.VERSION_NAME,
+                            number = BuildConfig.VERSION_CODE
+                        )
+                    }
                 },
                 AppModule,
                 CommonModule,

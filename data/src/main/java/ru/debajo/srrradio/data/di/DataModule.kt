@@ -23,6 +23,7 @@ import ru.debajo.srrradio.data.repository.TracksCollectionRepositoryImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
 import ru.debajo.srrradio.data.sync.SyncRepositoryImpl
+import ru.debajo.srrradio.data.usecase.CheckAppUpdateUseCase
 import ru.debajo.srrradio.data.usecase.LastPlaylistIdPreference
 import ru.debajo.srrradio.data.usecase.LastStationIdPreference
 import ru.debajo.srrradio.data.usecase.LastStationUseCaseImpl
@@ -92,5 +93,6 @@ val DataModule: Module = module {
     factoryOf(::RecommendationsUseCase)
     factory<TracksCollectionRepository> { TracksCollectionRepositoryImpl(get()) }
     factory<SyncUseCase> { SyncRepositoryImpl(get(), get()) }
-    single<ConfigRepository> { ConfigRepositoryImpl(get(), get()) }
+    single<ConfigRepository> { ConfigRepositoryImpl(get(), get(), get()) }
+    singleOf(::CheckAppUpdateUseCase)
 }

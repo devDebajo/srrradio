@@ -8,4 +8,5 @@ data class Config(
     val authEnabled: Boolean,
     val snowFallEnabled: Boolean,
     val rateAppEnabled: Boolean,
+    val lastVersionNumber: Int,
 )

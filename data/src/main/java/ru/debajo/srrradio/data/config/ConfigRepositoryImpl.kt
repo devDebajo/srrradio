@@ -6,6 +6,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.tasks.await
+import ru.debajo.srrradio.common.AppVersion
 import ru.debajo.srrradio.common.LazySuspend
 import ru.debajo.srrradio.common.lazySuspend
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
@@ -18,6 +19,7 @@ import timber.log.Timber
 
 internal class ConfigRepositoryImpl(
     private val context: Context,
+    private val appVersion: AppVersion,
     private val firebaseRemoteConfig: FirebaseRemoteConfig,
 ) : ConfigRepository {
 
@@ -62,6 +64,7 @@ internal class ConfigRepositoryImpl(
                 authEnabled = firebaseRemoteConfig.getBoolean("auth_enabled"),
                 snowFallEnabled = firebaseRemoteConfig.getBoolean("snow_fall_toggle_visible"),
                 rateAppEnabled = firebaseRemoteConfig.getBoolean("rate_app_enabled"),
+                lastVersionNumber = firebaseRemoteConfig.getLong("last_version_number").toInt(),
             )
         }
             .onSuccess {
@@ -80,6 +83,7 @@ internal class ConfigRepositoryImpl(
             authEnabled = false,
             snowFallEnabled = false,
             rateAppEnabled = false,
+            lastVersionNumber = appVersion.number,
         )
     }
 }

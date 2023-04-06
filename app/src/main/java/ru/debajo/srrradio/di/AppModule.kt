@@ -42,6 +42,7 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimer
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
+import ru.debajo.srrradio.ui.processor.AppUpdateProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
@@ -117,6 +118,7 @@ val AppModule: Module = module {
     factory { SaveCustomStationProcessor(get()) }
     factory { SrrradioNotificationManager(get(), get()) }
     factory { PlaybackBroadcastReceiver(get()) }
+    factoryOf(::AppUpdateProcessor)
 
     factoryOf(::PlayerWidgetManager)
     factoryOf(::MapController)

@@ -10,6 +10,7 @@
     <string name="favorite">Favorite</string>
     <string name="no_track">Unknown track</string>
 
+    <string name="tile_has_update">Update app</string>
     <string name="playlist_recommendations">Recommendations</string>
     <string name="playlist_recommendations_empty">Recommendations not found. Add more favorites stations</string>
     <string name="playlist_new">New</string>

@@ -6,10 +6,16 @@ import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Recommend
 import androidx.compose.material.icons.rounded.ShowChart
 import androidx.compose.material.icons.rounded.Update
+import androidx.compose.material.icons.rounded.Upgrade
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.model.UiPlaylistIcon
 
 object DefaultPlaylists {
+    val UpdateApp = UiPlaylistIcon(
+        title = R.string.tile_has_update,
+        icon = Icons.Rounded.Upgrade,
+    )
+
     val RecommendedStations = UiPlaylistIcon(
         title = R.string.playlist_recommendations,
         icon = Icons.Rounded.Recommend,
@@ -35,11 +41,14 @@ object DefaultPlaylists {
         icon = Icons.Rounded.Map,
     )
 
-    val all: List<UiPlaylistIcon> = listOf(
-        NewStations,
-        PopularStations,
-        FavoriteStations,
-        RecommendedStations,
-        StationsOnMap,
-    )
+    fun getTiles(hasAppUpdate: Boolean): List<UiPlaylistIcon> {
+        return listOfNotNull(
+            UpdateApp.takeIf { hasAppUpdate },
+            NewStations,
+            PopularStations,
+            FavoriteStations,
+            RecommendedStations,
+            StationsOnMap,
+        )
+    }
 }

@@ -14,6 +14,7 @@ import ru.debajo.srrradio.ui.host.main.list.model.toSearch
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 import ru.debajo.srrradio.ui.model.toDomain
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
+import ru.debajo.srrradio.ui.processor.AppUpdateProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
@@ -41,6 +42,7 @@ class StationsListReduktor(
                 ListenFavoriteStationsProcessor.Listen,
                 TrackCollectionListener.Listen,
                 PopularStationsProcessor.Load.takeIf { lastStationUseCase.lastPlaylistId == null },
+                AppUpdateProcessor.Task.CheckUpdate,
             )
         )
     }
