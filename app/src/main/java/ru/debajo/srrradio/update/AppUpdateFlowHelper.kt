@@ -13,6 +13,7 @@ import java.io.File
 import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.common.GooglePlayInAppUpdateHelper
 import ru.debajo.srrradio.common.utils.toTimber
 import ru.debajo.srrradio.domain.repository.ConfigRepository
 
@@ -20,8 +21,14 @@ class AppUpdateFlowHelper(
     private val context: Context,
     private val downloadManager: DownloadManager,
     private val configRepository: ConfigRepository,
+    private val googlePlayInAppUpdateHelper: GooglePlayInAppUpdateHelper,
 ) {
     suspend fun updateApp(): Boolean {
+        if (googlePlayInAppUpdateHelper.installedFromGooglePlay()) {
+            googlePlayInAppUpdateHelper.update()
+            return true
+        }
+
         val updateFileUrl = configRepository.provide().updateFileUrl ?: return false
         val request = buildDownloadRequest(Uri.parse(updateFileUrl))
         val downloadId = downloadManager.enqueue(request)

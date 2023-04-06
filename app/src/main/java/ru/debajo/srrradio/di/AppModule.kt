@@ -1,7 +1,5 @@
 package ru.debajo.srrradio.di
 
-import android.app.DownloadManager
-import android.content.Context
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import org.koin.core.module.Module
@@ -69,7 +67,6 @@ val AppModule: Module = module {
     single { AppSynchronizer(get(), get(), get(), get()) }
     factoryOf(::AppStateSnapshotExtractor)
 
-    single { get<Context>().getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager }
     single { StationCoverLoader(get()) }
     single { SleepTimer() }
     factory { SendingErrorsManager(get(), get()) }
