@@ -3,8 +3,8 @@ package ru.debajo.srrradio.common
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-fun interface LazySuspend<T> {
-    suspend fun get(): T
+interface LazySuspend<T> {
+    suspend fun get(force: Boolean = false): T
 }
 
 interface MutableLazySuspend<T> : LazySuspend<T> {
@@ -19,15 +19,16 @@ private class LazySuspendImpl<T>(
     private var value: T? = null
     private val mutex = Mutex()
 
-    override suspend fun get(): T {
-        if (value == null) {
+    override suspend fun get(force: Boolean): T {
+        return if (force) {
             mutex.withLock {
-                if (value == null) {
-                    value = factory()
-                }
+                factory().also { value = it }
+            }
+        } else {
+            value ?: mutex.withLock {
+                value ?: factory().also { value = it }
             }
         }
-        return value!!
     }
 
     override suspend fun set(value: T) {

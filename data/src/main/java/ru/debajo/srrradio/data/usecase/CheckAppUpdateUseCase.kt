@@ -8,7 +8,7 @@ class CheckAppUpdateUseCase(
     private val configRepository: ConfigRepository,
 ) {
     suspend fun hasUpdate(): Boolean {
-        val config = configRepository.provide()
+        val config = configRepository.provide(force = true)
         return config.lastVersionNumber > appVersion.number && !config.updateFileUrl.isNullOrEmpty()
     }
 }

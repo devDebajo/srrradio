@@ -26,9 +26,9 @@ internal class ConfigRepositoryImpl(
     private val config: LazySuspend<Config> = lazySuspend { fetch() }
     private val initialized: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    override suspend fun provide(): Config {
+    override suspend fun provide(force: Boolean): Config {
         ensureInitialized()
-        return config.get()
+        return config.get(force)
     }
 
     private suspend fun ensureInitialized() {
