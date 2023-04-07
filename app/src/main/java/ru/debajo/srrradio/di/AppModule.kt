@@ -7,6 +7,7 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.auth.AuthManagerProvider
+import ru.debajo.srrradio.auth.F
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.media.MediaController
@@ -62,7 +63,7 @@ val AppModule: Module = module {
     single { FirebaseCrashlytics.getInstance() }
     single { FirebaseAuth.getInstance() }
 
-    single { AuthManagerProvider(get(), get(), get(), get()) }
+    singleOf(::AuthManagerProvider)
     factory { AppStateSnapshotMerger() }
     single { AppSynchronizer(get(), get(), get(), get()) }
     factoryOf(::AppStateSnapshotExtractor)
@@ -120,7 +121,7 @@ val AppModule: Module = module {
     factory { SrrradioNotificationManager(get(), get()) }
     factory { PlaybackBroadcastReceiver(get()) }
     factoryOf(::AppUpdateProcessor)
-
+    single { F.getInstance(get()) }
     factoryOf(::PlayerWidgetManager)
     factoryOf(::MapController)
     factoryOf(::AppUpdateFlowHelper)

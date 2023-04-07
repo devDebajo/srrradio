@@ -3,14 +3,13 @@ package ru.debajo.srrradio.auth
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.activity.ComponentActivity
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import java.lang.ref.WeakReference
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,16 +17,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import ru.debajo.srrradio.ProcessScopeImmediate
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.common.ActivityHolder
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.common.utils.toTimber
+
+typealias F = FirebaseAnalytics
 
 interface AuthManager {
     val authState: StateFlow<AuthState>
 
     val currentUser: FirebaseUser?
         get() = (authState.value as? AuthState.Authenticated)?.user
-
-    fun setActivity(activity: ComponentActivity)
 
     suspend fun signIn()
 
@@ -40,7 +40,6 @@ interface AuthManager {
 
 object NotSupportedAuthManager : AuthManager {
     override val authState: StateFlow<AuthState> = MutableStateFlow(AuthState.Unavailable)
-    override fun setActivity(activity: ComponentActivity) = Unit
     override suspend fun signIn() = Unit
     override fun signOut() = Unit
     override suspend fun deleteUser() = Unit
@@ -50,11 +49,11 @@ object NotSupportedAuthManager : AuthManager {
 class AuthManagerImpl(
     private val firebaseAuth: FirebaseAuth,
     private val context: Context,
+    private val activityHolder: ActivityHolder,
 ) : AuthManager {
 
-    private var activityRef: WeakReference<Activity>? = null
     private val activity: Activity?
-        get() = activityRef?.get()
+        get() = activityHolder.currentActivity
 
     private val authStateMutable: MutableStateFlow<AuthState> = MutableStateFlow(getCurrentAuthState(firebaseAuth.currentUser))
     override val authState: StateFlow<AuthState> = authStateMutable.asStateFlow()
@@ -71,10 +70,6 @@ class AuthManagerImpl(
                 firebaseAuth.currentUser?.reload()?.await()
             }
         }
-    }
-
-    override fun setActivity(activity: ComponentActivity) {
-        activityRef = WeakReference(activity)
     }
 
     override suspend fun signIn() {
