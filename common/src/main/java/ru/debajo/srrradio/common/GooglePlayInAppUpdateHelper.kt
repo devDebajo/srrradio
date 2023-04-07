@@ -3,7 +3,6 @@ package ru.debajo.srrradio.common
 import android.content.Context
 import android.os.Build
 import com.google.android.play.core.appupdate.AppUpdateManager
-import com.google.android.play.core.common.IntentSenderForResultStarter
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.UpdateAvailability
 import kotlinx.coroutines.tasks.await
@@ -11,7 +10,7 @@ import kotlinx.coroutines.tasks.await
 class GooglePlayInAppUpdateHelper(
     private val context: Context,
     private val appUpdateManager: AppUpdateManager,
-    private val intentForResultStarterHolder: IntentForResultStarterHolder,
+    private val activityHolder: ActivityHolder,
 ) {
     @Suppress("DEPRECATION")
     fun installedFromGooglePlay(): Boolean {
@@ -33,29 +32,14 @@ class GooglePlayInAppUpdateHelper(
     }
 
     suspend fun update() {
-        val currentStarter = intentForResultStarterHolder.currentStarter?.wrap() ?: return
+        val currentActivity = activityHolder.currentActivity ?: return
         val appUpdateInfo = appUpdateManager.appUpdateInfo.await()
         appUpdateManager.startUpdateFlowForResult(
             appUpdateInfo,
             AppUpdateType.IMMEDIATE,
-            currentStarter,
+            currentActivity,
             REQUEST
         )
-    }
-
-    private fun IntentForResultStarter.wrap(): IntentSenderForResultStarter {
-        val receiver = this
-        return IntentSenderForResultStarter { intent, requestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options ->
-            receiver.startIntentForResult(
-                intent = intent,
-                requestCode = requestCode,
-                fillInIntent = fillInIntent,
-                flagsMask = flagsMask,
-                flagsValues = flagsValues,
-                extraFlags = extraFlags,
-                options = options
-            )
-        }
     }
 
     private companion object {

@@ -2,7 +2,6 @@ package ru.debajo.srrradio.ui.host
 
 import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
 import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
@@ -42,8 +41,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.auth.AuthManagerProvider
-import ru.debajo.srrradio.common.IntentForResultStarter
-import ru.debajo.srrradio.common.IntentForResultStarterHolder
+import ru.debajo.srrradio.common.ActivityHolder
 import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.di.diViewModels
@@ -73,7 +71,7 @@ import ru.debajo.srrradio.ui.navigation.SrrradioNavigationHost
 import ru.debajo.srrradio.ui.theme.SrrradioTheme
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
-class HostActivity : ComponentActivity(), IntentForResultStarter {
+class HostActivity : ComponentActivity() {
 
     private val stationsListViewModel: StationsListViewModel by diViewModels()
     private val playerBottomSheetViewModel: PlayerBottomSheetViewModel by diViewModels()
@@ -85,7 +83,7 @@ class HostActivity : ComponentActivity(), IntentForResultStarter {
     private val rateAppManager: RateAppManager by inject()
     private val alertDialogState: AlertDialogState by lazy { AlertDialogState(this@HostActivity) }
     private val notificationManager: SrrradioNotificationManager by inject()
-    private val intentForResultStarterHolder: IntentForResultStarterHolder by inject()
+    private val activityHolder: ActivityHolder by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -99,7 +97,7 @@ class HostActivity : ComponentActivity(), IntentForResultStarter {
         if (savedInstanceState == null) {
             handleRateApp()
         }
-        intentForResultStarterHolder.attach(this)
+        activityHolder.attach(this)
         lifecycleScope.launch {
             authManagerProvider().setActivity(this@HostActivity)
         }
@@ -160,6 +158,11 @@ class HostActivity : ComponentActivity(), IntentForResultStarter {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        activityHolder.detach(this)
+    }
+
     @Composable
     private fun NewsHandler() {
         val viewModel = StationsListViewModel.Local.current
@@ -202,26 +205,6 @@ class HostActivity : ComponentActivity(), IntentForResultStarter {
         lifecycleScope.launch {
             authManagerProvider().onActivityResult(requestCode, data)
         }
-    }
-
-    override fun startIntentForResult(
-        intent: IntentSender,
-        requestCode: Int,
-        fillInIntent: Intent?,
-        flagsMask: Int,
-        flagsValues: Int,
-        extraFlags: Int,
-        options: Bundle?
-    ) {
-        startIntentSenderForResult(
-            /* intent = */ intent,
-            /* requestCode = */ requestCode,
-            /* fillInIntent = */ fillInIntent,
-            /* flagsMask = */ flagsMask,
-            /* flagsValues = */ flagsValues,
-            /* extraFlags = */ extraFlags,
-            /* options = */ options
-        )
     }
 
     @Composable

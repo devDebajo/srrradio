@@ -18,11 +18,15 @@ class CheckAppUpdateUseCase(
     }
 
     private suspend fun hasUpdateUnsafe(): Boolean {
+        val config = configRepository.provide(force = true)
         if (googlePlayInAppUpdateHelper.installedFromGooglePlay()) {
-            return googlePlayInAppUpdateHelper.updateAvailable()
+            return if (config.googlePlayInAppUpdateEnabled) {
+                googlePlayInAppUpdateHelper.updateAvailable()
+            } else {
+                false
+            }
         }
 
-        val config = configRepository.provide(force = true)
         return config.lastVersionNumber > appVersion.number && !config.updateFileUrl.isNullOrEmpty()
     }
 }
