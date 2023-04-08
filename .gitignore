@@ -18,3 +18,6 @@ local.properties
 /app/release/
 /.idea/deploymentTargetDropDown.xml
 /.idea/inspectionProfiles/Project_Default.xml
+/build_apk.sh
+/build_bundle.sh
+/release.sh
