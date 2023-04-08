@@ -3,6 +3,8 @@ package ru.debajo.srrradio.domain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.onEach
 import ru.debajo.srrradio.common.mutableLazySuspend
+import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.common.utils.toTimber
 import ru.debajo.srrradio.domain.model.Station
 import ru.debajo.srrradio.domain.repository.FavoriteStationsRepository
 
@@ -16,9 +18,12 @@ interface FavoriteStationsStateUseCase {
     suspend fun get(): List<Station>
 
     suspend fun updateStations(stationIds: List<String>)
+
+    suspend fun reloadFromNetwork()
 }
 
 internal class FavoriteStationsStateUseCaseImpl(
+    private val searchStationsUseCase: SearchStationsUseCase,
     private val repository: FavoriteStationsRepository
 ) : FavoriteStationsStateUseCase {
 
@@ -48,5 +53,14 @@ internal class FavoriteStationsStateUseCaseImpl(
 
     override suspend fun updateStations(stationIds: List<String>) {
         repository.updateStations(stationIds)
+    }
+
+    override suspend fun reloadFromNetwork() {
+        runCatchingNonCancellation {
+            val ids = get().map { it.id }.distinct()
+            if (ids.isNotEmpty()) {
+                searchStationsUseCase.reloadToCache(ids)
+            }
+        }.toTimber()
     }
 }

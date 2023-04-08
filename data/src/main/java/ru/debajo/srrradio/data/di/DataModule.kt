@@ -13,9 +13,12 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.data.BuildConfig
+import ru.debajo.srrradio.data.appversion.AppVersionMigrationTo10
+import ru.debajo.srrradio.data.appversion.AppVersionMigrationsList
 import ru.debajo.srrradio.data.config.ConfigRepositoryImpl
 import ru.debajo.srrradio.data.db.MIGRATIONS
 import ru.debajo.srrradio.data.db.SrrradioDatabase
+import ru.debajo.srrradio.data.preference.PreviousAppVersionPreference
 import ru.debajo.srrradio.data.repository.FavoriteStationsRepositoryImpl
 import ru.debajo.srrradio.data.repository.SearchStationsRepositoryImpl
 import ru.debajo.srrradio.data.repository.StationsForMapLastUpdatePreference
@@ -23,6 +26,7 @@ import ru.debajo.srrradio.data.repository.TracksCollectionRepositoryImpl
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
 import ru.debajo.srrradio.data.service.ServiceHolder
 import ru.debajo.srrradio.data.sync.SyncRepositoryImpl
+import ru.debajo.srrradio.data.usecase.AppVersionMigrateUseCase
 import ru.debajo.srrradio.data.usecase.CheckAppUpdateUseCase
 import ru.debajo.srrradio.data.usecase.LastPlaylistIdPreference
 import ru.debajo.srrradio.data.usecase.LastStationIdPreference
@@ -95,4 +99,9 @@ val DataModule: Module = module {
     factory<SyncUseCase> { SyncRepositoryImpl(get(), get()) }
     single<ConfigRepository> { ConfigRepositoryImpl(get(), get(), get()) }
     singleOf(::CheckAppUpdateUseCase)
+
+    factoryOf(::PreviousAppVersionPreference)
+    factoryOf(::AppVersionMigrationsList)
+    factoryOf(::AppVersionMigrationTo10)
+    factoryOf(::AppVersionMigrateUseCase)
 }

@@ -19,6 +19,9 @@ internal interface RadioBrowserService {
     @GET("/json/stations/byurl")
     suspend fun byUrl(@Query("url") url: String): List<RemoteStation>
 
+    @GET("/json/stations/byuuid")
+    suspend fun byUuid(@Query("uuids") uuids: String): List<RemoteStation>
+
     @GET("/json/stations/lastchange")
     suspend fun newStations(
         @Query("limit") limit: Int,

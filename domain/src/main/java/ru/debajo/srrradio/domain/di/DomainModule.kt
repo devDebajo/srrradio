@@ -17,6 +17,6 @@ val DomainModule: Module = module {
     factory<SearchStationsUseCase> { get<SearchStationsRepository>() }
     factory<TracksCollectionUseCase> { get<TracksCollectionRepository>() }
     factory<UpdateFavoriteStationStateUseCase> { UpdateFavoriteStationStateUseCaseImpl(get()) }
-    single<FavoriteStationsStateUseCase> { FavoriteStationsStateUseCaseImpl(get()) }
+    single<FavoriteStationsStateUseCase> { FavoriteStationsStateUseCaseImpl(get(), get()) }
     single<UserLocationUseCase> { UserLocationUseCaseImpl(get(), get()) }
 }

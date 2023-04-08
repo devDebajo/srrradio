@@ -58,6 +58,13 @@ internal class SearchStationsRepositoryImpl(
         runCatchingNonCancellation { loadStationsWithGeoInfo() }.toTimber()
     }
 
+    override suspend fun reloadToCache(ids: List<String>) {
+        val toPersist = serviceHolder.createService()
+            .byUuid(uuids = ids.joinToString(separator = ","))
+            .map { it.toDb() }
+        dbStationDao.insert(toPersist)
+    }
+
     private suspend fun loadStationsWithGeoInfo(): List<Station> {
         val toPersist = serviceHolder.createService()
             .search(hasGeoInfo = true, hideBroken = true)

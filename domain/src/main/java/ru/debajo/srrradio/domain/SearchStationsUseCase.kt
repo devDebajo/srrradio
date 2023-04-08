@@ -14,4 +14,6 @@ interface SearchStationsUseCase {
     suspend fun searchPopular(limit: Int): List<Station>
 
     suspend fun warmUpStationsIfNeed()
+
+    suspend fun reloadToCache(ids: List<String>)
 }

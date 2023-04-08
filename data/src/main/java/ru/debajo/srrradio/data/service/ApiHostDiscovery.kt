@@ -2,15 +2,12 @@ package ru.debajo.srrradio.data.service
 
 import java.net.InetAddress
 import java.net.UnknownHostException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.supervisorScope
 import ru.debajo.srrradio.common.LazySuspend
 import ru.debajo.srrradio.common.lazySuspend
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
@@ -25,11 +22,7 @@ class ApiHostDiscovery(
     }
 
     suspend fun discover() {
-        supervisorScope {
-            launch(Dispatchers.IO) {
-                getHost()
-            }
-        }
+        getHost()
     }
 
     suspend fun getHost(): String = host.get()

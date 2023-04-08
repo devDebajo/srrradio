@@ -15,6 +15,7 @@ import ru.debajo.srrradio.common.di.CommonModule
 import ru.debajo.srrradio.common.utils.inject
 import ru.debajo.srrradio.data.di.DataModule
 import ru.debajo.srrradio.data.service.ApiHostDiscovery
+import ru.debajo.srrradio.data.usecase.AppVersionMigrateUseCase
 import ru.debajo.srrradio.di.AppModule
 import ru.debajo.srrradio.domain.SearchStationsUseCase
 import ru.debajo.srrradio.domain.di.DomainModule
@@ -33,6 +34,7 @@ class SrrradioApp : Application() {
     private val widgetManager: PlayerWidgetManager by inject()
     private val receiver: PlaybackBroadcastReceiver by inject()
     private val searchStationsUseCase: SearchStationsUseCase by inject()
+    private val appVersionMigrateUseCase: AppVersionMigrateUseCase by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -46,8 +48,9 @@ class SrrradioApp : Application() {
         val processScope = processLifecycle.coroutineScope
 
         with(processScope) {
-            launch {
+            launch(IO) {
                 apiHostDiscovery.discover()
+                appVersionMigrateUseCase.migrate()
             }
 
             launch(Main) {
