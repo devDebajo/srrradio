@@ -192,6 +192,12 @@ private fun SettingsList(bottomPadding: Dp) {
             state = calculateGroupState(expandedGroup, 3),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(3) }
         ) {
+            SettingsSwitch(
+                text = stringResource(R.string.settings_initial_autoplay),
+                checked = state.initialAutoplay,
+                onClick = { viewModel.onInitialAutoplayClick() }
+            )
+
             if (state.snowFallToggleVisible) {
                 SettingsSwitch(
                     text = stringResource(R.string.settings_snow_fall),

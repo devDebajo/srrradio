@@ -19,7 +19,7 @@
     <string name="playlist_popular_empty">There no popular stations</string>
     <string name="playlist_favorite">Favorite</string>
     <string name="playlist_favorite_empty">There no favorite stations</string>
-    <string name="playlist_on_map">On map</string>
+    <string name="playlist_on_map">On map (beta)</string>
 
     <string name="update_downloading">Downloading application update</string>
     <string name="update_failed">Failed to update application</string>
@@ -79,6 +79,7 @@
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_data_source">Stations source (API)</string>
     <string name="settings_app_version">App version: %s</string>
+    <string name="settings_initial_autoplay">Autoplay on app start</string>
 
     <string name="settings_group_debug">Debug</string>
     <string name="settings_clear_rate_app_data">Clear rate app data</string>

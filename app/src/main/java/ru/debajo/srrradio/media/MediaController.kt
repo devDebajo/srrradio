@@ -167,11 +167,7 @@ class MediaController(
         val currentMediaState = stateMutable.value as? MediaState.Loaded ?: return
         stateMutable.value = when (playerState) {
             is RadioPlayer.State.None -> {
-                currentMediaState.copy(
-                    mediaStationInfo = currentMediaState.mediaStationInfo?.copy(
-                        playingState = UiStationPlayingState.NONE
-                    )
-                )
+                currentMediaState.copy(mediaStationInfo = null)
             }
             is RadioPlayer.State.HasStation -> {
                 if (playerState.station !in currentMediaState.playlist) {

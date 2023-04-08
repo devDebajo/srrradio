@@ -16,6 +16,7 @@ import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.rate.GoogleServicesUtils
 import ru.debajo.srrradio.rate.HostActivityCreateCountPreference
+import ru.debajo.srrradio.rate.InitialAutoplayPreference
 import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.rate.RateAppStatePreference
 import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
@@ -44,6 +45,7 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.processor.AddFavoriteStationProcessor
 import ru.debajo.srrradio.ui.processor.AddTrackToCollectionProcessor
 import ru.debajo.srrradio.ui.processor.AppUpdateProcessor
+import ru.debajo.srrradio.ui.processor.AutoplayProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
@@ -91,20 +93,21 @@ val AppModule: Module = module {
     factoryOf(::StationsListViewModel)
     factoryOf(::StationsOnMapViewModel)
 
-    factory { SendingErrorsPreference(get()) }
-    factory { SrrradioThemePreference(get()) }
-    factory { SnowFallPreference(get()) }
-    factory { RateAppStatePreference(get()) }
-    factory { HostActivityCreateCountPreference(get()) }
+    factoryOf(::SendingErrorsPreference)
+    factoryOf(::SrrradioThemePreference)
+    factoryOf(::SnowFallPreference)
+    factoryOf(::RateAppStatePreference)
+    factoryOf(::HostActivityCreateCountPreference)
+    factoryOf(::InitialAutoplayPreference)
 
     single { SnowFallUseCase(get(), get()) }
     factory { UserStationsInteractor(get(), get()) }
     factory { LoadM3uInteractor(get(), get(), get(), get()) }
 
     factory { StationsListReduktor(get()) }
-    factory { StationsListCommandResultReduktor(get()) }
+    factoryOf(::StationsListCommandResultReduktor)
     factory { PlayerBottomSheetReduktor(get()) }
-    factory { PlayerBottomSheetCommandResultReduktor() }
+    factoryOf(::PlayerBottomSheetCommandResultReduktor)
     factory { AddCustomStationReduktor() }
     factory { AddCustomStationCommandResultReduktor() }
 
@@ -120,6 +123,7 @@ val AppModule: Module = module {
     factory { SaveCustomStationProcessor(get()) }
     factory { SrrradioNotificationManager(get(), get()) }
     factory { PlaybackBroadcastReceiver(get()) }
+    factoryOf(::AutoplayProcessor)
     factoryOf(::AppUpdateProcessor)
     single { F.getInstance(get()) }
     factoryOf(::PlayerWidgetManager)

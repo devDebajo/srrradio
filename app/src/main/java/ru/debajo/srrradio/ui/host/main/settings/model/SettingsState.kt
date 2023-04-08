@@ -11,4 +11,5 @@ internal data class SettingsState(
     val lastSyncDate: DateTime? = null,
     val snowFallToggleVisible: Boolean = false,
     val snowFallEnabled: Boolean = false,
+    val initialAutoplay: Boolean = false,
 )

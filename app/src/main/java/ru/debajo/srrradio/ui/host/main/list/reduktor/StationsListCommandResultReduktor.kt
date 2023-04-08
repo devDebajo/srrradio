@@ -3,16 +3,20 @@ package ru.debajo.srrradio.ui.host.main.list.reduktor
 import android.content.Context
 import java.util.UUID
 import ru.debajo.reduktor.Akt
+import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
+import ru.debajo.srrradio.ui.host.main.list.model.idle
 import ru.debajo.srrradio.ui.host.main.list.model.playlist
 import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.toPlaylist
 import ru.debajo.srrradio.ui.processor.AppUpdateProcessor
+import ru.debajo.srrradio.ui.processor.AutoplayProcessor
 import ru.debajo.srrradio.ui.processor.ListenFavoriteStationsProcessor
 import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
@@ -76,10 +80,20 @@ class StationsListCommandResultReduktor(
         state: StationsListState,
         event: MediaStateListenerCommandProcessor.OnNewMediaState,
     ): Akt<StationsListState, StationsListNews> {
+        var commands: List<Command>? = null
+        var autoPlayed = state.idle.autoPlayed
+        if (event.state is MediaState.Loaded && event.state.mediaStationInfo != null && !autoPlayed) {
+            commands = listOf(AutoplayProcessor.Autoplay)
+            autoPlayed = true
+        }
         return Akt(
             state = state.updateIdle {
-                copy(mediaState = event.state)
-            }
+                copy(
+                    mediaState = event.state,
+                    autoPlayed = autoPlayed,
+                )
+            },
+            commands = commands ?: emptyList(),
         )
     }
 

@@ -19,6 +19,7 @@ import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
+import ru.debajo.srrradio.rate.InitialAutoplayPreference
 import ru.debajo.srrradio.rate.RateAppManager
 import ru.debajo.srrradio.sync.AppSynchronizer
 import ru.debajo.srrradio.ui.common.SnowFallUseCase
@@ -38,6 +39,7 @@ internal class SettingsViewModel(
     private val snowFallUseCase: SnowFallUseCase,
     private val rateAppManager: RateAppManager,
     private val configRepository: ConfigRepository,
+    private val initialAutoplayPreference: InitialAutoplayPreference,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -81,6 +83,7 @@ internal class SettingsViewModel(
                         themes = themes,
                         authStatus = authStatus,
                         lastSyncDate = lastSyncDate,
+                        initialAutoplay = initialAutoplayPreference.get(),
                     )
                 }
             }
@@ -106,6 +109,15 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             loadM3uInteractor.load(filePath)
             updateState { copy(loadingM3u = false) }
+        }
+    }
+
+    fun onInitialAutoplayClick() {
+        viewModelScope.launch {
+            updateState {
+                initialAutoplayPreference.set(!initialAutoplay)
+                copy(initialAutoplay = !initialAutoplay)
+            }
         }
     }
 

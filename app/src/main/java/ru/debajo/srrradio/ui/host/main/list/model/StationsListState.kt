@@ -24,6 +24,7 @@ sealed interface StationsListState {
         val collectionEmpty: Boolean = true,
         val fallBackPlaylist: UiPlaylist? = null,
         val hasAppUpdate: Boolean = false,
+        val autoPlayed: Boolean = false,
     ) : StationsListState {
         override val uiElements: List<UiElement> = buildList {
             add(UiPlaylistsElement(DefaultMainTiles.getTiles(hasAppUpdate)))
@@ -55,11 +56,14 @@ sealed interface StationsListState {
     }
 }
 
-val StationsListState.mediaState: MediaState
+val StationsListState.idle: StationsListState.Idle
     get() = when (this) {
-        is StationsListState.Idle -> mediaState
-        is StationsListState.InSearchMode -> idleState.mediaState
+        is StationsListState.Idle -> this
+        is StationsListState.InSearchMode -> idleState
     }
+
+val StationsListState.mediaState: MediaState
+    get() = idle.mediaState
 
 val StationsListState.playlist: UiPlaylist?
     get() = when (this) {
@@ -68,19 +72,13 @@ val StationsListState.playlist: UiPlaylist?
     }
 
 val StationsListState.favoriteStations: List<UiStation>
-    get() = when (this) {
-        is StationsListState.Idle -> favoriteStations
-        is StationsListState.InSearchMode -> idleState.favoriteStations
-    }
+    get() = idle.favoriteStations
 
 val StationsListState.favoriteStationsIds: Set<String>
     get() = favoriteStations.map { it.id }.toSet()
 
 val StationsListState.collectionEmpty: Boolean
-    get() = when (this) {
-        is StationsListState.Idle -> collectionEmpty
-        is StationsListState.InSearchMode -> idleState.collectionEmpty
-    }
+    get() = idle.collectionEmpty
 
 val StationsListState.searchQuery: TextFieldValue
     get() = when (this) {

@@ -21,13 +21,15 @@ class RecommendationsUseCase internal constructor(
             .asSequence()
             .map { it.key to it.value.size }
             .sortedByDescending { it.second }
-            .take(1)
+            .take(5)
             .map { it.first }
             .toList()
+
+        val targetTag = targetTags.randomOrNull() ?: return emptyList()
         val favoriteIds = favoriteStations.map { it.id }.toSet()
         val remoteStations = serviceHolder.createService().search(
             hideBroken = true,
-            tagList = targetTags.joinToString(separator = ","),
+            tagList = targetTag,
             order = "votes",
             reverse = true,
             limit = 100,

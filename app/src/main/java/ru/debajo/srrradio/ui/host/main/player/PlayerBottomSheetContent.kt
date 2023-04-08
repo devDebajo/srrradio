@@ -86,6 +86,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.R
+import ru.debajo.srrradio.ui.common.CustomText
 import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
@@ -190,7 +191,9 @@ fun PlayerBottomSheetContent(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    modifier = Modifier.width(itemSize).basicMarquee(),
+                    modifier = Modifier
+                        .width(itemSize)
+                        .basicMarquee(),
                     text = station.name,
                     fontSize = 18.sp,
                     color = MaterialTheme.colorScheme.onSurface
@@ -198,11 +201,14 @@ fun PlayerBottomSheetContent(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            modifier = Modifier.width(itemSize).basicMarquee(),
+        CustomText(
+            modifier = Modifier.width(itemSize),
             text = state.title ?: stringResource(R.string.no_track),
             fontSize = 13.sp,
-            color = MaterialTheme.colorScheme.onSurface
+            lineHeight = 18.sp,
+            maxLines = 2,
+            minLines = 2,
+            color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(20.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
