@@ -1,5 +1,12 @@
 apply from: '../gradle/android_module.gradle'
 
+android {
+    buildTypes {
+        releaseApk {
+        }
+    }
+}
+
 dependencies {
     implementation project(":common")
 }
