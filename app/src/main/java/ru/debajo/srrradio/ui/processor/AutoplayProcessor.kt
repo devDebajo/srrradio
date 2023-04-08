@@ -7,6 +7,7 @@ import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
 import ru.debajo.reduktor.CommandResult
 import ru.debajo.srrradio.media.MediaController
+import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.rate.InitialAutoplayPreference
 
 class AutoplayProcessor(
@@ -17,7 +18,9 @@ class AutoplayProcessor(
         return commands.filterIsInstance<Autoplay>()
             .map {
                 if (initialAutoplayPreference.get()) {
-                    mediaController.play()
+                    if ((mediaController.state.value as? MediaState.Loaded)?.playing != true) {
+                        mediaController.play()
+                    }
                 }
                 CommandResult.EMPTY
             }
