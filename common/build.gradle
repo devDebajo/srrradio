@@ -1,5 +1,12 @@
 apply from: '../gradle/android_module.gradle'
 
+android {
+    buildTypes {
+        releaseApk {
+        }
+    }
+}
+
 dependencies {
     api "androidx.core:core-ktx:$core_ktx_version"
     api "joda-time:joda-time:$joda_time_version"
