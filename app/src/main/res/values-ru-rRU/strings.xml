@@ -18,6 +18,7 @@
     <string name="playlist_favorite">Избранные</string>
     <string name="playlist_favorite_empty">Нет избранных станций</string>
     <string name="playlist_on_map">На карте (beta)</string>
+    <string name="playlist_on_map_format">На карте: %s</string>
 
     <string name="update_downloading">Загрузка обновления</string>
     <string name="update_failed">Не удалось обновить приложение</string>
