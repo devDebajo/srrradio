@@ -44,6 +44,7 @@ import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.common.ActivityHolder
 import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.inject
+import ru.debajo.srrradio.data.usecase.AppVersionMigrateUseCase
 import ru.debajo.srrradio.di.diViewModels
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.rate.RateAppManager
@@ -84,6 +85,7 @@ class HostActivity : ComponentActivity() {
     private val alertDialogState: AlertDialogState by lazy { AlertDialogState(this@HostActivity) }
     private val notificationManager: SrrradioNotificationManager by inject()
     private val activityHolder: ActivityHolder by inject()
+    private val appVersionMigrateUseCase: AppVersionMigrateUseCase by inject()
 
     private val openDocumentLauncher: ActivityResultLauncher<Array<String>> = registerForActivityResult(ActivityResultContracts.OpenDocument()) {
         if (it != null) {
@@ -96,6 +98,7 @@ class HostActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             handleRateApp()
+            lifecycleScope.launch { appVersionMigrateUseCase.migrate() }
         }
         activityHolder.attach(this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
