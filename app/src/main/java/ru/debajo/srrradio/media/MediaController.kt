@@ -124,7 +124,12 @@ class MediaController(
 
         stateMutable.value = MediaState.Loaded(
             playlist = playlist,
-            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE, null)
+            mediaStationInfo = MediaStationInfo(
+                currentStationId = stationId,
+                playingState = UiStationPlayingState.NONE,
+                title = null,
+                playerInitialized = stateMutable.value.asLoaded?.mediaStationInfo?.playerInitialized == true,
+            )
         )
 
         savePlaylistInfoToPrefs()
@@ -137,7 +142,12 @@ class MediaController(
         val station = state.playlist.stations.firstOrNull { it.id == stationId } ?: return
 
         stateMutable.value = state.copy(
-            mediaStationInfo = MediaStationInfo(stationId, UiStationPlayingState.NONE, null)
+            mediaStationInfo = MediaStationInfo(
+                currentStationId = stationId,
+                playingState = UiStationPlayingState.NONE,
+                title = null,
+                playerInitialized = state.mediaStationInfo?.playerInitialized == true
+            )
         )
 
         savePlaylistInfoToPrefs()
@@ -159,7 +169,14 @@ class MediaController(
         }
         return MediaState.Loaded(
             playlist = playlist.toUi(),
-            mediaStationInfo = lastStation?.let { MediaStationInfo(it.id, UiStationPlayingState.NONE, null) }
+            mediaStationInfo = lastStation?.let {
+                MediaStationInfo(
+                    currentStationId = it.id,
+                    playingState = UiStationPlayingState.NONE,
+                    title = null,
+                    playerInitialized = false
+                )
+            }
         )
     }
 
@@ -176,7 +193,8 @@ class MediaController(
                         mediaStationInfo = MediaStationInfo(
                             currentStationId = playerState.station.id,
                             playingState = playerState.playbackState.toUi(),
-                            title = playerState.playingTitle
+                            title = playerState.playingTitle,
+                            playerInitialized = true,
                         ),
                     )
                 } else {
@@ -184,7 +202,8 @@ class MediaController(
                         mediaStationInfo = MediaStationInfo(
                             currentStationId = playerState.station.id,
                             playingState = playerState.playbackState.toUi(),
-                            title = playerState.playingTitle
+                            title = playerState.playingTitle,
+                            playerInitialized = true,
                         )
                     )
                 }

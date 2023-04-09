@@ -82,7 +82,7 @@ class StationsListCommandResultReduktor(
     ): Akt<StationsListState, StationsListNews> {
         var commands: List<Command>? = null
         var autoPlayed = state.idle.autoPlayed
-        if (event.state is MediaState.Loaded && event.state.mediaStationInfo != null && !autoPlayed) {
+        if (event.state is MediaState.Loaded && event.state.mediaStationInfo != null && event.state.mediaStationInfo.playerInitialized && !autoPlayed) {
             commands = listOf(AutoplayProcessor.Autoplay)
             autoPlayed = true
         }
