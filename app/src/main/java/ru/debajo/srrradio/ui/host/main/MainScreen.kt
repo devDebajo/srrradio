@@ -27,6 +27,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -61,9 +62,12 @@ import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.toDp
 import ru.debajo.srrradio.ui.host.main.list.StationsList
 import ru.debajo.srrradio.ui.host.main.map.StationsOnMapScreen
+import ru.debajo.srrradio.ui.host.main.player.LocalVolumeState
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetContent
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetPeekHeight
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
+import ru.debajo.srrradio.ui.host.main.player.VolumeBar
+import ru.debajo.srrradio.ui.host.main.player.rememberVolumeState
 import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistScreen
 import ru.debajo.srrradio.ui.host.main.playlist.DefaultPlaylistScreenStrategy
 import ru.debajo.srrradio.ui.host.main.settings.SettingsScreen
@@ -163,85 +167,93 @@ private fun RadioScreenContent() {
     }
 
     val navTree = NavTree.current
-    Box(Modifier.fillMaxSize()) {
-        BottomSheetScaffold(
-            scaffoldState = scaffoldState,
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            sheetElevation = 1.dp,
-            sheetBackgroundColor = bottomSheetBgColor,
-            sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
-            content = {
-                Box(Modifier.fillMaxSize()) {
-                    NavHost(navTree.main.navController, startDestination = navTree.main.radio.route) {
-                        navigation(startDestination = navTree.main.radio.root.route, route = navTree.main.radio.route) {
-                            composable(navTree.main.radio.root.route) {
-                                StationsList(listBottomPadding) {
-                                    if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isCollapsed) {
-                                        coroutineScope.launch {
-                                            bottomSheetScaffoldState.collapse()
+    val volumeState = rememberVolumeState()
+    CompositionLocalProvider(LocalVolumeState provides volumeState) {
+        Box(Modifier.fillMaxSize()) {
+            BottomSheetScaffold(
+                scaffoldState = scaffoldState,
+                backgroundColor = MaterialTheme.colorScheme.surface,
+                sheetElevation = 1.dp,
+                sheetBackgroundColor = bottomSheetBgColor,
+                sheetShape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                content = {
+                    Box(Modifier.fillMaxSize()) {
+                        NavHost(navTree.main.navController, startDestination = navTree.main.radio.route) {
+                            navigation(startDestination = navTree.main.radio.root.route, route = navTree.main.radio.route) {
+                                composable(navTree.main.radio.root.route) {
+                                    StationsList(listBottomPadding) {
+                                        if (bottomSheetScaffoldState.isExpanded && !bottomSheetScaffoldState.isCollapsed) {
+                                            coroutineScope.launch {
+                                                bottomSheetScaffoldState.collapse()
+                                            }
                                         }
                                     }
                                 }
+
+                                composable(navTree.main.radio.newStations.route) {
+                                    DefaultPlaylistScreen(
+                                        listBottomPadding = listBottomPadding,
+                                        strategy = DefaultPlaylistScreenStrategy.NEW
+                                    )
+                                }
+
+                                composable(navTree.main.radio.popularStations.route) {
+                                    DefaultPlaylistScreen(
+                                        listBottomPadding = listBottomPadding,
+                                        strategy = DefaultPlaylistScreenStrategy.POPULAR
+                                    )
+                                }
+
+                                composable(navTree.main.radio.favoriteStations.route) {
+                                    DefaultPlaylistScreen(
+                                        listBottomPadding = listBottomPadding,
+                                        strategy = DefaultPlaylistScreenStrategy.FAVORITE
+                                    )
+                                }
+
+                                composable(navTree.main.radio.recommendedStations.route) {
+                                    DefaultPlaylistScreen(
+                                        listBottomPadding = listBottomPadding,
+                                        strategy = DefaultPlaylistScreenStrategy.RECOMMENDATIONS
+                                    )
+                                }
+
+                                composable(navTree.main.radio.stationsOnMap.route) {
+                                    StationsOnMapScreen()
+                                }
                             }
 
-                            composable(navTree.main.radio.newStations.route) {
-                                DefaultPlaylistScreen(
-                                    listBottomPadding = listBottomPadding,
-                                    strategy = DefaultPlaylistScreenStrategy.NEW
-                                )
+                            composable(navTree.main.settings.route) {
+                                SettingsScreen(listBottomPadding)
                             }
-
-                            composable(navTree.main.radio.popularStations.route) {
-                                DefaultPlaylistScreen(
-                                    listBottomPadding = listBottomPadding,
-                                    strategy = DefaultPlaylistScreenStrategy.POPULAR
-                                )
-                            }
-
-                            composable(navTree.main.radio.favoriteStations.route) {
-                                DefaultPlaylistScreen(
-                                    listBottomPadding = listBottomPadding,
-                                    strategy = DefaultPlaylistScreenStrategy.FAVORITE
-                                )
-                            }
-
-                            composable(navTree.main.radio.recommendedStations.route) {
-                                DefaultPlaylistScreen(
-                                    listBottomPadding = listBottomPadding,
-                                    strategy = DefaultPlaylistScreenStrategy.RECOMMENDATIONS
-                                )
-                            }
-
-                            composable(navTree.main.radio.stationsOnMap.route) {
-                                StationsOnMapScreen()
-                            }
-                        }
-
-                        composable(navTree.main.settings.route) {
-                            SettingsScreen(listBottomPadding)
                         }
                     }
-                }
-            },
-            sheetPeekHeight = if (showBottomSheet) PlayerBottomSheetPeekHeight + navigationHeight.toDp() else 0.dp,
-            sheetContent = {
-                if (showBottomSheet) {
-                    PlayerBottomSheetContent(
-                        scaffoldState = scaffoldState,
-                        navigationHeight = navigationHeight.toDp(),
-                    )
-                } else {
-                    Box(Modifier.fillMaxWidth())
-                }
-            },
-        )
+                },
+                sheetPeekHeight = if (showBottomSheet) PlayerBottomSheetPeekHeight + navigationHeight.toDp() else 0.dp,
+                sheetContent = {
+                    if (showBottomSheet) {
+                        PlayerBottomSheetContent(
+                            scaffoldState = scaffoldState,
+                            navigationHeight = navigationHeight.toDp(),
+                        )
+                    } else {
+                        Box(Modifier.fillMaxWidth())
+                    }
+                },
+            )
 
-        Navigation(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .onGloballyPositioned { navigationHeight = it.size.height },
-            navigationController = navTree.main.navController
-        )
+            Navigation(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .onGloballyPositioned { navigationHeight = it.size.height },
+                navigationController = navTree.main.navController
+            )
+
+            VolumeBar(
+                modifier = Modifier.align(Alignment.TopCenter),
+                volumeState = volumeState,
+            )
+        }
     }
 }
 

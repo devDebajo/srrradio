@@ -12,6 +12,7 @@ import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
+import ru.debajo.srrradio.media.PlayerVolumePreference
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.rate.GoogleServicesUtils
@@ -79,8 +80,9 @@ val AppModule: Module = module {
     singleOf(::RateAppManager)
     single { GoogleServicesUtils(get()) }
     single { MediaSessionController(get()) }
+    factoryOf(::PlayerVolumePreference)
     single {
-        val player = RadioPlayer(get(), get(), get())
+        val player = RadioPlayer(get(), get(), get(), get())
         MediaController(get(), player, get(), get(), get())
     }
 

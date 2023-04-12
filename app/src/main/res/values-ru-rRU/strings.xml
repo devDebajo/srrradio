@@ -94,6 +94,7 @@
 
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>
+    <string name="accessibility_volume">Громкость</string>
     <string name="accessibility_play">Продолжить воспроизведение</string>
     <string name="accessibility_pause">Пауза</string>
     <string name="accessibility_close">Закрыть</string>

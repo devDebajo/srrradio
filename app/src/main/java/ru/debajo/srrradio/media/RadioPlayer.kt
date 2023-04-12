@@ -1,6 +1,8 @@
 package ru.debajo.srrradio.media
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import androidx.annotation.AnyThread
 import androidx.lifecycle.LifecycleCoroutineScope
 import com.google.android.exoplayer2.C
@@ -29,8 +31,10 @@ class RadioPlayer(
     private val context: Context,
     private val stationCoverLoader: StationCoverLoader,
     private val mediaSessionController: MediaSessionController,
+    private val playerVolumePreference: PlayerVolumePreference,
 ) {
 
+    private val handler: Handler = Handler(Looper.getMainLooper())
     private val coroutineScope: LifecycleCoroutineScope by ProcessScope
 
     private val emptyStationCoverListener: EmptyStationCoverListener = EmptyStationCoverListener(mediaSessionController, stationCoverLoader)
@@ -79,6 +83,9 @@ class RadioPlayer(
     val isPlaying: Boolean
         get() = (states.value as? State.HasStation)?.playing == true
 
+    var volume: Float = 1f
+        private set
+
     init {
         exoPlayer.addListener(object : Player.Listener {
             private val playWhenReady: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -118,6 +125,15 @@ class RadioPlayer(
                 this.playWhenReady.value = playWhenReady
             }
         })
+
+        setVolume(playerVolumePreference.get())
+    }
+
+    fun setVolume(value: Float) {
+        val normalized = value.coerceIn(0f, 1f)
+        runOnUiThread { exoPlayer.volume = normalized }
+        volume = normalized
+        playerVolumePreference.set(normalized)
     }
 
     private suspend fun updateMediaSession(playerState: State.HasStation) = runCatchingNonCancellation {
@@ -239,6 +255,14 @@ class RadioPlayer(
                 }
             }
             is State.None -> scheduleDeactivate()
+        }
+    }
+
+    private inline fun runOnUiThread(crossinline block: () -> Unit) {
+        if (Looper.getMainLooper() === Looper.myLooper()) {
+            block()
+        } else {
+            handler.post { block() }
         }
     }
 
