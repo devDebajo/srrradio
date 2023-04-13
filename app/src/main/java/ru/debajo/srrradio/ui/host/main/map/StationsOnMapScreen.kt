@@ -1,10 +1,21 @@
 package ru.debajo.srrradio.ui.host.main.map
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.withScale
+import androidx.core.graphics.withTranslation
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.CustomZoomButtonsController
@@ -36,6 +47,7 @@ fun StationsOnMapScreen() {
         viewModel.load()
     }
 
+    val accentColor = MaterialTheme.colorScheme.primaryContainer
     AndroidView(
         factory = { context ->
             MapView(context).also { mapView ->
@@ -52,12 +64,12 @@ fun StationsOnMapScreen() {
             }
         },
         update = { mapView ->
-            mapView.addStations(stations) { station -> viewModel.startPlaying(station) }
+            mapView.addStations(accentColor, stations) { station -> viewModel.startPlaying(station) }
         }
     )
 }
 
-private fun MapView.addStations(stations: List<UiStation>, onStationClick: (UiStation) -> Unit) {
+private fun MapView.addStations(color: Color, stations: List<UiStation>, onStationClick: (UiStation) -> Unit) {
     val listener = object : Marker.OnMarkerClickListener {
         override fun onMarkerClick(marker: Marker, mapView: MapView): Boolean {
             val station = stations.firstOrNull { it.id == marker.id } ?: return false
@@ -68,9 +80,11 @@ private fun MapView.addStations(stations: List<UiStation>, onStationClick: (UiSt
         }
     }
 
+    val icon = context.loadIcon(color)
     for (station in stations) {
         val location = station.location ?: continue
         val marker = Marker(this)
+        marker.icon = icon
         marker.id = station.id
         marker.setOnMarkerClickListener(listener)
         marker.title = station.name
@@ -78,4 +92,32 @@ private fun MapView.addStations(stations: List<UiStation>, onStationClick: (UiSt
         overlays.add(marker)
     }
     invalidate()
+}
+
+private fun Context.loadIcon(color: Color): Drawable {
+    val mutable = ContextCompat.getDrawable(this, ru.debajo.srrradio.R.drawable.ic_map_pin)!!.mutate()
+    mutable.setTint(android.graphics.Color.BLACK)
+
+    val bitmap = Bitmap.createBitmap(mutable.intrinsicWidth, mutable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+    val canvas = Canvas(bitmap)
+    mutable.setBounds(0, 0, bitmap.width, bitmap.height)
+    mutable.draw(canvas)
+
+    mutable.setTint(color.toArgb())
+    canvas.withScale(
+        x = 0.95f,
+        y = 0.95f,
+        pivotX = 0.5f,
+        pivotY = 0.5f,
+    ) {
+        mutable.draw(this)
+    }
+
+    val logo = ContextCompat.getDrawable(this, ru.debajo.srrradio.R.drawable.ic_launcher_foreground)!!
+    logo.setBounds(0, 0, bitmap.width, bitmap.height)
+    canvas.withTranslation(y = -10f) {
+        logo.draw(canvas)
+    }
+
+    return BitmapDrawable(resources, bitmap)
 }
