@@ -21,3 +21,4 @@ local.properties
 /build_apk.sh
 /build_bundle.sh
 /release.sh
+/install_release_to_device.sh
