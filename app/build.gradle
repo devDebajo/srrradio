@@ -118,6 +118,7 @@ dependencies {
     implementation "com.google.firebase:firebase-auth"
     implementation "com.google.android.gms:play-services-auth:$play_services_auth_version"
     implementation "com.github.jetradarmobile:android-snowfall:$snowfall_version"
+    implementation 'com.github.Justson:Downloader:v5.0.4-androidx'
 
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
 }

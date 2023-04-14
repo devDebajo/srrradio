@@ -185,7 +185,7 @@ private fun ListContent(
 }
 
 private fun navigateToTile(navTree: NavTree, tile: UiMainTile, eventProducer: (StationsListEvent) -> Unit) {
-    when (tile) {
+    when (tile.regular) {
         DefaultMainTiles.NewStations -> navTree.main.radio.newStations.navigate()
         DefaultMainTiles.PopularStations -> navTree.main.radio.popularStations.navigate()
         DefaultMainTiles.FavoriteStations -> navTree.main.radio.favoriteStations.navigate()

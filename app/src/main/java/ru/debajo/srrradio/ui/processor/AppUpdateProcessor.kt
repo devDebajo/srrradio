@@ -1,7 +1,10 @@
 package ru.debajo.srrradio.ui.processor
 
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.CommandProcessor
@@ -14,26 +17,28 @@ class AppUpdateProcessor(
     private val appUpdateFlowHelper: AppUpdateFlowHelper,
 ) : CommandProcessor {
 
+    @OptIn(FlowPreview::class)
     override fun invoke(commands: Flow<Command>): Flow<CommandResult> {
         return commands.filterIsInstance<Task>()
-            .map { task -> handle(task) }
+            .flatMapConcat { task -> handle(task) }
     }
 
-    private suspend fun handle(task: Task): CommandResult {
+    private suspend fun handle(task: Task): Flow<CommandResult> {
         return when (task) {
             is Task.CheckUpdate -> {
                 if (checkAppUpdateUseCase.hasUpdate()) {
-                    Result.HasUpdate
+                    flowOf(Result.HasUpdate)
                 } else {
-                    CommandResult.EMPTY
+                    flowOf(CommandResult.EMPTY)
                 }
             }
             is Task.UpdateFlow -> {
-                val success = appUpdateFlowHelper.updateApp()
-                if (success) {
-                    Result.UpdateSuccess
-                } else {
-                    Result.UpdateFailed
+                appUpdateFlowHelper.updateAppAsFlow().map { progress ->
+                    when (progress) {
+                        is AppUpdateFlowHelper.UpdateProgress.Failed -> Result.UpdateFailed
+                        is AppUpdateFlowHelper.UpdateProgress.Loaded -> Result.UpdateSuccess
+                        is AppUpdateFlowHelper.UpdateProgress.Loading -> Result.LoadingUpdate(progress.progress)
+                    }
                 }
             }
         }
@@ -46,7 +51,11 @@ class AppUpdateProcessor(
 
     sealed interface Result : CommandResult {
         object HasUpdate : Result
+
+        class LoadingUpdate(val progress: Float) : Result
+
         object UpdateSuccess : Result
+
         object UpdateFailed : Result
     }
 }

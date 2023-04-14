@@ -23,11 +23,21 @@ sealed interface StationsListState {
         val favoriteStations: List<UiStation> = emptyList(),
         val collectionEmpty: Boolean = true,
         val fallBackPlaylist: UiPlaylist? = null,
-        val hasAppUpdate: Boolean = false,
         val autoPlayed: Boolean = false,
+        val hasAppUpdate: Boolean = false,
+        val loadingUpdate: Boolean = false,
+        val loadingProgress: Float = 0f,
     ) : StationsListState {
         override val uiElements: List<UiElement> = buildList {
-            add(UiPlaylistsElement(DefaultMainTiles.getTiles(hasAppUpdate)))
+            add(
+                UiPlaylistsElement(
+                    DefaultMainTiles.getTiles(
+                        hasAppUpdate = hasAppUpdate,
+                        updateLoading = loadingUpdate,
+                        updateProgress = loadingProgress
+                    )
+                )
+            )
 
             val playlist = (mediaState as? MediaState.Loaded)?.playlist ?: fallBackPlaylist
             if (playlist != null) {

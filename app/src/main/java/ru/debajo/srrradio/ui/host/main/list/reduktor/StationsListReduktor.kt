@@ -93,7 +93,13 @@ class StationsListReduktor(
 
     private fun reduceUpdateApp(state: StationsListState): Akt<StationsListState, StationsListNews> {
         return Akt(
-            state = state.updateIdle { copy(hasAppUpdate = false) },
+            state = state.updateIdle {
+                copy(
+                    hasAppUpdate = true,
+                    loadingUpdate = true,
+                    loadingProgress = 0f,
+                )
+            },
             commands = listOf(AppUpdateProcessor.Task.UpdateFlow),
             news = listOf(StationsListNews.ShowToast(R.string.update_downloading))
         )
