@@ -40,7 +40,6 @@ import androidx.compose.material.icons.rounded.SkipNext
 import androidx.compose.material.icons.rounded.SkipPrevious
 import androidx.compose.material.icons.rounded.Timelapse
 import androidx.compose.material.icons.rounded.Timer
-import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Badge
 import androidx.compose.material3.CircularProgressIndicator
@@ -212,10 +211,7 @@ fun PlayerBottomSheetContent(
             color = MaterialTheme.colorScheme.onSurface,
         )
         Spacer(modifier = Modifier.height(20.dp))
-        val edgeIconSize = 36.dp
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Spacer(modifier = Modifier.size(edgeIconSize))
-            Spacer(Modifier.width(18.dp))
             PlayBackButton(
                 visible = state.hasPreviousStation,
                 size = 46.dp,
@@ -266,15 +262,6 @@ fun PlayerBottomSheetContent(
                 icon = Icons.Rounded.SkipNext,
                 contentDescription = stringResource(R.string.accessibility_next_station),
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
-            )
-            Spacer(Modifier.width(18.dp))
-            val volumeState = LocalVolumeState.current
-            PlayBackButton(
-                visible = true,
-                size = edgeIconSize,
-                icon = Icons.Rounded.VolumeUp,
-                contentDescription = stringResource(R.string.accessibility_volume),
-                onClick = { volumeState.show() },
             )
         }
         Spacer(modifier = Modifier.height(35.dp))

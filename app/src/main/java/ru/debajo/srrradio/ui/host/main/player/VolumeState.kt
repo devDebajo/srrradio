@@ -52,7 +52,7 @@ fun VolumeBar(
                 top = 16.dp
             )
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.onBackground)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(horizontal = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {

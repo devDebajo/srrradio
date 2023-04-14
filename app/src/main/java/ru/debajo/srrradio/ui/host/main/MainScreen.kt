@@ -15,6 +15,7 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material.rememberBottomSheetScaffoldState
 import androidx.compose.material.rememberBottomSheetState
 import androidx.compose.material.rememberModalBottomSheetState
@@ -301,6 +302,15 @@ private fun Navigation(
                             }
                         )
                     }
+                }
+
+                val volumeState = LocalVolumeState.current
+                IconButton(onClick = { volumeState.show() }) {
+                    Icon(
+                        imageVector = Icons.Rounded.VolumeUp,
+                        contentDescription = stringResource(R.string.accessibility_volume),
+                        tint = LocalContentColor.current
+                    )
                 }
             }
         )
