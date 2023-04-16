@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.media
 
 import android.content.Context
+import android.media.audiofx.Equalizer
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.AnyThread
@@ -32,6 +33,7 @@ class RadioPlayer(
     private val stationCoverLoader: StationCoverLoader,
     private val mediaSessionController: MediaSessionController,
     private val playerVolumePreference: PlayerVolumePreference,
+    private val radioEqualizerPreference: RadioEqualizerPreference,
 ) {
 
     private val handler: Handler = Handler(Looper.getMainLooper())
@@ -62,6 +64,10 @@ class RadioPlayer(
                     }
                 })
             }
+    }
+
+    val equalizer: RadioEqualizer by lazy {
+        RadioEqualizer(Equalizer(0, exoPlayer.audioSessionId))
     }
 
     private val mediaSourceFactory: ProgressiveMediaSource.Factory by lazy {
@@ -127,6 +133,13 @@ class RadioPlayer(
         })
 
         setVolume(playerVolumePreference.get())
+        if (radioEqualizerPreference.hasValue) {
+            equalizer.applyState(radioEqualizerPreference.get())
+        }
+    }
+
+    fun saveEqualizerState() {
+        radioEqualizerPreference.set(equalizer.dumpState())
     }
 
     fun setVolume(value: Float) {

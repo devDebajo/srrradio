@@ -113,6 +113,7 @@
     <string name="accessibility_sleep_timer" translatable="false">@string/sleep_timer</string>
     <string name="accessibility_save_track">Save track to collection</string>
     <string name="accessibility_remove_track">Remove track from collection</string>
+    <string name="accessibility_equalizer">Equalizer</string>
 
     <string name="accessibility_clear_stream">Clear stream url</string>
     <string name="accessibility_clear_stream_name">Clear stream name</string>

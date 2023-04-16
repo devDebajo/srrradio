@@ -37,8 +37,15 @@ class MediaController(
             player.setVolume(value)
         }
 
+    val equalizer: RadioEqualizer
+        get() = player.equalizer
+
     init {
         mediaSessionController.mediaSession.setCallback(this)
+    }
+
+    fun saveEqualizerState() {
+        player.saveEqualizerState()
     }
 
     suspend fun prepare() {

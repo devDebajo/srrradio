@@ -10,6 +10,9 @@ abstract class BasePreference<T : Any?>(
     private val sharedPreferences: SharedPreferences,
 ) : ReadWriteProperty<Any, T> {
 
+    val hasValue: Boolean
+        get() = sharedPreferences.contains(key)
+
     val timestamp: DateTime
         get() = getPersistedTimestamp()
 

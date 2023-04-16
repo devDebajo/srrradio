@@ -13,3 +13,4 @@ class PlayerVolumePreference(sharedPreferences: SharedPreferences) : FloatPrefer
 
     override fun defaultValue(): Float = 1f
 }
+

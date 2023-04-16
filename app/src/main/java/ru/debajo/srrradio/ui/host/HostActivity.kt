@@ -62,6 +62,7 @@ import ru.debajo.srrradio.ui.host.collection.CollectionScreen
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.MainScreen
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
+import ru.debajo.srrradio.ui.host.main.equalizer.EqualizerScreen
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.player.PlayerBottomSheetViewModel
@@ -243,6 +244,10 @@ class HostActivity : ComponentActivity() {
 
                 composable(navTree.collection.route) {
                     CollectionScreen()
+                }
+
+                composable(navTree.equalizer.route) {
+                    EqualizerScreen()
                 }
             }
         }

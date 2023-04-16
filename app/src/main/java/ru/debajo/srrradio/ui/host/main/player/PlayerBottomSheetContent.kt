@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomSheetScaffoldState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Equalizer
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Pause
@@ -98,6 +99,7 @@ import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetEvent
 import ru.debajo.srrradio.ui.host.main.player.model.PlayerBottomSheetState
 import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
+import ru.debajo.srrradio.ui.navigation.NavTree
 
 val PlayerBottomSheetPeekHeight = 60.dp
 
@@ -293,6 +295,15 @@ fun PlayerBottomSheetContent(
                 badgeText = state.sleepTimerLeftTimeFormatted,
             ) {
                 sleepTimerViewModel.show()
+            }
+
+            ActionButtonDivider()
+            val navTree = NavTree.current
+            ActionButton(
+                icon = Icons.Rounded.Equalizer,
+                contentDescription = stringResource(R.string.accessibility_equalizer),
+            ) {
+                navTree.equalizer.navigate()
             }
 
             if (!state.title.isNullOrEmpty()) {

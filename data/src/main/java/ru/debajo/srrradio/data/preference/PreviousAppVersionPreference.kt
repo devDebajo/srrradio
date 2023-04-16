@@ -5,26 +5,22 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import ru.debajo.srrradio.common.AppVersion
-import ru.debajo.srrradio.domain.preference.BasePreference
-import ru.debajo.srrradio.domain.preference.getStringOrThrow
 
 class PreviousAppVersionPreference(
     sharedPreferences: SharedPreferences,
-    private val json: Json,
-) : BasePreference<AppVersion>(sharedPreferences) {
+    json: Json,
+) : SerializablePreference<AppVersion>(sharedPreferences, json) {
 
     override val key: String = "previous_app_version"
 
     override fun defaultValue(): AppVersion = Default
 
-    override fun SharedPreferences.read(key: String): AppVersion {
-        val rawJson = getStringOrThrow(key)
-        return json.decodeFromString(SerializableAppVersion.serializer(), rawJson).convert()
+    override fun Json.serialize(input: AppVersion): String {
+        return encodeToString(SerializableAppVersion.serializer(), input.convert())
     }
 
-    override fun SharedPreferences.Editor.write(key: String, value: AppVersion): SharedPreferences.Editor {
-        val stringValue = json.encodeToString(SerializableAppVersion.serializer(), value.convert())
-        return putString(key, stringValue)
+    override fun Json.deserialize(input: String): AppVersion {
+        return decodeFromString(SerializableAppVersion.serializer(), input).convert()
     }
 
     private fun SerializableAppVersion.convert(): AppVersion {

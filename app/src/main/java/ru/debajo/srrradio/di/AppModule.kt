@@ -13,6 +13,7 @@ import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.media.MediaController
 import ru.debajo.srrradio.media.MediaSessionController
 import ru.debajo.srrradio.media.PlayerVolumePreference
+import ru.debajo.srrradio.media.RadioEqualizerPreference
 import ru.debajo.srrradio.media.RadioPlayer
 import ru.debajo.srrradio.media.StationCoverLoader
 import ru.debajo.srrradio.rate.GoogleServicesUtils
@@ -31,6 +32,7 @@ import ru.debajo.srrradio.ui.host.add.AddCustomStationCommandResultReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationReduktor
 import ru.debajo.srrradio.ui.host.add.AddCustomStationViewModel
 import ru.debajo.srrradio.ui.host.collection.CollectionViewModel
+import ru.debajo.srrradio.ui.host.main.equalizer.EqualizerViewModel
 import ru.debajo.srrradio.ui.host.main.list.StationsListViewModel
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListCommandResultReduktor
 import ru.debajo.srrradio.ui.host.main.list.reduktor.StationsListReduktor
@@ -63,29 +65,43 @@ import ru.debajo.srrradio.update.AppUpdateFlowHelper
 import ru.debajo.srrradio.widget.PlayerWidgetManager
 
 val AppModule: Module = module {
-    single { FirebaseCrashlytics.getInstance() }
-    single { FirebaseAuth.getInstance() }
-
-    singleOf(::AuthManagerProvider)
-    factory { AppStateSnapshotMerger() }
-    single { AppSynchronizer(get(), get(), get(), get()) }
-    factoryOf(::AppStateSnapshotExtractor)
+    firebase()
+    sync()
+    viewModel()
+    preference()
+    reduktor()
+    processor()
 
     single { StationCoverLoader(get()) }
     single { SleepTimer() }
     factory { SendingErrorsManager(get(), get()) }
-
     single { SrrradioThemeManager(get()) }
-
     singleOf(::RateAppManager)
     single { GoogleServicesUtils(get()) }
     single { MediaSessionController(get()) }
     factoryOf(::PlayerVolumePreference)
     single {
-        val player = RadioPlayer(get(), get(), get(), get())
+        val player = RadioPlayer(get(), get(), get(), get(), get())
         MediaController(get(), player, get(), get(), get())
     }
 
+    single { SnowFallUseCase(get(), get()) }
+    factory { UserStationsInteractor(get(), get()) }
+    factory { LoadM3uInteractor(get(), get(), get(), get()) }
+    factory { PlaybackBroadcastReceiver(get()) }
+    factory { SrrradioNotificationManager(get(), get()) }
+    factoryOf(::PlayerWidgetManager)
+    factoryOf(::MapController)
+    factoryOf(::AppUpdateFlowHelper)
+}
+
+private fun Module.firebase() {
+    single { FirebaseCrashlytics.getInstance() }
+    single { FirebaseAuth.getInstance() }
+    single { F.getInstance(get()) }
+}
+
+private fun Module.viewModel() {
     factoryOf(::PlayerBottomSheetViewModel)
     factoryOf(::SleepTimerViewModel)
     factoryOf(::SettingsViewModel)
@@ -94,41 +110,46 @@ val AppModule: Module = module {
     factoryOf(::DefaultPlaylistViewModel)
     factoryOf(::StationsListViewModel)
     factoryOf(::StationsOnMapViewModel)
+    factoryOf(::EqualizerViewModel)
+}
 
+private fun Module.preference() {
     factoryOf(::SendingErrorsPreference)
     factoryOf(::SrrradioThemePreference)
     factoryOf(::SnowFallPreference)
     factoryOf(::RateAppStatePreference)
     factoryOf(::HostActivityCreateCountPreference)
     factoryOf(::InitialAutoplayPreference)
+    factoryOf(::RadioEqualizerPreference)
+}
 
-    single { SnowFallUseCase(get(), get()) }
-    factory { UserStationsInteractor(get(), get()) }
-    factory { LoadM3uInteractor(get(), get(), get(), get()) }
+private fun Module.sync() {
+    singleOf(::AuthManagerProvider)
+    factory { AppStateSnapshotMerger() }
+    single { AppSynchronizer(get(), get(), get(), get()) }
+    factoryOf(::AppStateSnapshotExtractor)
+}
 
+private fun Module.reduktor() {
     factory { StationsListReduktor(get()) }
     factoryOf(::StationsListCommandResultReduktor)
     factory { PlayerBottomSheetReduktor(get()) }
     factoryOf(::PlayerBottomSheetCommandResultReduktor)
     factory { AddCustomStationReduktor() }
     factory { AddCustomStationCommandResultReduktor() }
+}
 
-    factory { SearchStationsCommandProcessor(get()) }
-    factory { NewPlayCommandProcessor(get()) }
-    factory { MediaStateListenerCommandProcessor(get()) }
-    factory { ListenFavoriteStationsProcessor(get()) }
-    factory { AddFavoriteStationProcessor(get()) }
-    factory { TrackCollectionListener(get()) }
-    factory { PopularStationsProcessor(get()) }
-    factory { SleepTimerListenerProcessor(get()) }
-    factory { AddTrackToCollectionProcessor(get()) }
-    factory { SaveCustomStationProcessor(get()) }
-    factory { SrrradioNotificationManager(get(), get()) }
-    factory { PlaybackBroadcastReceiver(get()) }
+private fun Module.processor() {
+    factoryOf(::SearchStationsCommandProcessor)
+    factoryOf(::NewPlayCommandProcessor)
+    factoryOf(::MediaStateListenerCommandProcessor)
+    factoryOf(::ListenFavoriteStationsProcessor)
+    factoryOf(::AddFavoriteStationProcessor)
+    factoryOf(::TrackCollectionListener)
+    factoryOf(::PopularStationsProcessor)
+    factoryOf(::SleepTimerListenerProcessor)
+    factoryOf(::AddTrackToCollectionProcessor)
+    factoryOf(::SaveCustomStationProcessor)
     factoryOf(::AutoplayProcessor)
     factoryOf(::AppUpdateProcessor)
-    single { F.getInstance(get()) }
-    factoryOf(::PlayerWidgetManager)
-    factoryOf(::MapController)
-    factoryOf(::AppUpdateFlowHelper)
 }

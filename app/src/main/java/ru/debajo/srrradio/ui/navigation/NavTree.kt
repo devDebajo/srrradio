@@ -25,6 +25,11 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         navController = rootController
     )
 
+    val equalizer: Screen = Screen(
+        route = "equalizer",
+        navController = rootController
+    )
+
     class Main(
         override val navController: NavHostController
     ) : AbstractScreen {

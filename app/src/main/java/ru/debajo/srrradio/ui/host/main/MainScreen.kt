@@ -227,6 +227,10 @@ private fun RadioScreenContent() {
                             composable(navTree.main.settings.route) {
                                 SettingsScreen(listBottomPadding)
                             }
+
+                            composable(navTree.main.settings.route) {
+                                SettingsScreen(listBottomPadding)
+                            }
                         }
                     }
                 },
