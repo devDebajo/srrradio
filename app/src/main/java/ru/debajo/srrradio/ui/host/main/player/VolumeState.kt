@@ -17,6 +17,7 @@ import androidx.compose.material.icons.rounded.VolumeUp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.Stable
@@ -29,6 +30,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
@@ -66,8 +68,10 @@ fun VolumeBar(
         Slider(
             modifier = Modifier.width(250.dp),
             value = volumeState.volume,
-            steps = 30,
-            onValueChange = { volumeState.setValue(it) }
+            onValueChange = { volumeState.setValue(it) },
+            colors = SliderDefaults.colors(
+                inactiveTrackColor = Color.Black.copy(alpha = 0.5f)
+            ),
         )
         Spacer(modifier = Modifier.width(7.dp))
         Icon(

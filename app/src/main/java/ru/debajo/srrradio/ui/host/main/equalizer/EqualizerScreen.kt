@@ -1,21 +1,22 @@
 package ru.debajo.srrradio.ui.host.main.equalizer
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderColors
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,10 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import kotlin.math.roundToInt
+import ru.debajo.srrradio.R
 import ru.debajo.srrradio.di.diViewModel
+import ru.debajo.srrradio.ui.common.AppScreenTitle
 
 @Composable
 fun EqualizerScreen() {
@@ -41,42 +46,65 @@ fun EqualizerScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .padding(horizontal = 16.dp)
             .systemBarsPadding()
     ) {
-        Switch(
-            checked = state.enabled,
-            onCheckedChange = {
-                viewModel.updateEnabled(it)
-            }
-        )
+        AppScreenTitle(text = stringResource(id = R.string.equalizer))
 
-        Box {
-            val expanded = remember { mutableStateOf(false) }
-            DropdownMenuItem(
-                enabled = state.enabled,
-                text = { Text(state.getPresetName()) },
-                onClick = { expanded.value = true }
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Включен:"
             )
-            DropdownMenu(
-                expanded = expanded.value,
-                onDismissRequest = { expanded.value = false }
-            ) {
-                for (presetIndex in state.presets.indices) {
-                    val preset = state.presets[presetIndex]
-                    DropdownMenuItem(
-                        text = { Text(preset) },
-                        onClick = {
-                            viewModel.selectPreset(presetIndex)
-                            expanded.value = false
-                        }
-                    )
+            Switch(
+                checked = state.enabled,
+                onCheckedChange = {
+                    viewModel.updateEnabled(it)
+                }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Пресет:"
+            )
+
+            Box {
+                val expanded = remember { mutableStateOf(false) }
+                Button(
+                    enabled = state.enabled,
+                    onClick = { expanded.value = true }
+                ) {
+                    Text(state.getPresetName())
+                }
+                DropdownMenu(
+                    expanded = expanded.value,
+                    onDismissRequest = { expanded.value = false }
+                ) {
+                    for (presetIndex in state.presets.indices) {
+                        val preset = state.presets[presetIndex]
+                        DropdownMenuItem(
+                            text = { Text(preset) },
+                            onClick = {
+                                viewModel.selectPreset(presetIndex)
+                                expanded.value = false
+                            }
+                        )
+                    }
                 }
             }
         }
 
+        Spacer(modifier = Modifier.height(40.dp))
+
         Row(
             modifier = Modifier
-                .height(400.dp)
+                .height(350.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
             for (bandIndex in state.bands.indices) {
@@ -105,54 +133,44 @@ private fun Band(
     onValueChangeFinished: () -> Unit,
     onChange: (Int) -> Unit,
 ) {
-    VerticalSlider(
+    Row(
         modifier = modifier,
-        value = band.value.toFloat(),
-        enabled = enabled,
-        valueRange = range,
-        onValueChange = { onChange(it.roundToInt()) },
-        onValueChangeFinished = onValueChangeFinished,
-    )
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.verticalLayout(),
+            text = "${band.frequencyHz} Hz",
+            fontSize = 9.sp
+        )
+
+        Slider(
+            modifier = Modifier.verticalLayout(),
+            value = band.value.toFloat(),
+            enabled = enabled,
+            valueRange = range,
+            onValueChange = { onChange(it.roundToInt()) },
+            onValueChangeFinished = onValueChangeFinished,
+        )
+    }
 }
 
-@Composable
-fun VerticalSlider(
-    value: Float,
-    onValueChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
-    steps: Int = 0,
-    onValueChangeFinished: (() -> Unit)? = null,
-    colors: SliderColors = SliderDefaults.colors(),
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
-) {
-    Slider(
-        value = value,
-        onValueChange = onValueChange,
-        modifier = modifier
-            .graphicsLayer {
-                rotationZ = 270f
-                transformOrigin = TransformOrigin(0f, 0f)
-            }
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(
-                    Constraints(
-                        minWidth = constraints.minHeight,
-                        maxWidth = constraints.maxHeight,
-                        minHeight = constraints.minWidth,
-                        maxHeight = constraints.maxHeight,
-                    )
+@Stable
+private fun Modifier.verticalLayout(): Modifier {
+    return graphicsLayer {
+        rotationZ = 270f
+        transformOrigin = TransformOrigin(0f, 0f)
+    }
+        .layout { measurable, constraints ->
+            val placeable = measurable.measure(
+                Constraints(
+                    minWidth = constraints.minHeight,
+                    maxWidth = constraints.maxHeight,
+                    minHeight = constraints.minWidth,
+                    maxHeight = constraints.maxHeight,
                 )
-                layout(placeable.height, placeable.width) {
-                    placeable.place(-placeable.width, 0)
-                }
-            },
-        enabled = enabled,
-        valueRange = valueRange,
-        steps = steps,
-        onValueChangeFinished = onValueChangeFinished,
-        colors = colors,
-        interactionSource = interactionSource,
-    )
+            )
+            layout(placeable.height, placeable.width) {
+                placeable.place(-placeable.width, 0)
+            }
+        }
 }

@@ -301,7 +301,7 @@ fun PlayerBottomSheetContent(
             val navTree = NavTree.current
             ActionButton(
                 icon = Icons.Rounded.Equalizer,
-                contentDescription = stringResource(R.string.accessibility_equalizer),
+                contentDescription = stringResource(R.string.equalizer),
             ) {
                 navTree.equalizer.navigate()
             }

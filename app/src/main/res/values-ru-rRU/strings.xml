@@ -8,6 +8,8 @@
     <string name="favorite">Избранное</string>
     <string name="no_track">Неизвестный трек</string>
 
+    <string name="equalizer">Эквалайзер</string>
+
     <string name="tile_has_update">Обновить</string>
     <string name="playlist_recommendations">Рекомендации</string>
     <string name="playlist_recommendations_empty">Не удалось найти рекомендованные станции. Добавьте больше станций в избранное</string>
@@ -105,7 +107,6 @@
     <string name="accessibility_add_custom_station">Добавить свой радио-поток</string>
     <string name="accessibility_save_track">Сохранить трек в коллекцию</string>
     <string name="accessibility_remove_track">Удалить трек из коллекцию</string>
-    <string name="accessibility_equalizer">Эквалайзер</string>
 
     <string name="accessibility_clear_stream">Очистить ссылку на радио-поток</string>
     <string name="accessibility_clear_stream_name">Очистить название радио-потока</string>
