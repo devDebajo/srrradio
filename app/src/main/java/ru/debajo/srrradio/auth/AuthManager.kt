@@ -3,6 +3,7 @@ package ru.debajo.srrradio.auth
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.core.os.bundleOf
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -18,10 +19,20 @@ import kotlinx.coroutines.tasks.await
 import ru.debajo.srrradio.ProcessScopeImmediate
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.common.ActivityHolder
+import ru.debajo.srrradio.common.utils.getFromDi
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.common.utils.toTimber
 
 typealias F = FirebaseAnalytics
+
+fun logEvent(name: String, vararg args: Pair<String, String>) {
+    val bundle = if (args.isEmpty()) {
+        null
+    } else {
+        bundleOf(*args)
+    }
+    getFromDi<F>().logEvent(name, bundle)
+}
 
 interface AuthManager {
     val authState: StateFlow<AuthState>
