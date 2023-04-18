@@ -8,6 +8,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.auth.F
+import ru.debajo.srrradio.bluetooth.BluetoothAutoplayPreference
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.error.SendingErrorsPreference
 import ru.debajo.srrradio.media.MediaController
@@ -121,6 +122,7 @@ private fun Module.preference() {
     factoryOf(::HostActivityCreateCountPreference)
     factoryOf(::InitialAutoplayPreference)
     factoryOf(::RadioEqualizerPreference)
+    factoryOf(::BluetoothAutoplayPreference)
 }
 
 private fun Module.sync() {

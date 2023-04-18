@@ -83,6 +83,7 @@
     <string name="settings_data_source">Stations source (API)</string>
     <string name="settings_app_version">App version: %s</string>
     <string name="settings_initial_autoplay">Autoplay on app start</string>
+    <string name="settings_bluetooth_autoplay">Autoplay on Bluetooth audio device connected</string>
 
     <string name="settings_group_debug">Debug</string>
     <string name="settings_clear_rate_app_data">Clear rate app data</string>

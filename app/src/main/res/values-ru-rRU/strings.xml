@@ -76,6 +76,7 @@
     <string name="settings_data_source">Источник радиостанций (API)</string>
     <string name="settings_app_version">Версия приложения: %s</string>
     <string name="settings_initial_autoplay">Автовоспроизведение при старте</string>
+    <string name="settings_bluetooth_autoplay">Автовоспроизведение при подключении Bluetooth-аудиоустройства</string>
 
     <string name="settings_group_debug">Отладка</string>
     <string name="settings_clear_rate_app_data">Сбросить оценку приложения</string>

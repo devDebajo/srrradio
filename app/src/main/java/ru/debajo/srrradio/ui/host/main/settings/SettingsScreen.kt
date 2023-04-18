@@ -1,8 +1,10 @@
 package ru.debajo.srrradio.ui.host.main.settings
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
@@ -47,6 +49,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
@@ -198,6 +203,14 @@ private fun SettingsList(bottomPadding: Dp) {
                 onClick = { viewModel.onInitialAutoplayClick() }
             )
 
+            BluetoothAutoplaySettingsSwitch(
+                text = stringResource(R.string.settings_bluetooth_autoplay),
+                checked = state.bluetoothAutoplay,
+                onClick = { checked ->
+                    viewModel.onBluetoothAutoplayChanged(checked)
+                }
+            )
+
             if (state.snowFallToggleVisible) {
                 SettingsSwitch(
                     text = stringResource(R.string.settings_snow_fall),
@@ -316,7 +329,7 @@ fun SettingsText(
 }
 
 @Composable
-fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
+fun SettingsSwitch(text: String, checked: Boolean, onClick: (Boolean) -> Unit) {
     Row(
         Modifier
             .fillMaxWidth()
@@ -337,7 +350,7 @@ fun SettingsSwitch(text: String, checked: Boolean, onClick: () -> Unit) {
             checked = checked,
             onCheckedChange = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onClick()
+                onClick(it)
             }
         )
     }
@@ -390,5 +403,42 @@ fun SettingsColor(
 private fun SettingsBackPress(expandedGroup: MutableState<Int>) {
     BackHandler(enabled = expandedGroup.value != -1) {
         expandedGroup.value = -1
+    }
+}
+
+@Composable
+@OptIn(ExperimentalPermissionsApi::class)
+private fun BluetoothAutoplaySettingsSwitch(
+    text: String,
+    checked: Boolean,
+    onClick: (Boolean) -> Unit
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val permissionState = rememberPermissionState(permission = Manifest.permission.BLUETOOTH_CONNECT) {
+            if (it) {
+                onClick(true)
+            }
+        }
+        SettingsSwitch(
+            text = text,
+            checked = checked,
+            onClick = { newChecked ->
+                if (newChecked) {
+                    if (permissionState.status is PermissionStatus.Granted) {
+                        onClick(true)
+                    } else {
+                        permissionState.launchPermissionRequest()
+                    }
+                } else {
+                    onClick(false)
+                }
+            }
+        )
+    } else {
+        SettingsSwitch(
+            text = text,
+            checked = checked,
+            onClick = onClick
+        )
     }
 }

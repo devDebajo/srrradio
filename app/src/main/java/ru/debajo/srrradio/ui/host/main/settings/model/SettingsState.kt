@@ -12,4 +12,5 @@ internal data class SettingsState(
     val snowFallToggleVisible: Boolean = false,
     val snowFallEnabled: Boolean = false,
     val initialAutoplay: Boolean = false,
+    val bluetoothAutoplay: Boolean = false,
 )

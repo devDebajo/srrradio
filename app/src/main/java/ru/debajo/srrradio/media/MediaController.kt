@@ -31,6 +31,14 @@ class MediaController(
     private val stateMutable: MutableStateFlow<MediaState> = MutableStateFlow(MediaState.None)
     val state: StateFlow<MediaState> = stateMutable.asStateFlow()
 
+    val playing: Boolean
+        get() {
+            return when (val state = state.value) {
+                is MediaState.Loaded -> state.playing
+                else -> false
+            }
+        }
+
     override var volume: Float
         get() = player.volume
         set(value) {

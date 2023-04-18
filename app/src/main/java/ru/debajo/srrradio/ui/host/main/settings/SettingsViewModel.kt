@@ -1,5 +1,7 @@
 package ru.debajo.srrradio.ui.host.main.settings
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.lifecycle.ViewModel
@@ -16,6 +18,8 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import ru.debajo.srrradio.auth.AuthManagerProvider
 import ru.debajo.srrradio.auth.AuthState
+import ru.debajo.srrradio.bluetooth.BluetoothAutoplayPreference
+import ru.debajo.srrradio.bluetooth.hasBluetoothConnectPermission
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
 import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
@@ -30,6 +34,7 @@ import ru.debajo.srrradio.ui.host.main.settings.model.SettingsTheme
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
 
+@SuppressLint("StaticFieldLeak")
 internal class SettingsViewModel(
     private val themeManager: SrrradioThemeManager,
     private val loadM3uInteractor: LoadM3uInteractor,
@@ -40,6 +45,8 @@ internal class SettingsViewModel(
     private val rateAppManager: RateAppManager,
     private val configRepository: ConfigRepository,
     private val initialAutoplayPreference: InitialAutoplayPreference,
+    private val context: Context,
+    private val bluetoothAutoplayPreference: BluetoothAutoplayPreference,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -51,6 +58,8 @@ internal class SettingsViewModel(
         updateState {
             copy(
                 autoSendErrors = sendingErrorsManager.isEnabled,
+                initialAutoplay = initialAutoplayPreference.get(),
+                bluetoothAutoplay = context.hasBluetoothConnectPermission && bluetoothAutoplayPreference.get(),
             )
         }
 
@@ -83,7 +92,6 @@ internal class SettingsViewModel(
                         themes = themes,
                         authStatus = authStatus,
                         lastSyncDate = lastSyncDate,
-                        initialAutoplay = initialAutoplayPreference.get(),
                     )
                 }
             }
@@ -184,6 +192,13 @@ internal class SettingsViewModel(
         viewModelScope.launch {
             val databaseHomepage = configRepository.provide().databaseHomepage
             newsMutable.emit(SettingsNews.OpenUrl(databaseHomepage))
+        }
+    }
+
+    fun onBluetoothAutoplayChanged(checked: Boolean) {
+        updateState {
+            bluetoothAutoplayPreference.set(checked)
+            copy(bluetoothAutoplay = checked)
         }
     }
 

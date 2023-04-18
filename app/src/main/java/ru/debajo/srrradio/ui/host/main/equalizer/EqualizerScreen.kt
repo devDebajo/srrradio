@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.ui.host.main.equalizer
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -105,7 +106,8 @@ fun EqualizerScreen() {
         Row(
             modifier = Modifier
                 .height(350.dp)
-                .align(Alignment.CenterHorizontally)
+                .align(Alignment.CenterHorizontally),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             for (bandIndex in state.bands.indices) {
                 val band = state.bands[bandIndex]
@@ -133,12 +135,13 @@ private fun Band(
     onValueChangeFinished: () -> Unit,
     onChange: (Int) -> Unit,
 ) {
-    Row(
+    Box(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
-            modifier = Modifier.verticalLayout(),
+            modifier = Modifier
+                .verticalLayout()
+                .align(Alignment.BottomStart),
             text = "${band.frequencyHz} Hz",
             fontSize = 9.sp
         )
