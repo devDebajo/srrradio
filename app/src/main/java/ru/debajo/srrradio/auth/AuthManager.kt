@@ -25,13 +25,17 @@ import ru.debajo.srrradio.common.utils.toTimber
 
 typealias F = FirebaseAnalytics
 
-fun logEvent(name: String, vararg args: Pair<String, String>) {
+fun log(name: String, vararg args: Pair<String, String>) {
+    getFromDi<F>().log(name, *args)
+}
+
+fun F.log(name: String, vararg args: Pair<String, String>) {
     val bundle = if (args.isEmpty()) {
         null
     } else {
         bundleOf(*args)
     }
-    getFromDi<F>().logEvent(name, bundle)
+    logEvent(name, bundle)
 }
 
 interface AuthManager {

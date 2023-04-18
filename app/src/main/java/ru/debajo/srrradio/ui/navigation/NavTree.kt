@@ -10,7 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import ru.debajo.srrradio.R
-import ru.debajo.srrradio.auth.logEvent
+import ru.debajo.srrradio.auth.log
 
 class NavTree(val rootController: NavHostController, mainController: NavHostController) {
 
@@ -75,7 +75,7 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         val navController: NavController
 
         fun navigate() {
-            logEvent("navigate_to", "route" to route)
+            log("navigate_to", "route" to route)
             navController.navigate(route)
         }
     }
@@ -101,7 +101,7 @@ class NavTree(val rootController: NavHostController, mainController: NavHostCont
         open val nestedScreens: List<Screen> = emptyList()
 
         override fun navigate() {
-            logEvent("navigate_to", "route" to route)
+            log("navigate_to", "route" to route)
             val currentRoute = navController.currentDestination?.route
             navController.navigate(route) {
                 popUpTo(navController.graph.findStartDestination().id) {

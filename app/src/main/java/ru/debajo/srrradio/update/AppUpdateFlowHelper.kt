@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.debajo.srrradio.BuildConfig
 import ru.debajo.srrradio.auth.F
+import ru.debajo.srrradio.auth.log
 import ru.debajo.srrradio.common.GooglePlayInAppUpdateHelper
 import ru.debajo.srrradio.common.utils.toTimber
 import ru.debajo.srrradio.domain.repository.ConfigRepository
@@ -42,12 +43,12 @@ class AppUpdateFlowHelper(
 
     suspend fun updateApp(onProgress: (Float) -> Unit): Boolean {
         if (googlePlayInAppUpdateHelper.installedFromGooglePlay()) {
-            f.logEvent("start_update_by_google_play", null)
+            f.log("start_update_by_google_play")
             googlePlayInAppUpdateHelper.update()
             return true
         }
 
-        f.logEvent("start_embedded_update", null)
+        f.log("start_embedded_update")
         val updateFileUrl = configRepository.provide().updateFileUrl ?: return false
         val uri = download(
             url = updateFileUrl,
