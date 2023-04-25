@@ -56,9 +56,9 @@ object DefaultMainTiles {
             } else {
                 null
             },
+            FavoriteStations,
             NewStations,
             PopularStations,
-            FavoriteStations,
             RecommendedStations,
             StationsOnMap,
         )

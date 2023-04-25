@@ -8,8 +8,6 @@
     <string name="favorite">Избранное</string>
     <string name="no_track">Неизвестный трек</string>
 
-    <string name="equalizer">Эквалайзер</string>
-
     <string name="tile_has_update">Обновить</string>
     <string name="playlist_recommendations">Рекомендации</string>
     <string name="playlist_recommendations_empty">Не удалось найти рекомендованные станции. Добавьте больше станций в избранное</string>
@@ -75,8 +73,11 @@
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
     <string name="settings_data_source">Источник радиостанций (API)</string>
     <string name="settings_app_version">Версия приложения: %s</string>
+
+    <string name="settings_group_playback">Воспроизведение</string>
     <string name="settings_initial_autoplay">Автовоспроизведение при старте</string>
     <string name="settings_bluetooth_autoplay">Автовоспроизведение при подключении Bluetooth-аудиоустройства</string>
+    <string name="settings_equalizer">Эквалайзер</string>
 
     <string name="settings_group_debug">Отладка</string>
     <string name="settings_clear_rate_app_data">Сбросить оценку приложения</string>
@@ -95,9 +96,12 @@
     <string name="rate_app_later_button">Не сейчас</string>
     <string name="rate_app_never_button">Не предлагать</string>
 
+    <string name="equalizer_enabled">Включен:</string>
+    <string name="equalizer_preset">Пресет:</string>
+    <string name="equalizer_volume">Громкость</string>
+
     <string name="accessibility_next_station">Следующая радиостанция</string>
     <string name="accessibility_previous_station">Прошлая радиостанция</string>
-    <string name="accessibility_volume">Громкость</string>
     <string name="accessibility_play">Продолжить воспроизведение</string>
     <string name="accessibility_pause">Пауза</string>
     <string name="accessibility_close">Закрыть</string>
@@ -107,7 +111,7 @@
     <string name="accessibility_station_poster">Обложка радиостанции</string>
     <string name="accessibility_add_custom_station">Добавить свой радио-поток</string>
     <string name="accessibility_save_track">Сохранить трек в коллекцию</string>
-    <string name="accessibility_remove_track">Удалить трек из коллекцию</string>
+    <string name="accessibility_remove_track">Удалить трек из коллекции</string>
 
     <string name="accessibility_clear_stream">Очистить ссылку на радио-поток</string>
     <string name="accessibility_clear_stream_name">Очистить название радио-потока</string>

@@ -13,6 +13,7 @@ data class EqualizerState(
     val enabled: Boolean = false,
     val presets: List<String> = listOf(),
     val selectedPresetIndex: Int = 0,
+    val volume: Float = 1f,
 ) {
 
     fun getPresetName(index: Int = selectedPresetIndex): String {

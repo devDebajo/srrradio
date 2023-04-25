@@ -66,6 +66,11 @@ class EqualizerViewModel(
         saveToPreferences()
     }
 
+    fun onVolumeChanged(volume: Float) {
+        mediaController.volume = volume
+        _state.value = _state.value.copy(volume = volume)
+    }
+
     private fun saveToPreferences() {
         mediaController.saveEqualizerState()
     }

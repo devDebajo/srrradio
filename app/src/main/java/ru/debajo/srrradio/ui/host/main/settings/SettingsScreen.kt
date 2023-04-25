@@ -64,6 +64,7 @@ import ru.debajo.srrradio.ui.ext.optionalClickable
 import ru.debajo.srrradio.ui.host.LocalOpenDocumentLauncher
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsAuthStatus
 import ru.debajo.srrradio.ui.host.main.settings.model.SettingsNews
+import ru.debajo.srrradio.ui.navigation.NavTree
 
 @Composable
 fun SettingsScreen(bottomPadding: Dp) {
@@ -193,7 +194,7 @@ private fun SettingsList(bottomPadding: Dp) {
         Spacer(Modifier.height(12.dp))
 
         SettingsGroup(
-            title = stringResource(R.string.settings_group_app),
+            title = stringResource(R.string.settings_group_playback),
             state = calculateGroupState(expandedGroup, 3),
             onHeaderClick = { expandedGroup.onGroupHeaderClick(3) }
         ) {
@@ -211,6 +212,21 @@ private fun SettingsList(bottomPadding: Dp) {
                 }
             )
 
+            val navTree = NavTree.current
+            SettingsText(
+                text = stringResource(R.string.settings_equalizer)
+            ) {
+                navTree.equalizer.navigate()
+            }
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        SettingsGroup(
+            title = stringResource(R.string.settings_group_app),
+            state = calculateGroupState(expandedGroup, 4),
+            onHeaderClick = { expandedGroup.onGroupHeaderClick(4) }
+        ) {
             if (state.snowFallToggleVisible) {
                 SettingsSwitch(
                     text = stringResource(R.string.settings_snow_fall),
@@ -240,7 +256,7 @@ private fun SettingsList(bottomPadding: Dp) {
             Spacer(Modifier.height(12.dp))
             DebugGroup(
                 expandedGroup = expandedGroup,
-                groupIndex = 4,
+                groupIndex = 5,
                 viewModel = viewModel,
             )
         }

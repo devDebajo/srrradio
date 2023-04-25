@@ -50,14 +50,14 @@ fun EqualizerScreen() {
             .padding(horizontal = 16.dp)
             .systemBarsPadding()
     ) {
-        AppScreenTitle(text = stringResource(id = R.string.equalizer))
+        AppScreenTitle(text = stringResource(id = R.string.settings_equalizer))
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Включен:"
+                text = stringResource(R.string.equalizer_enabled)
             )
             Switch(
                 checked = state.enabled,
@@ -72,7 +72,7 @@ fun EqualizerScreen() {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = "Пресет:"
+                text = stringResource(R.string.equalizer_preset)
             )
 
             Box {
@@ -122,6 +122,11 @@ fun EqualizerScreen() {
                     viewModel.updateBand(bandIndex, it)
                 }
             }
+            VerticalSliderWithTitle(
+                value = state.volume,
+                title = stringResource(R.string.equalizer_volume),
+                onChange = { viewModel.onVolumeChanged(it) },
+            )
         }
     }
 }
@@ -135,6 +140,27 @@ private fun Band(
     onValueChangeFinished: () -> Unit,
     onChange: (Int) -> Unit,
 ) {
+    VerticalSliderWithTitle(
+        modifier = modifier,
+        value = band.value.toFloat(),
+        title = "${band.frequencyHz} Hz",
+        enabled = enabled,
+        range = range,
+        onValueChangeFinished = onValueChangeFinished,
+        onChange = { onChange(it.roundToInt()) },
+    )
+}
+
+@Composable
+private fun VerticalSliderWithTitle(
+    modifier: Modifier = Modifier,
+    value: Float,
+    title: String,
+    enabled: Boolean = true,
+    range: ClosedFloatingPointRange<Float> = 0f..1f,
+    onValueChangeFinished: () -> Unit = {},
+    onChange: (Float) -> Unit,
+) {
     Box(
         modifier = modifier,
     ) {
@@ -142,16 +168,16 @@ private fun Band(
             modifier = Modifier
                 .verticalLayout()
                 .align(Alignment.BottomStart),
-            text = "${band.frequencyHz} Hz",
+            text = title,
             fontSize = 9.sp
         )
 
         Slider(
             modifier = Modifier.verticalLayout(),
-            value = band.value.toFloat(),
+            value = value,
             enabled = enabled,
             valueRange = range,
-            onValueChange = { onChange(it.roundToInt()) },
+            onValueChange = { onChange(it) },
             onValueChangeFinished = onValueChangeFinished,
         )
     }
