@@ -19,8 +19,10 @@ class BluetoothReceiver : BroadcastReceiver() {
     private val mediaController: MediaController by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
-        if (intent.action != BluetoothDevice.ACTION_ACL_CONNECTED) {
-            return
+        val connected = when (intent.action) {
+            BluetoothDevice.ACTION_ACL_CONNECTED -> true
+            BluetoothDevice.ACTION_ACL_DISCONNECTED -> false
+            else -> return
         }
         if (!context.hasBluetoothConnectPermission) {
             return
@@ -30,8 +32,13 @@ class BluetoothReceiver : BroadcastReceiver() {
         }
 
         val bluetoothDevice = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) ?: return
-        if (bluetoothDevice.isAudioDevice && !mediaController.playing) {
+        if (connected && bluetoothDevice.isAudioDevice && !mediaController.playing) {
             mediaController.play()
+            return
+        }
+
+        if (!connected && bluetoothDevice.isAudioDevice && mediaController.playing) {
+            mediaController.pause()
         }
     }
 
