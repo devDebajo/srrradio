@@ -35,7 +35,7 @@ internal class StreamConverterFactory(
         retrofit: Retrofit
     ): Converter<*, RequestBody> {
         val serializer = json.serializersModule.serializer(type)
-        return StreamRequestConverter(json, mediaType, serializer)
+        return RequestConverter(json, mediaType, serializer)
     }
 
     private class StreamResponseConverter<T>(
@@ -47,7 +47,7 @@ internal class StreamConverterFactory(
         }
     }
 
-    private class StreamRequestConverter<T>(
+    private class RequestConverter<T>(
         private val json: Json,
         private val mediaType: MediaType,
         private val serializer: KSerializer<T>,
