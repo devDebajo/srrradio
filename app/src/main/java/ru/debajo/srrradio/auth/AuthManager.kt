@@ -3,7 +3,6 @@ package ru.debajo.srrradio.auth
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.core.os.bundleOf
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.auth.api.identity.SignInClient
@@ -30,12 +29,12 @@ fun log(name: String, vararg args: Pair<String, String>) {
 }
 
 fun F.log(name: String, vararg args: Pair<String, String>) {
-    val bundle = if (args.isEmpty()) {
-        null
+    val nameToLog = if (args.isEmpty()) {
+        name
     } else {
-        bundleOf(*args)
+        name + args.joinToString(prefix = "_") { "${it.first}_${it.second}" }
     }
-    logEvent(name, bundle)
+    logEvent(nameToLog, null)
 }
 
 interface AuthManager {
