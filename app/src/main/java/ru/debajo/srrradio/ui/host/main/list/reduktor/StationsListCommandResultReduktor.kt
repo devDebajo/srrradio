@@ -22,6 +22,7 @@ import ru.debajo.srrradio.ui.processor.MediaStateListenerCommandProcessor
 import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
+import ru.debajo.srrradio.ui.processor.UseFavoriteAsDefaultListener
 
 class StationsListCommandResultReduktor(
     private val context: Context,
@@ -35,6 +36,7 @@ class StationsListCommandResultReduktor(
             is TrackCollectionListener.TrackCollectionChanged -> reduceTrackCollectionChanged(state, event)
             is PopularStationsProcessor.Loaded -> reducePopularStationsLoaded(state, event)
             is AppUpdateProcessor.Result -> reduceAppUpdateProcessorResult(state, event)
+            is UseFavoriteAsDefaultListener.OnUseFavoriteAsDefaultChanged -> reduceOnUseFavoriteAsDefaultChanged(state, event)
             else -> Akt()
         }
     }
@@ -165,5 +167,16 @@ class StationsListCommandResultReduktor(
                 )
             }
         }
+    }
+
+    private fun reduceOnUseFavoriteAsDefaultChanged(
+        state: StationsListState,
+        event: UseFavoriteAsDefaultListener.OnUseFavoriteAsDefaultChanged,
+    ): Akt<StationsListState, StationsListNews> {
+        return Akt(
+            state = state.updateIdle {
+                copy(useFavoritePlaylistAsDefault = event.value)
+            }
+        )
     }
 }

@@ -1,10 +1,12 @@
 package ru.debajo.srrradio.ui.host.main.list.reduktor
 
+import androidx.compose.ui.text.input.TextFieldValue
 import ru.debajo.reduktor.Akt
 import ru.debajo.reduktor.Command
 import ru.debajo.reduktor.Reduktor
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.domain.LastStationUseCase
+import ru.debajo.srrradio.ui.ext.Empty
 import ru.debajo.srrradio.ui.ext.isEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
@@ -23,6 +25,7 @@ import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
+import ru.debajo.srrradio.ui.processor.UseFavoriteAsDefaultListener
 
 class StationsListReduktor(
     private val lastStationUseCase: LastStationUseCase,
@@ -32,6 +35,7 @@ class StationsListReduktor(
         return when (event) {
             is StationsListEvent.Start -> reduceStart()
             is StationsListEvent.OnSearchQueryChanged -> reduceOnSearchQueryChanged(state, event)
+            is StationsListEvent.ClearSearch -> reduceClearSearch(state)
             is StationsListEvent.OnPlayPauseStation -> reduceOnPlayPauseClick(state, event)
             is StationsListEvent.ChangeFavorite -> reduceChangeFavorite(event)
             is StationsListEvent.UpdateApp -> reduceUpdateApp(state)
@@ -46,6 +50,7 @@ class StationsListReduktor(
                 TrackCollectionListener.Listen,
                 PopularStationsProcessor.Load.takeIf { lastStationUseCase.lastPlaylistId == null },
                 AppUpdateProcessor.Task.CheckUpdate,
+                UseFavoriteAsDefaultListener.Listen,
             )
         )
     }
@@ -67,6 +72,11 @@ class StationsListReduktor(
             state = newState,
             commands = commands,
         )
+    }
+
+    private fun reduceClearSearch(state: StationsListState): Akt<StationsListState, StationsListNews> {
+        val next = reduceOnSearchQueryChanged(state, StationsListEvent.OnSearchQueryChanged(TextFieldValue.Empty))
+        return next.copy(news = next.news + StationsListNews.ScrollToTop)
     }
 
     private fun reduceOnPlayPauseClick(

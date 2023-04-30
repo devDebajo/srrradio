@@ -4,6 +4,10 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import org.joda.time.DateTime
 
 abstract class BasePreference<T : Any?>(
@@ -45,6 +49,20 @@ abstract class BasePreference<T : Any?>(
     override fun getValue(thisRef: Any, property: KProperty<*>): T = get()
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) = set(value)
+
+    fun observe(): Flow<T> {
+        return callbackFlow {
+            trySend(get())
+            val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                if (key == this@BasePreference.key) {
+                    trySend(get())
+                }
+            }
+
+            sharedPreferences.registerOnSharedPreferenceChangeListener(listener)
+            awaitClose { sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener) }
+        }.distinctUntilChanged()
+    }
 
     private fun SharedPreferences.Editor.persistNowEdited(): SharedPreferences.Editor {
         val now = DateTime.now()

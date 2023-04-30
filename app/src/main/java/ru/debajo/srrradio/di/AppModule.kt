@@ -58,6 +58,7 @@ import ru.debajo.srrradio.ui.processor.SaveCustomStationProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.SleepTimerListenerProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
+import ru.debajo.srrradio.ui.processor.UseFavoriteAsDefaultListener
 import ru.debajo.srrradio.ui.processor.interactor.LoadM3uInteractor
 import ru.debajo.srrradio.ui.processor.interactor.UserStationsInteractor
 import ru.debajo.srrradio.ui.theme.SrrradioThemeManager
@@ -154,4 +155,5 @@ private fun Module.processor() {
     factoryOf(::SaveCustomStationProcessor)
     factoryOf(::AutoplayProcessor)
     factoryOf(::AppUpdateProcessor)
+    factoryOf(::UseFavoriteAsDefaultListener)
 }

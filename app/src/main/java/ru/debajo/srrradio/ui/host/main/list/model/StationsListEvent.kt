@@ -7,6 +7,7 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 sealed interface StationsListEvent {
     object Start : StationsListEvent
     class OnSearchQueryChanged(val query: TextFieldValue) : StationsListEvent
+    object ClearSearch : StationsListEvent
     class OnPlayPauseStation(val station: UiStation, val playingState: UiStationPlayingState) : StationsListEvent
     class ChangeFavorite(val station: UiStation, val favorite: Boolean) : StationsListEvent
     object UpdateApp : StationsListEvent

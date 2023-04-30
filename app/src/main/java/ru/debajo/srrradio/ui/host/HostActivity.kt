@@ -173,6 +173,7 @@ class HostActivity : ComponentActivity() {
             viewModel.news.collect { news ->
                 when (news) {
                     is StationsListNews.ShowToast -> snackbarLauncher.show(news.stringRes)
+                    is StationsListNews.ScrollToTop -> Unit
                 }
             }
         }

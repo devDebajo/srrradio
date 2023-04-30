@@ -77,6 +77,7 @@
 
     <string name="settings_group_app">Application</string>
     <string name="settings_snow_fall">Snowfall</string>
+    <string name="settings_favorite_as_default">Favorite on main screen</string>
     <string name="settings_privacy_policy">Privacy policy</string>
     <string name="settings_data_source">Stations source (API)</string>
     <string name="settings_app_version">App version: %s</string>

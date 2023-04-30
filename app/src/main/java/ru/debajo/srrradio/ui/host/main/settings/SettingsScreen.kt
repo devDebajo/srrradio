@@ -235,6 +235,12 @@ private fun SettingsList(bottomPadding: Dp) {
                 )
             }
 
+            SettingsSwitch(
+                text = stringResource(R.string.settings_favorite_as_default),
+                checked = state.useFavoriteAsDefault,
+                onClick = { viewModel.useFavoriteAsDefaultClick() }
+            )
+
             SettingsText(
                 text = stringResource(R.string.settings_privacy_policy)
             ) {

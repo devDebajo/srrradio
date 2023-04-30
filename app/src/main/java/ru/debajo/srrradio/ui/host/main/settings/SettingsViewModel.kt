@@ -21,6 +21,7 @@ import ru.debajo.srrradio.auth.AuthState
 import ru.debajo.srrradio.bluetooth.BluetoothAutoplayPreference
 import ru.debajo.srrradio.bluetooth.hasBluetoothConnectPermission
 import ru.debajo.srrradio.common.utils.runCatchingNonCancellation
+import ru.debajo.srrradio.domain.preference.UseFavoriteAsDefaultPreference
 import ru.debajo.srrradio.domain.repository.ConfigRepository
 import ru.debajo.srrradio.error.SendingErrorsManager
 import ru.debajo.srrradio.rate.InitialAutoplayPreference
@@ -47,6 +48,7 @@ internal class SettingsViewModel(
     private val initialAutoplayPreference: InitialAutoplayPreference,
     private val context: Context,
     private val bluetoothAutoplayPreference: BluetoothAutoplayPreference,
+    private val useFavoriteAsDefaultPreference: UseFavoriteAsDefaultPreference,
 ) : ViewModel() {
 
     private val stateMutable: MutableStateFlow<SettingsState> = MutableStateFlow(SettingsState())
@@ -60,6 +62,7 @@ internal class SettingsViewModel(
                 autoSendErrors = sendingErrorsManager.isEnabled,
                 initialAutoplay = initialAutoplayPreference.get(),
                 bluetoothAutoplay = context.hasBluetoothConnectPermission && bluetoothAutoplayPreference.get(),
+                useFavoriteAsDefault = useFavoriteAsDefaultPreference.get(),
             )
         }
 
@@ -199,6 +202,13 @@ internal class SettingsViewModel(
         updateState {
             bluetoothAutoplayPreference.set(checked)
             copy(bluetoothAutoplay = checked)
+        }
+    }
+
+    fun useFavoriteAsDefaultClick() {
+        updateState {
+            useFavoriteAsDefaultPreference.set(!useFavoriteAsDefault)
+            copy(useFavoriteAsDefault = !useFavoriteAsDefault)
         }
     }
 

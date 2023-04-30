@@ -70,6 +70,7 @@
 
     <string name="settings_group_app">Приложение</string>
     <string name="settings_snow_fall">Снегопад</string>
+    <string name="settings_favorite_as_default">Избранные на главном экране</string>
     <string name="settings_privacy_policy">Политика конфиденциальности</string>
     <string name="settings_data_source">Источник радиостанций (API)</string>
     <string name="settings_app_version">Версия приложения: %s</string>

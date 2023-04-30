@@ -48,4 +48,7 @@ sealed interface MediaState {
 }
 
 val MediaState.asLoaded: MediaState.Loaded?
-    get() = this as? MediaState.Loaded
+    inline get() = this as? MediaState.Loaded
+
+val MediaState.playlist: UiPlaylist?
+    inline get() = asLoaded?.playlist

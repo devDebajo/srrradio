@@ -19,6 +19,7 @@ import ru.debajo.srrradio.ui.processor.NewPlayCommandProcessor
 import ru.debajo.srrradio.ui.processor.PopularStationsProcessor
 import ru.debajo.srrradio.ui.processor.SearchStationsCommandProcessor
 import ru.debajo.srrradio.ui.processor.TrackCollectionListener
+import ru.debajo.srrradio.ui.processor.UseFavoriteAsDefaultListener
 import timber.log.Timber
 
 @Stable
@@ -34,6 +35,7 @@ class StationsListViewModel(
     popularStationsProcessor: PopularStationsProcessor,
     appUpdateProcessor: AppUpdateProcessor,
     autoplayProcessor: AutoplayProcessor,
+    useFavoriteAsDefaultListener: UseFavoriteAsDefaultListener,
 ) : ReduktorViewModel<StationsListState, StationsListEvent, StationsListNews>(
     store = reduktorStore(
         initialState = StationsListState.Idle(),
@@ -50,6 +52,7 @@ class StationsListViewModel(
             trackCollectionListener,
             popularStationsProcessor,
             autoplayProcessor,
+            useFavoriteAsDefaultListener,
         ),
         errorDispatcher = { Timber.e(it) },
     )

@@ -4,8 +4,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.text.input.TextFieldValue
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.media.model.asLoaded
+import ru.debajo.srrradio.media.model.playlist
 import ru.debajo.srrradio.ui.ext.Empty
 import ru.debajo.srrradio.ui.host.main.list.reduktor.buildUiElements
+import ru.debajo.srrradio.ui.host.main.list.reduktor.toFavoritePlaylist
 import ru.debajo.srrradio.ui.model.UiElement
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.UiPlaylistsElement
@@ -27,7 +29,12 @@ sealed interface StationsListState {
         val hasAppUpdate: Boolean = false,
         val loadingUpdate: Boolean = false,
         val loadingProgress: Float = 0f,
+        val useFavoritePlaylistAsDefault: Boolean = false,
     ) : StationsListState {
+
+        private val favoritePlaylist: UiPlaylist?
+            get() = favoriteStations.toFavoritePlaylist()
+
         override val uiElements: List<UiElement> = buildList {
             add(
                 UiPlaylistsElement(
@@ -39,7 +46,12 @@ sealed interface StationsListState {
                 )
             )
 
-            val playlist = (mediaState as? MediaState.Loaded)?.playlist ?: fallBackPlaylist
+            val playlist = if (useFavoritePlaylistAsDefault) {
+                favoritePlaylist ?: mediaState.playlist ?: fallBackPlaylist
+            } else {
+                mediaState.playlist ?: fallBackPlaylist
+            }
+
             if (playlist != null) {
                 add(UiTextElement(playlist.name))
                 addAll(

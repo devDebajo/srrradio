@@ -30,11 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import me.onebone.toolbar.CollapsingToolbarScaffold
 import me.onebone.toolbar.ScrollStrategy
 import me.onebone.toolbar.rememberCollapsingToolbarScaffoldState
@@ -42,10 +43,10 @@ import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.common.AppScreenTitle
 import ru.debajo.srrradio.ui.common.AppTextButton
 import ru.debajo.srrradio.ui.common.outlinedTextFieldColors
-import ru.debajo.srrradio.ui.ext.Empty
 import ru.debajo.srrradio.ui.ext.isNotEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.DefaultMainTiles
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
+import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
 import ru.debajo.srrradio.ui.host.main.list.model.collectionEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.searchQuery
@@ -65,7 +66,7 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
         state = rememberCollapsingToolbarScaffoldState(),
         toolbar = {
             Column(
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
@@ -98,7 +99,7 @@ fun StationsList(bottomPadding: Dp, onScroll: () -> Unit) {
                     colors = outlinedTextFieldColors(),
                     trailingIcon = {
                         if (state.searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.onEvent(StationsListEvent.OnSearchQueryChanged(TextFieldValue.Empty)) }) {
+                            IconButton(onClick = { viewModel.onEvent(StationsListEvent.ClearSearch) }) {
                                 Icon(
                                     imageVector = Icons.Rounded.Clear,
                                     tint = MaterialTheme.colorScheme.primary,
@@ -132,9 +133,23 @@ private fun ListContent(
     val listState = rememberLazyListState()
     val navTree = NavTree.current
     LaunchedEffect(listState, onScroll) {
-        snapshotFlow { listState.isScrollInProgress }
-            .filter { it }
-            .collect { onScroll() }
+        launch {
+            snapshotFlow { listState.isScrollInProgress }
+                .filter { it }
+                .collect { onScroll() }
+        }
+
+        launch {
+            viewModel.news.collect { news ->
+                when (news) {
+                    is StationsListNews.ScrollToTop -> {
+                        delay(300)
+                        listState.scrollToItem(0)
+                    }
+                    else -> Unit
+                }
+            }
+        }
     }
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
