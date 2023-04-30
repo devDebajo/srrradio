@@ -1,6 +1,7 @@
 package ru.debajo.srrradio.ui.host.main.player
 
 import android.content.res.Configuration
+import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.StartOffset
@@ -65,15 +66,21 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -100,6 +107,14 @@ import ru.debajo.srrradio.ui.host.main.timer.SleepTimerViewModel
 import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 val PlayerBottomSheetPeekHeight = 60.dp
+val PlayerBottomSheetSpaceAboveCover = 10.dp
+val PlayerBottomSheetSpaceAboveTitle = 12.dp
+val PlayerBottomSheetSpaceAboveSubtitle = 8.dp
+val PlayerBottomSheetSpaceAbovePlaybackButtons = 20.dp
+val PlayerBottomSheetMaxPlaybackButtonHeight = 80.dp
+val PlayerBottomSheetSpaceAboveActionBar = 35.dp
+val PlayerBottomSheetActionBarHeight = 42.dp
+val PlayerBottomSheetSpaceAboveNavigation = 20.dp
 
 @Composable
 @OptIn(ExperimentalPagerApi::class, FlowPreview::class)
@@ -138,7 +153,7 @@ fun PlayerBottomSheetContent(
             .padding(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveCover))
 
         val currentStationIndexState = rememberUpdatedState(state.currentStationIndex)
         val pagerState = rememberPagerState(state.currentStationIndex.coerceAtLeast(0))
@@ -158,7 +173,17 @@ fun PlayerBottomSheetContent(
             }
         }
 
-        val itemSize = if (isHorizontalOrientation()) 100.dp else 270.dp
+        val localView = LocalView.current
+        val density = LocalDensity.current
+        var titleHeight by remember { mutableStateOf(0) }
+        var subtitleHeight by remember { mutableStateOf(0) }
+        val itemSize = remember(localView, density, navigationHeight, titleHeight, subtitleHeight) {
+            density.calculateCoverSize(
+                localView = localView,
+                navigationHeight = navigationHeight,
+                textHeight = titleHeight.toDp(density) + subtitleHeight.toDp(density)
+            )
+        }
         HorizontalPager(
             count = state.stations.size,
             state = pagerState,
@@ -189,18 +214,19 @@ fun PlayerBottomSheetContent(
                         .clip(RoundedCornerShape(10.dp)),
                     url = station.image,
                 )
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveTitle))
                 Text(
                     modifier = Modifier
                         .width(itemSize)
                         .basicMarquee(),
                     text = station.name,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
+                    onTextLayout = { titleHeight = it.size.height }
                 )
             }
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveSubtitle))
         CustomText(
             modifier = Modifier.width(itemSize),
             text = state.title ?: stringResource(R.string.no_track),
@@ -209,8 +235,9 @@ fun PlayerBottomSheetContent(
             maxLines = 2,
             minLines = 2,
             color = MaterialTheme.colorScheme.onSurface,
+            onTextLayout = { subtitleHeight = it.size.height }
         )
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAbovePlaybackButtons))
         Row(verticalAlignment = Alignment.CenterVertically) {
             PlayBackButton(
                 visible = state.hasPreviousStation,
@@ -222,7 +249,7 @@ fun PlayerBottomSheetContent(
             Spacer(Modifier.width(18.dp))
             PlayBackButton(
                 visible = true,
-                size = 80.dp,
+                size = PlayerBottomSheetMaxPlaybackButtonHeight,
                 icon = { size ->
                     when (state.playingState) {
                         UiStationPlayingState.PLAYING -> {
@@ -264,12 +291,12 @@ fun PlayerBottomSheetContent(
                 onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
             )
         }
-        Spacer(modifier = Modifier.height(35.dp))
+        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveActionBar))
         val snackbarLauncher = LocalSnackbarLauncher.current
         ActionsBar(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(42.dp)
+                .height(PlayerBottomSheetActionBarHeight)
                 .padding(horizontal = 16.dp),
         ) {
             ActionButton(
@@ -306,8 +333,42 @@ fun PlayerBottomSheetContent(
                 }
             }
         }
-        Spacer(modifier = Modifier.height(navigationHeight + 20.dp))
+        Spacer(modifier = Modifier.height(navigationHeight + PlayerBottomSheetSpaceAboveNavigation))
     }
+}
+
+private val View.statusBarHeight: Int
+    get() {
+        val insets = ViewCompat.getRootWindowInsets(this) ?: return 0
+        return insets.getInsets(WindowInsetsCompat.Type.statusBars()).top
+    }
+
+private val View.navigationBarHeight: Int
+    get() {
+        val insets = ViewCompat.getRootWindowInsets(this) ?: return 0
+        return insets.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+    }
+
+private fun Density.calculateCoverSize(
+    localView: View,
+    navigationHeight: Dp,
+    textHeight: Dp,
+): Dp {
+    var result = localView.measuredHeight.toDp()
+    result -= localView.statusBarHeight.toDp()
+    result -= PlayerBottomSheetPeekHeight
+    result -= PlayerBottomSheetSpaceAboveCover
+    result -= PlayerBottomSheetSpaceAboveTitle
+    result -= PlayerBottomSheetSpaceAboveSubtitle
+    result -= textHeight
+    result -= PlayerBottomSheetSpaceAbovePlaybackButtons
+    result -= PlayerBottomSheetMaxPlaybackButtonHeight
+    result -= PlayerBottomSheetSpaceAboveActionBar
+    result -= PlayerBottomSheetActionBarHeight
+    result -= PlayerBottomSheetSpaceAboveNavigation
+    result -= navigationHeight
+    result -= localView.navigationBarHeight.toDp()
+    return min(result, 270.dp)
 }
 
 @Composable

@@ -27,7 +27,6 @@ dependencies {
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:$retrofit_coroutines_adapter"
 
     api "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlin_serialization_version"
-    implementation "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:$kotlin_serialization_converter_version"
     implementation "com.github.bjoernpetersen:m3u-parser:$m3u_parser_version"
     implementation "com.google.code.gson:gson:$gson_version"
 
