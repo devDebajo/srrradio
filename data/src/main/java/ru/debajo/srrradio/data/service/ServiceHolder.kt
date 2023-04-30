@@ -2,6 +2,7 @@ package ru.debajo.srrradio.data.service
 
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import kotlinx.serialization.json.Json
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import ru.debajo.srrradio.common.LazySuspend
@@ -18,7 +19,7 @@ internal class ServiceHolder(
 
         Retrofit.Builder()
             .baseUrl("https://$host/")
-            .addConverterFactory(StreamConverterFactory(json))
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(httpClient)
             .build()
