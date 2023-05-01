@@ -13,7 +13,15 @@ import com.google.android.exoplayer2.mediacodec.MediaCodecSelector
 
 internal class FFTRendererFactory(context: Context) : DefaultRenderersFactory(context), FFTAudioProcessor.FFTListener {
 
-    var listener: FFTAudioProcessor.FFTListener? = null
+    private val listeners: MutableSet<FFTAudioProcessor.FFTListener> = mutableSetOf()
+
+    fun addListener(listener: FFTAudioProcessor.FFTListener) {
+        listeners.add(listener)
+    }
+
+    fun removeListener(listener: FFTAudioProcessor.FFTListener) {
+        listeners.remove(listener)
+    }
 
     override fun buildAudioRenderers(
         context: Context,
@@ -52,6 +60,12 @@ internal class FFTRendererFactory(context: Context) : DefaultRenderersFactory(co
     }
 
     override fun onFFTReady(sampleRateHz: Int, channelCount: Int, fft: FloatArray) {
-        listener?.onFFTReady(sampleRateHz, channelCount, fft)
+        if (listeners.isEmpty()) {
+            return
+        }
+
+        for (listener in listeners) {
+            listener.onFFTReady(sampleRateHz, channelCount, fft)
+        }
     }
 }

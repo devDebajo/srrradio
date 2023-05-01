@@ -41,8 +41,6 @@ class RadioPlayer(
     private val rendererFactory: FFTRendererFactory = FFTRendererFactory(context)
     private val emptyStationCoverListener: EmptyStationCoverListener = EmptyStationCoverListener(mediaSessionController, stationCoverLoader)
 
-    var fftListener: FFTAudioProcessor.FFTListener? by rendererFactory::listener
-
     private val audioAttributes: AudioAttributes by lazy {
         AudioAttributes.Builder()
             .setUsage(C.USAGE_MEDIA)
@@ -139,6 +137,14 @@ class RadioPlayer(
         if (radioEqualizerPreference.hasValue) {
             equalizer.applyState(radioEqualizerPreference.get())
         }
+    }
+
+    fun addFftListener(listener: FFTAudioProcessor.FFTListener) {
+        rendererFactory.addListener(listener)
+    }
+
+    fun removeFftListener(listener: FFTAudioProcessor.FFTListener) {
+        rendererFactory.removeListener(listener)
     }
 
     fun saveEqualizerState() {
