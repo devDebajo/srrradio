@@ -61,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
@@ -86,6 +87,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
 import com.skydoves.landscapist.glide.GlideImage
+import com.skydoves.landscapist.palette.BitmapPalette
 import kotlin.math.absoluteValue
 import kotlin.math.sin
 import kotlinx.coroutines.FlowPreview
@@ -564,12 +566,17 @@ fun StationCover(
     modifier: Modifier = Modifier,
     url: String?,
 ) {
+    val secondaryColor = MaterialTheme.colorScheme.secondary
+    var paletteColor by remember(url) { mutableStateOf<Color?>(null) }
     BoxWithConstraints(modifier = modifier) {
         val maxHeight = maxHeight
         GlideImage(
-            modifier = modifier.background(MaterialTheme.colorScheme.secondary),
+            modifier = modifier.background(paletteColor ?: secondaryColor),
             contentScale = ContentScale.Fit,
             imageModel = url,
+            bitmapPalette = remember(url) {
+                createPalette(url) { paletteColor = it }
+            },
             loading = { CircularProgressIndicator(Modifier.align(Alignment.Center)) },
             failure = {
                 Box(Modifier.fillMaxSize()) {
@@ -584,6 +591,15 @@ fun StationCover(
                 }
             }
         )
+    }
+}
+
+private fun createPalette(url: String?, callback: (Color) -> Unit): BitmapPalette {
+    return BitmapPalette(imageModel = url) { palette ->
+        val rgb = palette.dominantSwatch?.rgb
+        if (rgb != null) {
+            callback(Color(rgb))
+        }
     }
 }
 

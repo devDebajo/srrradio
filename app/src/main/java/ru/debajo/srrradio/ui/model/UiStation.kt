@@ -13,7 +13,9 @@ data class UiStation(
     val location: LatLng?,
     val alive: Boolean,
     val tags: List<String>,
-)
+) {
+    val tagsJoined: String = tags.joinToString()
+}
 
 internal fun Station.toUi(): UiStation {
     return UiStation(

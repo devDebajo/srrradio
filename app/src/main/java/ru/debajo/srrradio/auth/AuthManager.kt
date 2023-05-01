@@ -28,6 +28,10 @@ fun log(name: String, vararg args: Pair<String, String>) {
     getFromDi<F>().log(name, *args)
 }
 
+fun setProperty(name: String, value: String?) {
+    getFromDi<F>().setUserProperty(name, value)
+}
+
 fun F.log(name: String, vararg args: Pair<String, String>) {
     val nameToLog = if (args.isEmpty()) {
         name

@@ -7,6 +7,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +35,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.ui.common.AppCard
 import ru.debajo.srrradio.ui.ext.longPress
@@ -73,13 +75,26 @@ fun StationItem(
                 }
             }
             Spacer(Modifier.width(8.dp))
-            Text(
+            Column(
                 modifier = Modifier
                     .weight(1f)
                     .padding(vertical = 6.dp),
-                text = station.name,
-                overflow = TextOverflow.Ellipsis
-            )
+            ) {
+                Text(
+                    text = station.name,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if (station.tagsJoined.isNotEmpty()) {
+                    Text(
+                        text = station.tagsJoined,
+                        maxLines = 1,
+                        fontSize = 8.sp,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
             Spacer(Modifier.width(8.dp))
             val haptic = LocalHapticFeedback.current
             IconButton(onClick = {

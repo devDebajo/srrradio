@@ -5,6 +5,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.debajo.srrradio.auth.setProperty
 
 internal class SrrradioThemeManager(
     private val themePreference: SrrradioThemePreference,
@@ -22,14 +23,22 @@ internal class SrrradioThemeManager(
 
     private fun saveSelected(code: String) {
         themePreference.set(code)
+        setProperty(K, code)
     }
 
     private fun loadCurrent(): AppTheme {
-        val key = themePreference.get() ?: return defaultTheme
+        val key = themePreference.get()
+        if (key == null) {
+            setProperty(K, defaultTheme.code)
+            return defaultTheme
+        }
+
+        setProperty(K, key)
         return themes.firstOrNull { it.code == key } ?: defaultTheme
     }
 
     companion object {
+        const val K: String = "theme"
         val Local: ProvidableCompositionLocal<SrrradioThemeManager> = staticCompositionLocalOf { TODO() }
 
         private val defaultTheme: AppTheme = GraphiteTheme
