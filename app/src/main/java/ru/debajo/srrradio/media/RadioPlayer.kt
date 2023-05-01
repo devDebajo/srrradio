@@ -38,8 +38,10 @@ class RadioPlayer(
 
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val coroutineScope: LifecycleCoroutineScope by ProcessScope
-
+    private val rendererFactory: FFTRendererFactory = FFTRendererFactory(context)
     private val emptyStationCoverListener: EmptyStationCoverListener = EmptyStationCoverListener(mediaSessionController, stationCoverLoader)
+
+    var fftListener: FFTAudioProcessor.FFTListener? by rendererFactory::listener
 
     private val audioAttributes: AudioAttributes by lazy {
         AudioAttributes.Builder()
@@ -52,6 +54,7 @@ class RadioPlayer(
         ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
+            .setRenderersFactory(rendererFactory)
             .build()
             .apply {
                 addListener(object : Player.Listener {
@@ -320,3 +323,4 @@ private class EmptyStationCoverListener(
         }
     }
 }
+

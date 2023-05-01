@@ -48,6 +48,8 @@ class MediaController(
     val equalizer: RadioEqualizer
         get() = player.equalizer
 
+    var fftListener: FFTAudioProcessor.FFTListener? by player::fftListener
+
     init {
         mediaSessionController.mediaSession.setCallback(this)
     }
