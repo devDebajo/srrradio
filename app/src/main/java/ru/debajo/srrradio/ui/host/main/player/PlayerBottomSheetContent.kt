@@ -2,6 +2,7 @@ package ru.debajo.srrradio.ui.host.main.player
 
 import android.content.res.Configuration
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.StartOffset
@@ -80,9 +81,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
 import com.google.accompanist.pager.rememberPagerState
@@ -100,6 +101,7 @@ import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.ext.toDp
+import ru.debajo.srrradio.ui.host.main.AudioVisualizerView
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.PlayPauseButton
@@ -119,7 +121,7 @@ val PlayerBottomSheetActionBarHeight = 42.dp
 val PlayerBottomSheetSpaceAboveNavigation = 20.dp
 
 @Composable
-@OptIn(ExperimentalPagerApi::class, FlowPreview::class)
+@OptIn(FlowPreview::class)
 fun PlayerBottomSheetContent(
     scaffoldState: BottomSheetScaffoldState,
     navigationHeight: Dp,
@@ -136,206 +138,218 @@ fun PlayerBottomSheetContent(
         }
     }
 
-    BottomSheetHeader(
-        state = state,
-        visible = scaffoldState.bottomSheetState.isCollapsed,
-        onClick = {
-            coroutineScope.launch {
-                scaffoldState.bottomSheetState.expand()
-            }
-        },
-        onPlayPauseClick = {
-            viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
+    var bottomSheetHeight by remember { mutableStateOf(0) }
+    Box(
+        modifier = Modifier.onGloballyPositioned {
+            bottomSheetHeight = it.size.height
         }
-    )
-
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveCover))
-
-        val currentStationIndexState = rememberUpdatedState(state.currentStationIndex)
-        val pagerState = rememberPagerState(state.currentStationIndex.coerceAtLeast(0))
-        LaunchedEffect(pagerState) {
-            launch {
-                snapshotFlow { pagerState.currentPage }
-                    .debounce(100)
-                    .collect {
-                        viewModel.onEvent(PlayerBottomSheetEvent.OnSelectStation(it))
-                    }
-            }
-
-            launch {
-                snapshotFlow { currentStationIndexState.value }.filter { it >= 0 }.collect {
-                    pagerState.animateScrollToPage(it)
-                }
-            }
-        }
-
-        val localView = LocalView.current
-        val density = LocalDensity.current
-        var titleHeight by remember { mutableStateOf(0) }
-        var subtitleHeight by remember { mutableStateOf(0) }
-        val itemSize = remember(localView, density, navigationHeight, titleHeight, subtitleHeight) {
-            density.calculateCoverSize(
-                localView = localView,
-                navigationHeight = navigationHeight,
-                textHeight = titleHeight.toDp(density) + subtitleHeight.toDp(density)
-            )
-        }
-        HorizontalPager(
-            count = state.stations.size,
-            state = pagerState,
-        ) { index ->
-            val station = state.stations[index]
-            Column(
-                modifier = Modifier.graphicsLayer {
-                    val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
-                    lerp(
-                        start = 0.85f,
-                        stop = 1f,
-                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                    ).also { scale ->
-                        scaleX = scale
-                        scaleY = scale
-                    }
-
-                    alpha = lerp(
-                        start = 0.5f,
-                        stop = 1f,
-                        fraction = 1f - pageOffset.coerceIn(0f, 1f)
-                    )
-                }
-            ) {
-                StationCover(
-                    modifier = Modifier
-                        .size(itemSize)
-                        .clip(RoundedCornerShape(10.dp)),
-                    url = station.image,
-                )
-                Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveTitle))
-                Text(
-                    modifier = Modifier
-                        .width(itemSize)
-                        .basicMarquee(),
-                    text = station.name,
-                    fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    onTextLayout = { titleHeight = it.size.height }
-                )
-            }
-        }
-        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveSubtitle))
-        CustomText(
-            modifier = Modifier.width(itemSize),
-            text = state.title ?: stringResource(R.string.no_track),
-            fontSize = 13.sp,
-            lineHeight = 18.sp,
-            maxLines = 2,
-            minLines = 2,
-            color = MaterialTheme.colorScheme.onSurface,
-            onTextLayout = { subtitleHeight = it.size.height }
+        Visualizer(
+            modifier = Modifier
+                .padding(top = PlayerBottomSheetPeekHeight)
+                .fillMaxWidth()
+                .height(bottomSheetHeight.toDp() - PlayerBottomSheetPeekHeight - navigationHeight)
         )
-        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAbovePlaybackButtons))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            PlayBackButton(
-                visible = state.hasPreviousStation,
-                size = 46.dp,
-                icon = Icons.Rounded.SkipPrevious,
-                contentDescription = stringResource(R.string.accessibility_previous_station),
-                onClick = { viewModel.onEvent(PlayerBottomSheetEvent.PreviousStation) }
-            )
-            Spacer(Modifier.width(18.dp))
-            PlayBackButton(
-                visible = true,
-                size = PlayerBottomSheetMaxPlaybackButtonHeight,
-                icon = { size ->
-                    when (state.playingState) {
-                        UiStationPlayingState.PLAYING -> {
-                            Icon(
-                                modifier = Modifier.size(size),
-                                imageVector = Icons.Rounded.Pause,
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                contentDescription = null,
-                            )
-                        }
-                        UiStationPlayingState.NONE -> {
-                            Icon(
-                                modifier = Modifier.size(size),
-                                imageVector = Icons.Rounded.PlayArrow,
-                                tint = MaterialTheme.colorScheme.onPrimary,
-                                contentDescription = null,
-                            )
-                        }
-                        UiStationPlayingState.BUFFERING -> {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(size / 2f),
-                                strokeWidth = 2.dp,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                            )
-                        }
+
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            BottomSheetHeader(
+                state = state,
+                visible = scaffoldState.bottomSheetState.isCollapsed,
+                onClick = {
+                    coroutineScope.launch {
+                        scaffoldState.bottomSheetState.expand()
                     }
                 },
-                contentDescription = stringResource(
-                    if (state.playing) R.string.accessibility_pause else R.string.accessibility_play,
-                ),
-                onClick = { viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick) }
-            )
-            Spacer(Modifier.width(18.dp))
-            PlayBackButton(
-                visible = state.hasNextStation,
-                size = 46.dp,
-                icon = Icons.Rounded.SkipNext,
-                contentDescription = stringResource(R.string.accessibility_next_station),
-                onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
-            )
-        }
-        Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveActionBar))
-        val snackbarLauncher = LocalSnackbarLauncher.current
-        ActionsBar(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(PlayerBottomSheetActionBarHeight)
-                .padding(horizontal = 16.dp),
-        ) {
-            ActionButton(
-                icon = state.currentStationInFavorite.select(Icons.Rounded.Favorite, Icons.Rounded.FavoriteBorder),
-                contentDescription = state.currentStationInFavorite.stringResource(
-                    positiveId = R.string.accessibility_remove_favorite,
-                    negativeId = R.string.accessibility_add_favorite
-                )
-            ) {
-                if (state.currentStationInFavorite) {
-                    snackbarLauncher.show(R.string.station_removed_from_favorite)
-                } else {
-                    snackbarLauncher.show(R.string.station_added_to_favorite)
+                onPlayPauseClick = {
+                    viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick)
                 }
-                viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
-            }
-            ActionButtonDivider()
-            ActionButton(
-                icon = state.sleepTimerScheduled.select(Icons.Rounded.Timelapse, Icons.Rounded.Timer),
-                contentDescription = stringResource(R.string.accessibility_sleep_timer),
-                badgeText = state.sleepTimerLeftTimeFormatted,
-            ) {
-                sleepTimerViewModel.show()
+            )
+
+            Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveCover))
+
+            val currentStationIndexState = rememberUpdatedState(state.currentStationIndex)
+            val pagerState = rememberPagerState(state.currentStationIndex.coerceAtLeast(0))
+            LaunchedEffect(pagerState) {
+                launch {
+                    snapshotFlow { pagerState.currentPage }
+                        .debounce(100)
+                        .collect {
+                            viewModel.onEvent(PlayerBottomSheetEvent.OnSelectStation(it))
+                        }
+                }
+
+                launch {
+                    snapshotFlow { currentStationIndexState.value }.filter { it >= 0 }.collect {
+                        pagerState.animateScrollToPage(it)
+                    }
+                }
             }
 
-            if (!state.title.isNullOrEmpty()) {
-                ActionButtonDivider()
-                ActionButton(
-                    icon = Icons.Rounded.Save,
-                    contentDescription = stringResource(R.string.accessibility_save_track),
+            val localView = LocalView.current
+            val density = LocalDensity.current
+            var titleHeight by remember { mutableStateOf(0) }
+            var subtitleHeight by remember { mutableStateOf(0) }
+            val itemSize = remember(localView, density, navigationHeight, titleHeight, subtitleHeight) {
+                density.calculateCoverSize(
+                    localView = localView,
+                    navigationHeight = navigationHeight,
+                    textHeight = titleHeight.toDp(density) + subtitleHeight.toDp(density)
+                )
+            }
+            HorizontalPager(
+                count = state.stations.size,
+                state = pagerState,
+            ) { index ->
+                val station = state.stations[index]
+                Column(
+                    modifier = Modifier.graphicsLayer {
+                        val pageOffset = calculateCurrentOffsetForPage(index).absoluteValue
+                        lerp(
+                            start = 0.85f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        ).also { scale ->
+                            scaleX = scale
+                            scaleY = scale
+                        }
+
+                        alpha = lerp(
+                            start = 0.5f,
+                            stop = 1f,
+                            fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                        )
+                    }
                 ) {
-                    snackbarLauncher.show(R.string.track_added_to_collection)
-                    viewModel.onEvent(PlayerBottomSheetEvent.AddTrackToCollection(state.title.orEmpty()))
+                    StationCover(
+                        modifier = Modifier
+                            .size(itemSize)
+                            .clip(RoundedCornerShape(10.dp)),
+                        url = station.image,
+                    )
+                    Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveTitle))
+                    Text(
+                        modifier = Modifier
+                            .width(itemSize)
+                            .basicMarquee(),
+                        text = station.name,
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        onTextLayout = { titleHeight = it.size.height }
+                    )
                 }
             }
+            Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveSubtitle))
+            CustomText(
+                modifier = Modifier.width(itemSize),
+                text = state.title ?: stringResource(R.string.no_track),
+                fontSize = 13.sp,
+                lineHeight = 18.sp,
+                maxLines = 2,
+                minLines = 2,
+                color = MaterialTheme.colorScheme.onSurface,
+                onTextLayout = { subtitleHeight = it.size.height }
+            )
+            Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAbovePlaybackButtons))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                PlayBackButton(
+                    visible = state.hasPreviousStation,
+                    size = 46.dp,
+                    icon = Icons.Rounded.SkipPrevious,
+                    contentDescription = stringResource(R.string.accessibility_previous_station),
+                    onClick = { viewModel.onEvent(PlayerBottomSheetEvent.PreviousStation) }
+                )
+                Spacer(Modifier.width(18.dp))
+                PlayBackButton(
+                    visible = true,
+                    size = PlayerBottomSheetMaxPlaybackButtonHeight,
+                    icon = { size ->
+                        when (state.playingState) {
+                            UiStationPlayingState.PLAYING -> {
+                                Icon(
+                                    modifier = Modifier.size(size),
+                                    imageVector = Icons.Rounded.Pause,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    contentDescription = null,
+                                )
+                            }
+                            UiStationPlayingState.NONE -> {
+                                Icon(
+                                    modifier = Modifier.size(size),
+                                    imageVector = Icons.Rounded.PlayArrow,
+                                    tint = MaterialTheme.colorScheme.onPrimary,
+                                    contentDescription = null,
+                                )
+                            }
+                            UiStationPlayingState.BUFFERING -> {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(size / 2f),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                )
+                            }
+                        }
+                    },
+                    contentDescription = stringResource(
+                        if (state.playing) R.string.accessibility_pause else R.string.accessibility_play,
+                    ),
+                    onClick = { viewModel.onEvent(PlayerBottomSheetEvent.OnPlayPauseClick) }
+                )
+                Spacer(Modifier.width(18.dp))
+                PlayBackButton(
+                    visible = state.hasNextStation,
+                    size = 46.dp,
+                    icon = Icons.Rounded.SkipNext,
+                    contentDescription = stringResource(R.string.accessibility_next_station),
+                    onClick = { viewModel.onEvent(PlayerBottomSheetEvent.NextStation) }
+                )
+            }
+            Spacer(modifier = Modifier.height(PlayerBottomSheetSpaceAboveActionBar))
+            val snackbarLauncher = LocalSnackbarLauncher.current
+            ActionsBar(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(PlayerBottomSheetActionBarHeight)
+                    .padding(horizontal = 16.dp),
+            ) {
+                ActionButton(
+                    icon = state.currentStationInFavorite.select(Icons.Rounded.Favorite, Icons.Rounded.FavoriteBorder),
+                    contentDescription = state.currentStationInFavorite.stringResource(
+                        positiveId = R.string.accessibility_remove_favorite,
+                        negativeId = R.string.accessibility_add_favorite
+                    )
+                ) {
+                    if (state.currentStationInFavorite) {
+                        snackbarLauncher.show(R.string.station_removed_from_favorite)
+                    } else {
+                        snackbarLauncher.show(R.string.station_added_to_favorite)
+                    }
+                    viewModel.onEvent(PlayerBottomSheetEvent.UpdateStationFavorite(!state.currentStationInFavorite))
+                }
+                ActionButtonDivider()
+                ActionButton(
+                    icon = state.sleepTimerScheduled.select(Icons.Rounded.Timelapse, Icons.Rounded.Timer),
+                    contentDescription = stringResource(R.string.accessibility_sleep_timer),
+                    badgeText = state.sleepTimerLeftTimeFormatted,
+                ) {
+                    sleepTimerViewModel.show()
+                }
+
+                if (!state.title.isNullOrEmpty()) {
+                    ActionButtonDivider()
+                    ActionButton(
+                        icon = Icons.Rounded.Save,
+                        contentDescription = stringResource(R.string.accessibility_save_track),
+                    ) {
+                        snackbarLauncher.show(R.string.track_added_to_collection)
+                        viewModel.onEvent(PlayerBottomSheetEvent.AddTrackToCollection(state.title.orEmpty()))
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(navigationHeight + PlayerBottomSheetSpaceAboveNavigation))
         }
-        Spacer(modifier = Modifier.height(navigationHeight + PlayerBottomSheetSpaceAboveNavigation))
     }
 }
 
@@ -671,4 +685,19 @@ fun isHorizontalOrientation(): Boolean {
     return remember(context) {
         context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     }
+}
+
+@Composable
+private fun Visualizer(modifier: Modifier = Modifier) {
+    AndroidView(
+        modifier = modifier,
+        factory = {
+            AudioVisualizerView(it).apply {
+                layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                )
+            }
+        }
+    )
 }

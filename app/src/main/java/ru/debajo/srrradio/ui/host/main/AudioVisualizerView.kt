@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 import java.lang.System.arraycopy
@@ -27,6 +26,14 @@ class AudioVisualizerView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr), FFTAudioProcessor.FFTListener {
 
+    var visualizeEnabled: Boolean = true
+        set(value) {
+            field = value
+            if (value) {
+                invalidate()
+            }
+        }
+
     private val mediaController: MediaController by inject()
 
     private val bands: Int = FREQUENCY_BAND_LIMITS.size
@@ -35,34 +42,16 @@ class AudioVisualizerView @JvmOverloads constructor(
 
     private val fft: FloatArray = FloatArray(size)
     private val paintBandsFill: Paint = Paint()
-    private val paintBands: Paint = Paint()
-    private val paintAvg: Paint = Paint()
-    private val paintPath: Paint = Paint()
 
     // We average out the values over 3 occurences (plus the current one), so big jumps are smoothed out
     private val smoothingFactor: Int = 3
     private val previousValues: FloatArray = FloatArray(bands * smoothingFactor)
-
-    private val fftPath: Path = Path()
 
     private var startedAt: Long = 0
 
     init {
         paintBandsFill.color = Color.parseColor("#20FFFFFF")
         paintBandsFill.style = Paint.Style.FILL
-
-        paintBands.color = Color.parseColor("#60FFFFFF")
-        paintBands.strokeWidth = 1f
-        paintBands.style = Paint.Style.STROKE
-
-        paintAvg.color = Color.parseColor("#1976d2")
-        paintAvg.strokeWidth = 2f
-        paintAvg.style = Paint.Style.STROKE
-
-        paintPath.color = Color.WHITE
-        paintPath.strokeWidth = 8f
-        paintPath.isAntiAlias = true
-        paintPath.style = Paint.Style.STROKE
     }
 
     override fun onAttachedToWindow() {
@@ -76,6 +65,10 @@ class AudioVisualizerView @JvmOverloads constructor(
     }
 
     override fun onFFTReady(sampleRateHz: Int, channelCount: Int, fft: FloatArray) {
+        if (!visualizeEnabled) {
+            return
+        }
+
         synchronized(this.fft) {
             if (startedAt == 0L) {
                 startedAt = System.currentTimeMillis()
@@ -97,8 +90,6 @@ class AudioVisualizerView @JvmOverloads constructor(
         // Set up counters and widgets
         var currentFftPosition = 0
         var currentFrequencyBandLimitIndex = 0
-        fftPath.reset()
-        fftPath.moveTo(0f, height.toFloat())
         var currentAverage = 0f
 
         // Iterate over the entire FFT result array
@@ -165,38 +156,18 @@ class AudioVisualizerView @JvmOverloads constructor(
                 height.toFloat(),
                 paintBandsFill
             )
-            canvas.drawRect(
-                leftX,
-                top,
-                rightX,
-                height.toFloat(),
-                paintBands
-            )
-
-            fftPath.lineTo(
-                (leftX + rightX) / 2,
-                top
-            )
 
             currentFrequencyBandLimitIndex++
         }
-
-        canvas.drawPath(fftPath, paintPath)
-
-        canvas.drawLine(
-            0f,
-            height * (1 - (currentAverage / maxConst)),
-            width.toFloat(),
-            height * (1 - (currentAverage / maxConst)),
-            paintAvg
-        )
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        drawAudio(canvas)
-        // By calling invalidate, we request a redraw. See https://github.com/dzolnai/ExoVisualizer/issues/2
-        invalidate()
+        if (visualizeEnabled) {
+            drawAudio(canvas)
+            // By calling invalidate, we request a redraw. See https://github.com/dzolnai/ExoVisualizer/issues/2
+            invalidate()
+        }
     }
 
     private companion object {

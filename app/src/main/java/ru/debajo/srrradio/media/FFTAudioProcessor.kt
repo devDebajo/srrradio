@@ -14,11 +14,6 @@ import kotlin.math.max
 
 /**
  * Copy of: https://github.com/dzolnai/ExoVisualizer/blob/master/app/src/main/java/com/egeniq/exovisualizer/FFTAudioProcessor.kt
- *
- * An audio processor which forwards the input to the output,
- * but also takes the input and executes a Fast-Fourier Transformation (FFT) on it.
- * The results of this transformation is a 'list' of frequencies with their amplitudes,
- * which will be forwarded to the listener
  */
 class FFTAudioProcessor internal constructor() : AudioProcessor {
 
