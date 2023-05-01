@@ -10,8 +10,8 @@ import ru.debajo.srrradio.R
 import ru.debajo.srrradio.media.model.MediaState
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
+import ru.debajo.srrradio.ui.host.main.list.model.currentPlaylist
 import ru.debajo.srrradio.ui.host.main.list.model.idle
-import ru.debajo.srrradio.ui.host.main.list.model.playlist
 import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
 import ru.debajo.srrradio.ui.model.UiPlaylist
 import ru.debajo.srrradio.ui.model.toPlaylist
@@ -45,7 +45,7 @@ class StationsListCommandResultReduktor(
         state: StationsListState,
         event: PopularStationsProcessor.Loaded,
     ): Akt<StationsListState, StationsListNews> {
-        if (state.playlist != null) {
+        if (state.currentPlaylist != null) {
             return Akt()
         }
 

@@ -11,7 +11,7 @@ import ru.debajo.srrradio.ui.ext.isEmpty
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListEvent
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListNews
 import ru.debajo.srrradio.ui.host.main.list.model.StationsListState
-import ru.debajo.srrradio.ui.host.main.list.model.playlist
+import ru.debajo.srrradio.ui.host.main.list.model.currentPlaylist
 import ru.debajo.srrradio.ui.host.main.list.model.toIdle
 import ru.debajo.srrradio.ui.host.main.list.model.toSearch
 import ru.debajo.srrradio.ui.host.main.list.model.updateIdle
@@ -83,7 +83,7 @@ class StationsListReduktor(
         state: StationsListState,
         event: StationsListEvent.OnPlayPauseStation,
     ): Akt<StationsListState, StationsListNews> {
-        val playlist = state.playlist ?: return Akt()
+        val playlist = state.currentPlaylist ?: return Akt()
         return Akt(
             commands = listOf(
                 NewPlayCommandProcessor.NewPlay(
