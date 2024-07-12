@@ -176,14 +176,6 @@ class MediaController(
         player.changeStation(station, play)
     }
 
-    fun addFftListener(listener: FFTAudioProcessor.FFTListener) {
-        player.addFftListener(listener)
-    }
-
-    fun removeFftListener(listener: FFTAudioProcessor.FFTListener) {
-        player.removeFftListener(listener)
-    }
-
     private fun savePlaylistInfoToPrefs() {
         val currentMediaState = stateMutable.value as? MediaState.Loaded ?: return
         lastStationUseCase.lastPlaylistId = currentMediaState.playlist.id

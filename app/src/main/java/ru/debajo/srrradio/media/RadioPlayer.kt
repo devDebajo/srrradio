@@ -38,7 +38,6 @@ class RadioPlayer(
 
     private val handler: Handler = Handler(Looper.getMainLooper())
     private val coroutineScope: LifecycleCoroutineScope by ProcessScope
-    private val rendererFactory: FFTRendererFactory = FFTRendererFactory(context)
     private val emptyStationCoverListener: EmptyStationCoverListener = EmptyStationCoverListener(mediaSessionController, stationCoverLoader)
 
     private val audioAttributes: AudioAttributes by lazy {
@@ -52,7 +51,6 @@ class RadioPlayer(
         ExoPlayer.Builder(context)
             .setAudioAttributes(audioAttributes, true)
             .setHandleAudioBecomingNoisy(true)
-            .setRenderersFactory(rendererFactory)
             .build()
             .apply {
                 addListener(object : Player.Listener {
@@ -137,14 +135,6 @@ class RadioPlayer(
         if (radioEqualizerPreference.hasValue) {
             equalizer.applyState(radioEqualizerPreference.get())
         }
-    }
-
-    fun addFftListener(listener: FFTAudioProcessor.FFTListener) {
-        rendererFactory.addListener(listener)
-    }
-
-    fun removeFftListener(listener: FFTAudioProcessor.FFTListener) {
-        rendererFactory.removeListener(listener)
     }
 
     fun saveEqualizerState() {

@@ -1,6 +1,8 @@
 apply from: '../gradle/android_module.gradle'
 
 android {
+    namespace "ru.debajo.srrradio.domain"
+
     buildTypes {
         releaseApk {
         }

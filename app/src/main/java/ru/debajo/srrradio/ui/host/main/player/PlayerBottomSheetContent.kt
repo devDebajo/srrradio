@@ -2,7 +2,6 @@ package ru.debajo.srrradio.ui.host.main.player
 
 import android.content.res.Configuration
 import android.view.View
-import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.StartOffset
@@ -81,7 +80,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.min
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.accompanist.pager.HorizontalPager
@@ -101,7 +99,6 @@ import ru.debajo.srrradio.ui.ext.darken
 import ru.debajo.srrradio.ui.ext.select
 import ru.debajo.srrradio.ui.ext.stringResource
 import ru.debajo.srrradio.ui.ext.toDp
-import ru.debajo.srrradio.ui.host.main.AudioVisualizerView
 import ru.debajo.srrradio.ui.host.main.LocalSnackbarLauncher
 import ru.debajo.srrradio.ui.host.main.bottomSheetBgColor
 import ru.debajo.srrradio.ui.host.main.list.PlayPauseButton
@@ -144,13 +141,6 @@ fun PlayerBottomSheetContent(
             bottomSheetHeight = it.size.height
         }
     ) {
-        Visualizer(
-            modifier = Modifier
-                .padding(top = PlayerBottomSheetPeekHeight)
-                .fillMaxWidth()
-                .height(bottomSheetHeight.toDp() - PlayerBottomSheetPeekHeight - navigationHeight)
-        )
-
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -275,6 +265,7 @@ fun PlayerBottomSheetContent(
                                     contentDescription = null,
                                 )
                             }
+
                             UiStationPlayingState.NONE -> {
                                 Icon(
                                     modifier = Modifier.size(size),
@@ -283,6 +274,7 @@ fun PlayerBottomSheetContent(
                                     contentDescription = null,
                                 )
                             }
+
                             UiStationPlayingState.BUFFERING -> {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(size / 2f),
@@ -393,7 +385,7 @@ private fun BottomSheetHeader(
     visible: Boolean = true,
     state: PlayerBottomSheetState,
     onClick: () -> Unit,
-    onPlayPauseClick: () -> Unit
+    onPlayPauseClick: () -> Unit,
 ) {
     val visibleAsState = rememberUpdatedState(visible)
     var alpha by remember { mutableStateOf(if (visible) 1f else 0f) }
@@ -470,7 +462,7 @@ private fun ActionButtonDivider() {
 @Composable
 private fun ActionsBar(
     modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
+    content: @Composable RowScope.() -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -486,7 +478,7 @@ private fun RowScope.ActionButton(
     icon: ImageVector,
     contentDescription: String,
     badgeText: String? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -624,7 +616,7 @@ private const val BAR_DURATION_MS = 400
 @Composable
 private fun PlayingIndicator(
     modifier: Modifier = Modifier,
-    playing: Boolean
+    playing: Boolean,
 ) {
     BoxWithConstraints(modifier = modifier) {
         val maxWidth = this.maxWidth
@@ -660,7 +652,7 @@ private fun PlayingIndicatorBar(
     playing: Boolean,
     delay: Int,
 ) {
-    val fraction by rememberInfiniteTransition().animateFloat(
+    val fraction by rememberInfiniteTransition(label = "PlayingIndicatorBar").animateFloat(
         initialValue = 0f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(
@@ -669,7 +661,8 @@ private fun PlayingIndicatorBar(
                 easing = cycleEasing(),
             ),
             initialStartOffset = StartOffset(delay)
-        )
+        ),
+        label = "PlayingIndicatorBar_float"
     )
     Box(
         modifier
@@ -685,19 +678,4 @@ fun isHorizontalOrientation(): Boolean {
     return remember(context) {
         context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     }
-}
-
-@Composable
-private fun Visualizer(modifier: Modifier = Modifier) {
-    AndroidView(
-        modifier = modifier,
-        factory = {
-            AudioVisualizerView(it).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                )
-            }
-        }
-    )
 }

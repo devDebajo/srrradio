@@ -7,7 +7,9 @@ plugins {
 }
 
 android {
-    compileSdk 33
+    namespace "ru.debajo.srrradio"
+
+    compileSdk 34
 
     signingConfigs {
         release {
@@ -29,7 +31,7 @@ android {
     defaultConfig {
         applicationId "ru.debajo.srrradio"
         minSdk 21
-        targetSdk 33
+        targetSdk 34
         versionCode 15
         versionName "1.0.13"
 
@@ -55,8 +57,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
 
         kotlin {
             kotlinOptions {
@@ -73,11 +75,12 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
 
     buildFeatures {
         compose true
+        buildConfig true
     }
 
     composeOptions {
@@ -117,7 +120,6 @@ dependencies {
     implementation "me.onebone:toolbar-compose:$toolbar_compose"
 
     implementation "com.google.android.exoplayer:exoplayer:$exo_player_version"
-    implementation 'com.github.paramsen:noise:2.0.0'
     implementation "com.github.devDebajo:reduktor:$reduktor_version"
 
     implementation 'org.osmdroid:osmdroid-android:6.1.16'

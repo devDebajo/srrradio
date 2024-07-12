@@ -1,7 +1,9 @@
 package ru.debajo.srrradio
 
+import android.annotation.SuppressLint
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.coroutineScope
@@ -34,13 +36,18 @@ class SrrradioApp : Application() {
     private val receiver: PlaybackBroadcastReceiver by inject()
     private val searchStationsUseCase: SearchStationsUseCase by inject()
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override fun onCreate() {
         super.onCreate()
 
         initDi()
         initLogs()
         initFatalErrors()
-        registerReceiver(receiver, PlaybackBroadcastReceiver.intentFilter())
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, PlaybackBroadcastReceiver.intentFilter(), RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, PlaybackBroadcastReceiver.intentFilter())
+        }
 
         val processLifecycle = ProcessLifecycleOwner.get().lifecycle
         val processScope = processLifecycle.coroutineScope
