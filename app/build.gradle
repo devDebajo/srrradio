@@ -30,9 +30,9 @@ android {
 
     defaultConfig {
         applicationId "ru.debajo.srrradio"
-        minSdk 21
+        minSdk 23
         targetSdk 34
-        versionCode 15
+        versionCode 16
         versionName "1.0.13"
 
         vectorDrawables {
