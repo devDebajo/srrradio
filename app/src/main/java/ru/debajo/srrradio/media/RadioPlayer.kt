@@ -279,7 +279,7 @@ class RadioPlayer(
     }
 
     sealed interface State {
-        object None : State
+        data object None : State
 
         data class HasStation(
             val station: UiStation,

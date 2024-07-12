@@ -7,11 +7,11 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 @Immutable
 sealed interface MediaState {
-    object None : MediaState
+    data object None : MediaState
 
-    object Loading : MediaState
+    data object Loading : MediaState
 
-    object Empty : MediaState
+    data object Empty : MediaState
 
     data class Loaded(
         val playlist: UiPlaylist,

@@ -8,12 +8,10 @@ import ru.debajo.srrradio.ui.model.UiStationElement
 sealed interface DefaultPlaylistState {
     val items: List<UiStationElement>
 
-    @Immutable
-    object Loading : DefaultPlaylistState {
+    data object Loading : DefaultPlaylistState {
         override val items: List<UiStationElement> = emptyList()
     }
 
-    @Immutable
     data class Loaded(
         override val items: List<UiStationElement> = emptyList(),
         val playlist: UiPlaylist? = null

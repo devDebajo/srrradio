@@ -117,8 +117,8 @@ class AppUpdateFlowHelper(
     sealed interface UpdateProgress {
         class Loading(val progress: Float) : UpdateProgress
 
-        object Loaded : UpdateProgress
+        data object Loaded : UpdateProgress
 
-        object Failed : UpdateProgress
+        data object Failed : UpdateProgress
     }
 }

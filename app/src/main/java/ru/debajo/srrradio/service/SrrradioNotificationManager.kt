@@ -85,13 +85,13 @@ sealed interface SrrradioNotificationChannel {
 
     val descriptionRes: Int
 
-    object MediaControls : SrrradioNotificationChannel {
+    data object MediaControls : SrrradioNotificationChannel {
         override val id: String = "SRRRADIO_MEDIA_PLAYBACK_NOTIFICATION"
         override val nameRes: Int = R.string.notification_channel_name
         override val descriptionRes: Int = R.string.notification_channel_description
     }
 
-    object StubChannel : SrrradioNotificationChannel {
+    data object StubChannel : SrrradioNotificationChannel {
         override val id: String = ""
         override val nameRes: Int = 0
         override val descriptionRes: Int = 0

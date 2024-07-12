@@ -141,7 +141,6 @@ internal class SyncRepositoryImpl(
         )
     }
 
-    @Suppress("ThrowableNotThrown")
     private suspend fun DatabaseReference.getOnce(): DataSnapshot {
         return suspendCancellableCoroutine { continuation ->
             val listener = object : ValueEventListener {
@@ -159,7 +158,6 @@ internal class SyncRepositoryImpl(
         }
     }
 
-    @Suppress("ThrowableNotThrown")
     private fun DatabaseReference.observe(): Flow<DataSnapshot> {
         return callbackFlow {
             val listener = object : ValueEventListener {

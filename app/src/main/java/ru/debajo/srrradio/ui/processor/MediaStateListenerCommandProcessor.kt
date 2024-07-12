@@ -29,8 +29,8 @@ class MediaStateListenerCommandProcessor(
     }
 
     sealed interface ListenerCommand : Command {
-        object Start : ListenerCommand
-        object Stop : ListenerCommand
+        data object Start : ListenerCommand
+        data object Stop : ListenerCommand
     }
 
     data class OnNewMediaState(val state: MediaState) : CommandResult

@@ -66,7 +66,7 @@ class SleepTimer {
     }
 
     private sealed interface Task {
-        object None : Task
+        data object None : Task
         data class Pause(val at: Long) : Task
     }
 

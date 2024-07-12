@@ -43,7 +43,7 @@ class SearchStationsCommandProcessor(
     sealed interface Action : Command {
         data class Search(val query: String) : Action
         data class SearchByUrl(val url: String) : Action
-        object Cancel : Action
+        data object Cancel : Action
     }
 
     data class SearchResult(

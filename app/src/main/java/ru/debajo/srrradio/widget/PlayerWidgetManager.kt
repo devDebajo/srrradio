@@ -63,7 +63,7 @@ class PlayerWidgetManager(
 
 
     sealed interface WidgetState {
-        object NoData : WidgetState
+        data object NoData : WidgetState
 
         data class HasData(
             val hasPreviousStation: Boolean,

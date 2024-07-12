@@ -8,7 +8,7 @@ enum class RateAppState(val code: Int) {
 
     companion object {
         fun fromCode(code: Int): RateAppState {
-            return values().firstOrNull { it.code == code } ?: NOT_RATED
+            return RateAppState.entries.firstOrNull { it.code == code } ?: NOT_RATED
         }
     }
 }
