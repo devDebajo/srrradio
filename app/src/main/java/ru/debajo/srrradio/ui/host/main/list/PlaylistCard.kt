@@ -34,10 +34,10 @@ fun PlaylistCard(
             is UiMainTile.Regular -> Unit
             is UiMainTile.Progress -> {
                 if (item.loading) {
-                    val progress = animateFloatAsState(item.progress)
+                    val progress = animateFloatAsState(item.progress, label = "CircularProgressIndicator progress")
                     CircularProgressIndicator(
+                        progress = { progress.value },
                         modifier = Modifier.align(Alignment.Center),
-                        progress = progress.value,
                         strokeWidth = 2.dp,
                     )
                 }

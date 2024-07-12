@@ -1,10 +1,10 @@
 package ru.debajo.srrradio.ui.host.main.list.model
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ShowChart
 import androidx.compose.material.icons.rounded.FavoriteBorder
 import androidx.compose.material.icons.rounded.Map
 import androidx.compose.material.icons.rounded.Recommend
-import androidx.compose.material.icons.rounded.ShowChart
 import androidx.compose.material.icons.rounded.Update
 import androidx.compose.material.icons.rounded.Upgrade
 import ru.debajo.srrradio.R
@@ -28,7 +28,7 @@ object DefaultMainTiles {
 
     val PopularStations = UiMainTile.Regular(
         title = R.string.playlist_popular,
-        icon = Icons.Rounded.ShowChart,
+        icon = Icons.AutoMirrored.Rounded.ShowChart,
     )
 
     val FavoriteStations = UiMainTile.Regular(
