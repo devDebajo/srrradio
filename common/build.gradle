@@ -2,11 +2,6 @@ apply from: '../gradle/android_module.gradle'
 
 android {
     namespace "ru.debajo.srrradio.common"
-
-    buildTypes {
-        releaseApk {
-        }
-    }
 }
 
 dependencies {
@@ -15,7 +10,7 @@ dependencies {
     api "com.jakewharton.timber:timber:$timber_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:$coroutines_version"
-    api "io.insert-koin:koin-core:3.3.3"
+    api "io.insert-koin:koin-core:3.5.3"
 
-    implementation 'com.google.android.play:app-update:2.0.1'
+    implementation 'com.google.android.play:app-update:2.1.0'
 }

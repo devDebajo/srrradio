@@ -1,5 +1,6 @@
 package ru.debajo.srrradio.widget
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
@@ -8,6 +9,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
+import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
@@ -23,7 +25,7 @@ import androidx.glance.appwidget.action.actionSendBroadcast
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.appwidget.background
 import androidx.glance.appwidget.cornerRadius
-import androidx.glance.appwidget.unit.ColorProvider
+import androidx.glance.appwidget.provideContent
 import androidx.glance.currentState
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
@@ -36,7 +38,9 @@ import androidx.glance.layout.padding
 import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.Text
+import androidx.glance.text.TextDefaults
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import kotlinx.coroutines.runBlocking
 import ru.debajo.srrradio.R
 import ru.debajo.srrradio.service.PlaybackBroadcastReceiver
@@ -45,8 +49,14 @@ import ru.debajo.srrradio.ui.model.UiStationPlayingState
 
 class PlayerWidget : GlanceAppWidget() {
 
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        provideContent {
+            Content()
+        }
+    }
+
     @Composable
-    override fun Content() {
+    private fun Content() {
         val padding = 4.dp
         val context = LocalContext.current
         val glanceId = LocalGlanceId.current
@@ -136,7 +146,7 @@ class PlayerWidget : GlanceAppWidget() {
                         PlaybackButton(modifier = GlanceModifier.size(buttonSize)) {
                             CircularProgressIndicator(
                                 modifier = GlanceModifier.size(buttonSize).padding(4.dp),
-                                color = ColorProvider(Color.White, Color.White)
+                                color = ColorProvider(Color.White)
                             )
                         }
                     }
@@ -182,7 +192,7 @@ class PlayerWidget : GlanceAppWidget() {
             modifier = modifier,
             text = text,
             style = TextStyle(
-                color = color?.let { ColorProvider(color, color) },
+                color = color?.let { ColorProvider(color) } ?: TextDefaults.defaultTextColor,
                 fontSize = fontSize
             ),
             maxLines = maxLines

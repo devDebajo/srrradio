@@ -5,15 +5,6 @@ apply plugin: 'kotlinx-serialization'
 android {
     namespace "ru.debajo.srrradio.data"
 
-    buildFeatures {
-        buildConfig true
-    }
-
-    buildTypes {
-        releaseApk {
-        }
-    }
-
     defaultConfig {
         Properties properties = new Properties()
         if (project.rootProject.file("local.properties").canRead()) {
