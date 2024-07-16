@@ -5,4 +5,5 @@ import ru.debajo.srrradio.domain.preference.BooleanPreference
 
 class SendingErrorsPreference(sharedPreferences: SharedPreferences) : BooleanPreference(sharedPreferences) {
     override val key: String = "SendingErrorsManager"
+    override fun defaultValue(): Boolean = true
 }
